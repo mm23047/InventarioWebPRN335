@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html">
+
+<h:head>
+    <title>Tipo Producto Generico </title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: black;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .btn-all {
+            background-color: dodgerblue;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn-all:hover {
+            background-color: darkblue;
+        }
+        #detalle {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+        }
+        #detalle h2 {
+            color: black;
+        }
+
+    </style>
+</h:head>
+
+<h:body>
+    <h1 align="center">TIPO PRODUCTO GENERICO</h1>
+
+    <!-- ===== Panel LISTA (se muestra solo cuando NO hay registro seleccionado/creando) ===== -->
+    <h:panelGroup id="pnlTabla" rendered="#{tipoProductoFrm.estado=='NADA'}">
+        <h:form id="frmTable">
+            <h:dataTable id="tbl" value="#{tipoProductoFrm.modelo}" var="r">
+
+                <h:column>
+                    <f:facet name="header">ID</f:facet>
+                    <h:outputText value="#{r.id}"/>
+                </h:column>
+
+                <h:column>
+                    <f:facet name="header">Nombre</f:facet>
+                    <h:outputText value="#{r.nombre}"/>
+                </h:column>
+
+                <h:column>
+                    <f:facet name="header">Estado</f:facet>
+                    <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}"/>
+                </h:column>
+
+                <h:column>
+                    <f:facet name="header">Comentarios</f:facet>
+                    <h:outputText value="#{r.comentarios}"/>
+                </h:column>
+
+                <h:column>
+                    <h:commandButton value="Seleccionar"
+                                     action="#{frmTipoProductoGenerico.btnSeleccionarRegistroHandler(r.id)}"
+                                     styleClass="btn-all">
+                        <!-- Al seleccionar, ocultar tabla y mostrar detalle -->
+                        <f:ajax execute="@form" render=":pnlTabla :pnlDetalle"/>
+                    </h:commandButton>
+                </h:column>
+            </h:dataTable>
+
+            <h:panelGroup>
+                <h:commandButton value="Nuevo"
+                                 actionListener="#{frmTipoProductoGenerico.btnNuevoHandler}"
+                                 styleClass="btn-all">
+                    <!-- Al nuevo, ocultar tabla y mostrar detalle -->
+                    <f:ajax execute="@this" render=":pnlTabla :pnlDetalle"/>
+                </h:commandButton>
+            </h:panelGroup>
+        </h:form>
+    </h:panelGroup>
+
+    <!-- ===== Panel DETALLE (se muestra solo cuando SÍ hay registro) ===== -->
+    <h:panelGroup id="pnlDetalle" layout="block">
+        <h:form id="frmDetalle" rendered="#{not empty frmTipoProductoGenerico.registro}">
+            <div id="detalle">
+                <h2>Detalle de Tipo de Producto</h2>
+
+                <h:panelGrid columns="2">
+
+                    <h:outputLabel value="ID" for="txtId"/>
+                    <h:inputText id="txtId" value="#{frmTipoProductoGenerico.registro.id}" readonly="true" disabled="true"/>
+
+                    <h:outputLabel value="Nombre" for="txtNombre"/>
+                    <h:inputText size="70" id="txtNombre" value="#{frmTipoProductoGenerico.registro.nombre}"/>
+
+                    <h:outputLabel for="chkActivo" value="Activo"/>
+                    <h:selectBooleanCheckbox id="chkActivo" value="#{frmTipoProductoGenerico.registro.activo}"/>
+
+                    <h:outputLabel for="txtComentarios" value="Comentarios"/>
+                    <h:inputTextarea id="txtComentarios" value="#{frmTipoProductoGenerico.registro.comentarios}" cols="70" rows="3"/>
+                </h:panelGrid>
+
+                <h:panelGrid>
+                    <h:messages showSummary="true" showDetail="true"/>
+
+                    <h:panelGroup>
+                        <h:commandButton value="Guardar"
+                                         actionListener="#{frmTipoProductoGenerico.btnGuardarHandler}"
+                                         styleClass="btn-all"
+                                         rendered="#{frmTipoProductoGenerico.estado=='CREAR'}">
+                            <f:ajax execute="@form" render=":pnlTabla :pnlDetalle"/>
+                        </h:commandButton>
+
+                        <h:commandButton value="Modificar"
+                                         actionListener="#{frmTipoProductoGenerico.btnModificarHandler}"
+                                         styleClass="btn-all"
+                                         rendered="#{frmTipoProductoGenerico.estado=='MODIFICAR'}">
+                            <f:ajax execute="@form" render=":pnlTabla :pnlDetalle"/>
+                        </h:commandButton>
+
+                        <h:commandButton value="Eliminar"
+                                         actionListener="#{frmTipoProductoGenerico.btnEliminarHandler}"
+                                         styleClass="btn-all"
+                                         rendered="#{frmTipoProductoGenerico.estado=='MODIFICAR'}">
+                            <f:ajax execute="@form" render=":pnlTabla :pnlDetalle"/>
+                        </h:commandButton>
+
+                        <!-- Cancelar dentro del detalle para volver a la lista -->
+                        <h:commandButton value="Cancelar"
+                                         actionListener="#{frmTipoProductoGenerico.btnCancelarHandler}"
+                                         styleClass="btn-all">
+                            <f:ajax execute="@this" render=":pnlTabla :pnlDetalle"/>
+                        </h:commandButton>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </div>
+        </h:form>
+    </h:panelGroup>
+</h:body>
+</html>

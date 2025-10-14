@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>#{TipoProductoFrm.nombreBean}</title>
+    <h:outputStylesheet library="estilos" name="crud.css"/>
+</h:head>
+<h:body>
+    <main>
+        <article>
+            <h:panelGroup id="pnlTable">
+                <h:panelGrid>
+                    <h:form id="frmTop">
+                        <h:dataTable id="table-top">
+                            lazy="true"
+                            rendered="#{tipoProductoFrm.estado=='NADA'}"
+                            rows="#{tipoProductoFrm.pageSize}"
+                            paginator="true"
+                            paginatorPosition="bottom"
+                            value="#{tipoProductoFrm.modelo}"
+                            var="reg"
+                            selection="#{tipoProductoFrm.registro}"
+                            selectionMode="single"
+
+                            <p:column headerText="ID">
+                                <h:outputText value="#{reg.id}"/>
+                            </p:column>
+                            <p:column headerText="Tipo">
+                                <h:outputText rendered="#{empty reg.idTipoProductoPadre}" value="NINGUNO"/>
+                                <h:outputText rendered="#{not empty reg.idTipoProductoPadre}"
+                                              value="#{tipoProductoFrm.getAncestrosAsString(reg)}"/>
+                            </p:column>
+                            <p:column headerText="Nombre">
+                                <h:outputText value="#{reg.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Estado">
+                                <h:outputText value="#{reg.activo?'Activo':'Inactivo'}"/>
+                            </p:column>
+                            <p:column headerText="Observaciones">
+                                <h:outputText value="#{reg.comentarios}"/>
+                            </p:column>
+                        </h:dataTable>
+
+
+
+
+<p:commandButton id="btnNuevo" value="Nuevo"
+                 rendered="#{tipoProductoFrm.estado=='NADA'}"
+                 actionListener="#{tipoProductoFrm.btnNuevoHandler}" update="pnlDetalle :pnlTable">
+
+</p:commandButton>
+<p:commandButton id="btnCancelar" value="Cancelar"
+                    rendered="#{tipoProductoFrm.estado!='NADA'}"
+                    actionListener="#{tipoProductoFrm.btnCancelarHandler}" update="pnlDetalle :pnlTable">
+
+</p:commandButton>
+                    </h:form>
+                    <p:messages showSummary="true" showDetail="true"/>
+                </h:panelGrid>
+            </h:panelGroup>
+            <h:panelGroup id="pnlDetalle">
+                <h:form id="frmCrear" rendered="#{tipoProductoFrm.estado!='NADA'}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="txtId" value="ID:"/>
+                        <p:inputText id="txtId" value="#{tipoProductoFrm.registro.id}" readonly="true" disabled="true"/>
+                        <p:outputLabel for="txtNombre" value="Nombre:"/>
+                        <p:inputText id="txtNombre" value="#{tipoProductoFrm.registro.nombre}" size="75"/>
+                        <p:outputLabel for="chkActivo" value="Activo:"/>
+                        <h:selectBooleanCheckbox id="chkActivo" value="#{tipoProductoFrm.registro.activo}"/>
+                        <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                        <p:inputTextarea id="txtObservaciones" value="#{tipoProductoFrm.registro.comentarios}" rows="4"
+                                         cols="50"/>
+                        </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                            <p:commandButton value="Crear" actionListener="#{tipoProductoFrm.btnGuardarHandler}"
+                                                             rendered="#{tipoProductoFrm.estado=='CREAR'}"
+                                                             update=":pnlTable :pnlDetalle"/>
+
+                                            <p:commandButton value="Modificar" actionListener="#{tipoProductoFrm.btnModificarHandler}"
+                                                             rendered="#{tipoProductoFrm.estado=='MODIFICAR'}"
+                                                             update=":pnlTable :pnlDetalle"/>
+
+                                            <p:commandButton value="Eliminar" actionListener="#{tipoProductoFrm.btnEliminarHandler}"
+                                             rendered="#{tipoProductoFrm.estado=='MODIFICAR'}"
+                                             update=":pnlTable :pnlDetalle"/>
+
+                        </h:panelGrid>
+                </h:form>
+            </h:panelGroup>
+        </article>
+<header>
+<h1>#{TipoProductoFrm.nombreBean}</h1>
+</header>
+<nav>
+menu navegacion
+</nav>
+<footer>
+2025  - Mi Aplicación
+</footer>
+    </main>
+</h:body>
+</html>
+
+
+
