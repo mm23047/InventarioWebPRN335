@@ -100,7 +100,7 @@ public abstract class DefaultFrm<T> implements Serializable {
         }
     }
 
-    public void selectioHandler(SelectEvent<T> r) {
+    public void selectionHandler(SelectEvent<T> r) {
         if(r!=null){
             this.estado = ESTADO_CRUD.MODIFICAR;
         }

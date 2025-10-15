@@ -15,7 +15,7 @@
             <h:panelGroup id="pnlTable">
                 <h:panelGrid>
                     <h:form id="frmTop">
-                        <h:dataTable id="table-top">
+                        <p:dataTable id="table-top">
                             lazy="true"
                             rendered="#{tipoProductoFrm.estado=='NADA'}"
                             rows="#{tipoProductoFrm.pageSize}"
@@ -26,6 +26,7 @@
                             selection="#{tipoProductoFrm.registro}"
                             selectionMode="single"
 
+                            <p:ajax event="rowSelect" listener="#{tipoProductoFrm.selectionHandler}" update=":pnlDetalle :pnlTable"/>
                             <p:column headerText="ID">
                                 <h:outputText value="#{reg.id}"/>
                             </p:column>
@@ -43,7 +44,7 @@
                             <p:column headerText="Observaciones">
                                 <h:outputText value="#{reg.comentarios}"/>
                             </p:column>
-                        </h:dataTable>
+                        </p:dataTable>
 
 
 
