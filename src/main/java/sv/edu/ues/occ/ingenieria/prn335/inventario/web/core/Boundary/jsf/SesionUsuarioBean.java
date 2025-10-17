@@ -18,17 +18,29 @@ public class SesionUsuarioBean implements Serializable {
 
     @Inject
     FacesContext facesContext;
-    Map<String, Locale >idiomas = new HashMap<>();
+    Map<String, Locale >idiomasDisponibles = new HashMap<>();
     String idiomaSeleccionado;
 
     @PostConstruct
     public void inicializar() {
-        idiomas.put("English", new Locale("en", "US"));
-        idiomas.put("Spanish", new Locale("es", "ES"));
+       idiomasDisponibles.put("English", Locale.ENGLISH);
+       Locale espa = new Locale("es");
+       idiomasDisponibles.put("Español", espa);
+       this.idiomaSeleccionado = espa.toString();
     }
 
-    public Map<String, Locale> getIdiomas() {
-        return idiomas;
+
+    public void cambiarIdioma(ValueChangeEvent event) {
+        String idioma = event.getNewValue().toString();
+        for (Map.Entry<String, Locale> entry : idiomasDisponibles.entrySet()) {
+            if (entry.getKey().equals(idioma)) {
+                facesContext.getViewRoot().setLocale(entry.getValue());
+            }
+        }
+    }
+
+    public Map<String, Locale> getIdiomasDisponibles() {
+        return idiomasDisponibles;
     }
 
     public String getIdiomaSeleccionado() {
@@ -39,13 +51,6 @@ public class SesionUsuarioBean implements Serializable {
         this.idiomaSeleccionado = idiomaSeleccionado;
     }
 
-    public void cambiarIdioma(ValueChangeEvent event) {
-        String idioma = event.getNewValue().toString();
-        for (Map.Entry<String, Locale> entry : idiomas.entrySet()) {
-            if (entry.getKey().equals(idioma)) {
-                facesContext.getViewRoot().setLocale(entry.getValue());
-            }
-        }
-    }
+
 
 }

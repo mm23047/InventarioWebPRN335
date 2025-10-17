@@ -6,9 +6,9 @@
 
     <application>
         <locale-config>
-            <default-locale>en</default-locale>
-            <supported-locale>es</supported-locale>
+            <default-locale>es</default-locale>
             <supported-locale>en</supported-locale>
+            <supported-locale>es</supported-locale>
         </locale-config>
         <resource-bundle>
             <base-name>crud</base-name>

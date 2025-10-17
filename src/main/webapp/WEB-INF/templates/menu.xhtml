@@ -1,22 +1,22 @@
 <ui:composition
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
         xmlns:p="http://primefaces.org/ui"
-        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:f="jakarta.faces.core"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns="http://www.w3.org/1999/xhtml"
 >
     <h:panelGrid>
         <h:form id="frmSeleccionarIdioma">
             <p:selectOneMenu value="#{sesionUsuarioBean.idiomaSeleccionado}"
-                             valueChangeListener="#{sesionUsuarioBean.cambiarIdioma}">
+                            valueChangeListener="#{sesionUsuarioBean.cambiarIdioma}"
+            >
 
-                <f:selectItem noSelectionOption="true" itemValue="#{null}" itemLabel="Idioma"/>
-                <f:selectItems value="#{sesionUsuarioBean.idiomas.entrySet()}"
+                <f:selectItems value="#{sesionUsuarioBean.idiomasDisponibles}"
                                var="idioma"
-                               itemLabel="#{idioma.key}"
-                               itemValue="#{idioma.key}"/>
-                <p:ajax execute="@form" render="@all"/>
-
+                               itemLabel="#{idioma}"
+                               itemValue="#{idioma}"
+                />
+                <f:ajax execute=" @this" render="@all" />
             </p:selectOneMenu>
         </h:form>
         <p:menu>

@@ -1,0 +1,111 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:ues="jakarta.faces.composite/ues"
+        template="../WEB-INF/templates/default.xhtml">
+
+    <!-- Header -->
+    <ui:define name="header">
+        <h1>#{proveedorFrm.nombreBean}</h1>
+    </ui:define>
+
+    <!-- Tabla de registros -->
+    <ui:define name="contenido-tabla">
+        <h:panelGrid>
+            <h:form id="frmTop">
+                <p:dataTable value="#{proveedorFrm.modelo}" var="r"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             lazy="true"
+                             selection="#{proveedorFrm.registro}"
+                             selectionMode="single"
+                             rows="#{proveedorFrm.registrosPorPagina}"
+                             rendered="#{proveedorFrm.estado=='NADA'}">
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{r.id}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{r.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Razón Social">
+                        <h:outputText value="#{r.razonSocial}" />
+                    </p:column>
+
+                    <p:column headerText="NIT">
+                        <h:outputText value="#{r.nit}" />
+                    </p:column>
+
+                    <p:column headerText="Estado">
+                        <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
+                    </p:column>
+
+                    <p:column headerText="Observaciones">
+                        <h:outputText value="#{r.observaciones}" />
+                    </p:column>
+
+                    <p:ajax event="rowSelect"
+                            listener="#{proveedorFrm.seleccionarRegistro}"
+                            update=":pnlTabla :pnlDetalle"/>
+                </p:dataTable>
+
+                <ues:botones-top formulario="#{proveedorFrm}" />
+            </h:form>
+        </h:panelGrid>
+    </ui:define>
+
+    <!-- Detalle (formulario de edición/creación) -->
+    <ui:define name="contenido-detalle">
+        <h:form id="frmCrear" rendered="#{proveedorFrm.estado!='NADA'}">
+            <h:panelGrid columns="2">
+
+                <p:outputLabel for="txtId" value="ID:"/>
+                <p:inputText id="txtId" value="#{proveedorFrm.registro.id}" readonly="true" disabled="true"/>
+
+                <p:outputLabel for="txtNombre" value="Nombre:"/>
+                <p:inputText id="txtNombre" value="#{proveedorFrm.registro.nombre}"
+                             size="75" required="true"
+                             validator="#{proveedorFrm.validarnombre}"/>
+
+                <p:outputLabel for="txtRazonSocial" value="Razón Social:"/>
+                <p:inputText id="txtRazonSocial" value="#{proveedorFrm.registro.razonSocial}"
+                             size="75" maxlength="155"/>
+
+                <p:outputLabel for="txtNit" value="NIT:"/>
+                <p:inputText id="txtNit" value="#{proveedorFrm.registro.nit}"
+                             size="20" maxlength="14"/>
+
+                <p:outputLabel for="chkActivo" value="Activo:"/>
+                <p:selectBooleanCheckbox id="chkActivo" value="#{proveedorFrm.registro.activo}"/>
+
+                <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                <p:inputTextarea id="txtObservaciones"
+                                 value="#{proveedorFrm.registro.observaciones}"
+                                 rows="4" cols="50"/>
+            </h:panelGrid>
+
+            <h:panelGrid columns="#{proveedorFrm.estado=='MODIFICAR' ? 1 : 2}">
+                <p:commandButton value="Guardar"
+                                 actionListener="#{proveedorFrm.btnGuardarHandler}"
+                                 rendered="#{proveedorFrm.estado=='CREAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="Modificar"
+                                 actionListener="#{proveedorFrm.btnModificarHandler}"
+                                 rendered="#{proveedorFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="Eliminar"
+                                 actionListener="#{proveedorFrm.btnEliminarHandler}"
+                                 rendered="#{proveedorFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
