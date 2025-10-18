@@ -1,0 +1,101 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:ues="jakarta.faces.composite/ues"
+        template="../WEB-INF/templates/default.xhtml">
+
+   <!-- Header -->
+   <ui:define name="header">
+      <h1>#{productoFrm.nombreBean}</h1>
+   </ui:define>
+
+   <!-- Tabla de registros -->
+   <ui:define name="contenido-tabla">
+      <h:panelGrid>
+         <h:form id="frmTop">
+            <p:dataTable value="#{productoFrm.modelo}" var="r"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         lazy="true"
+                         selection="#{productoFrm.registro}"
+                         selectionMode="single"
+                         rows="#{productoFrm.registrosPorPagina}"
+                         rendered="#{productoFrm.estado=='NADA'}">
+
+               <p:column headerText="ID">
+                  <h:outputText value="#{r.id}" />
+               </p:column>
+
+               <p:column headerText="Nombre">
+                  <h:outputText value="#{r.nombreProducto}" />
+               </p:column>
+
+               <p:column headerText="Referencia">
+                  <h:outputText value="#{r.referenciaExterna}" />
+               </p:column>
+
+               <p:column headerText="Comentarios">
+                  <h:outputText value="#{r.comentarios}" />
+               </p:column>
+
+               <p:column headerText="Activo">
+                  <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
+               </p:column>
+
+               <p:ajax event="rowSelect"
+                       listener="#{productoFrm.seleccionarRegistro}"
+                       update=":pnlTabla :pnlDetalle"/>
+            </p:dataTable>
+
+            <!-- Botones tipo composite -->
+            <ues:botones-top formulario="#{productoFrm}" />
+         </h:form>
+      </h:panelGrid>
+   </ui:define>
+
+   <!-- Detalle (formulario de edición/creación) -->
+   <ui:define name="contenido-detalle">
+      <h:form id="frmCrear" rendered="#{productoFrm.estado!='NADA'}">
+         <h:panelGrid columns="2">
+
+            <p:outputLabel for="txtId" value="ID:"/>
+            <p:inputText id="txtId" value="#{productoFrm.registro.id}" readonly="true" disabled="true"/>
+
+            <p:outputLabel for="txtNombre" value="Nombre Producto:"/>
+            <p:inputText id="txtNombre" value="#{productoFrm.registro.nombreProducto}" size="75"/>
+
+            <p:outputLabel for="txtReferencia" value="Referencia Externa:"/>
+            <p:inputText id="txtReferencia" value="#{productoFrm.registro.referenciaExterna}" size="50"/>
+
+            <p:outputLabel for="txtComentarios" value="Comentarios:"/>
+            <p:inputTextarea id="txtComentarios"
+                             value="#{productoFrm.registro.comentarios}"
+                             rows="4" cols="50"/>
+
+            <p:outputLabel for="chkActivo" value="Activo:"/>
+            <p:selectBooleanCheckbox id="chkActivo" value="#{productoFrm.registro.activo}"/>
+         </h:panelGrid>
+
+         <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
+            <p:commandButton value="Crear"
+                             actionListener="#{productoFrm.btnGuardarHandler}"
+                             rendered="#{productoFrm.estado=='CREAR'}"
+                             update=":pnlTabla :pnlDetalle"/>
+
+            <p:commandButton value="Modificar"
+                             actionListener="#{productoFrm.btnModificarHandler}"
+                             rendered="#{productoFrm.estado=='MODIFICAR'}"
+                             update=":pnlTabla :pnlDetalle"/>
+
+            <p:commandButton value="Eliminar"
+                             actionListener="#{productoFrm.btnEliminarHandler}"
+                             rendered="#{productoFrm.estado=='MODIFICAR'}"
+                             update=":pnlTabla :pnlDetalle"/>
+         </h:panelGrid>
+      </h:form>
+   </ui:define>
+
+</ui:composition>
