@@ -10,34 +10,28 @@
 
     <!-- Header -->
     <ui:define name="header">
-        <h1>#{tipoProductoFrm.nombreBean}</h1>
+        <h1>#{almacenFrm.nombreBean}</h1>
     </ui:define>
 
     <!-- Tabla de registros -->
     <ui:define name="contenido-tabla">
         <h:panelGrid>
             <h:form id="frmTop">
-                <p:dataTable value="#{tipoProductoFrm.modelo}" var="r"
+                <p:dataTable value="#{almacenFrm.modelo}" var="r"
                              paginator="true"
                              paginatorPosition="bottom"
                              lazy="true"
-                             selection="#{tipoProductoFrm.registro}"
+                             selection="#{almacenFrm.registro}"
                              selectionMode="single"
-                             rows="#{tipoProductoFrm.registrosPorPagina}"
-                             rendered="#{tipoProductoFrm.estado=='NADA'}">
+                             rows="#{almacenFrm.registrosPorPagina}"
+                             rendered="#{almacenFrm.estado=='NADA'}">
 
                     <p:column headerText="ID">
                         <h:outputText value="#{r.id}" />
                     </p:column>
 
-                    <p:column headerText="Tipo">
-                        <h:outputText rendered="#{empty r.idTipoProductoPadre}" value="NINGUNO"/>
-                        <h:outputText rendered="#{not empty r.idTipoProductoPadre}"
-                                      value="#{tipoProductoFrm.getAncestrosAsString(r)}"/>
-                    </p:column>
-
-                    <p:column headerText="Nombre">
-                        <h:outputText value="#{r.nombre}" />
+                    <p:column headerText="Tipo Almacén">
+                        <h:outputText value="#{r.idTipoAlmacen.nombre}" />
                     </p:column>
 
                     <p:column headerText="Estado">
@@ -45,53 +39,60 @@
                     </p:column>
 
                     <p:column headerText="Observaciones">
-                        <h:outputText value="#{r.comentarios}" />
+                        <h:outputText value="#{r.observaciones}" />
                     </p:column>
 
                     <p:ajax event="rowSelect"
-                            listener="#{tipoProductoFrm.seleccionarRegistro}"
+                            listener="#{almacenFrm.seleccionarRegistro}"
                             update=":pnlTabla :pnlDetalle"/>
                 </p:dataTable>
 
-                <ues:botones-top formulario="#{tipoProductoFrm}" />
+                <ues:botones-top formulario="#{almacenFrm}" />
             </h:form>
         </h:panelGrid>
     </ui:define>
 
     <!-- Detalle (formulario de edición/creación) -->
     <ui:define name="contenido-detalle">
-        <h:form id="frmCrear" rendered="#{tipoProductoFrm.estado!='NADA'}">
+        <h:form id="frmCrear" rendered="#{almacenFrm.estado!='NADA'}">
             <h:panelGrid columns="2">
 
                 <p:outputLabel for="txtId" value="ID:"/>
-                <p:inputText id="txtId" value="#{tipoProductoFrm.registro.id}" readonly="true" disabled="true"/>
+                <p:inputText id="txtId" value="#{almacenFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="txtNombre" value="Nombre:"/>
-                <p:inputText id="txtNombre" value="#{tipoProductoFrm.registro.nombre}" size="75"/>
+                <p:outputLabel for="cmbTipoAlmacen" value="Tipo Almacén:"/>
+                <p:selectOneMenu id="cmbTipoAlmacen" value="#{almacenFrm.registro.idTipoAlmacen}"
+                                 converter="#{tipoAlmacenConverter}" required="true">
+                    <f:selectItem itemLabel="Seleccione..." itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{almacenFrm.listaTipoAlmacen}"
+                                   var="ta"
+                                   itemLabel="#{ta.nombre}"
+                                   itemValue="#{ta}"/>
+                </p:selectOneMenu>
 
                 <p:outputLabel for="chkActivo" value="Activo:"/>
-                <p:selectBooleanCheckbox id="chkActivo" value="#{tipoProductoFrm.registro.activo}"/>
+                <p:selectBooleanCheckbox id="chkActivo" value="#{almacenFrm.registro.activo}"/>
 
                 <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
                 <p:inputTextarea id="txtObservaciones"
-                                 value="#{tipoProductoFrm.registro.comentarios}"
+                                 value="#{almacenFrm.registro.observaciones}"
                                  rows="4" cols="50"/>
             </h:panelGrid>
 
-            <h:panelGrid columns="#{tipoProductoFrm.estado=='MODIFICAR' ? 1 : 2}">
+            <h:panelGrid columns="#{almacenFrm.estado=='MODIFICAR' ? 1 : 2}">
                 <p:commandButton value="Crear"
-                                 actionListener="#{tipoProductoFrm.btnGuardarHandler}"
-                                 rendered="#{tipoProductoFrm.estado=='CREAR'}"
+                                 actionListener="#{almacenFrm.btnGuardarHandler}"
+                                 rendered="#{almacenFrm.estado=='CREAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
                 <p:commandButton value="Modificar"
-                                 actionListener="#{tipoProductoFrm.btnModificarHandler}"
-                                 rendered="#{tipoProductoFrm.estado=='MODIFICAR'}"
+                                 actionListener="#{almacenFrm.btnModificarHandler}"
+                                 rendered="#{almacenFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
                 <p:commandButton value="Eliminar"
-                                 actionListener="#{tipoProductoFrm.btnEliminarHandler}"
-                                 rendered="#{tipoProductoFrm.estado=='MODIFICAR'}"
+                                 actionListener="#{almacenFrm.btnEliminarHandler}"
+                                 rendered="#{almacenFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
             </h:panelGrid>
         </h:form>
