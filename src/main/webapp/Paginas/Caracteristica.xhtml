@@ -9,7 +9,7 @@
 
     <!-- Header -->
     <ui:define name="header">
-        <h1>#{caracteristicaFrm.nombreBean}</h1>
+        <h1>#{crud['frm.botones.caracteristica']}</h1>
     </ui:define>
 
     <!-- Tabla de registros -->
@@ -29,19 +29,19 @@
                         <h:outputText value="#{r.id}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="#{crud['frm.botones.nombre']}">
                         <h:outputText value="#{r.nombre}" />
                     </p:column>
 
-                    <p:column headerText="Tipo Unidad Medida">
+                    <p:column headerText="#{crud['frm.botones.tipoUnidadMedida']}">
                         <h:outputText value="#{r.idTipoUnidadMedida.nombre}" />
                     </p:column>
 
-                    <p:column headerText="Estado">
+                    <p:column headerText="#{crud['frm.botones.estado']}">
                         <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                     </p:column>
 
-                    <p:column headerText="Descripción">
+                    <p:column headerText="#{crud['frm.botones.descripcion']}">
                         <h:outputText value="#{r.descripcion}" />
                     </p:column>
 
@@ -63,12 +63,12 @@
                 <p:outputLabel for="txtId" value="ID:"/>
                 <p:inputText id="txtId" value="#{caracteristicaFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="txtNombre" value="Nombre:"/>
+                <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
                 <p:inputText id="txtNombre" value="#{caracteristicaFrm.registro.nombre}"
                              required="true"
                              validator="#{caracteristicaFrm.validarnombre}"/>
 
-                <p:outputLabel for="ddlTipoUnidadMedida" value="Tipo Unidad Medida:"/>
+                <p:outputLabel for="ddlTipoUnidadMedida" value="#{crud['frm.botones.tipoUnidadMedida']}:"/>
                 <p:selectOneMenu id="ddlTipoUnidadMedida" value="#{caracteristicaFrm.registro.idTipoUnidadMedida}">
                     <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" />
                     <f:selectItems value="#{caracteristicaFrm.listaTipoUnidadMedida}"
@@ -77,27 +77,27 @@
                                    itemValue="#{tum}" />
                 </p:selectOneMenu>
 
-                <p:outputLabel for="chkActivo" value="Activo:"/>
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.estado']}:"/>
                 <p:selectBooleanCheckbox id="chkActivo" value="#{caracteristicaFrm.registro.activo}"/>
 
-                <p:outputLabel for="txtDescripcion" value="Descripción:"/>
+                <p:outputLabel for="txtDescripcion" value="#{crud['frm.botones.descripcion']}:"/>
                 <p:inputTextarea id="txtDescripcion"
                                  value="#{caracteristicaFrm.registro.descripcion}"
                                  rows="4" cols="50"/>
             </h:panelGrid>
 
             <h:panelGrid columns="#{caracteristicaFrm.estado=='MODIFICAR' ? 1 : 2}">
-                <p:commandButton value="Guardar"
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
                                  actionListener="#{caracteristicaFrm.btnGuardarHandler}"
                                  rendered="#{caracteristicaFrm.estado=='CREAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Modificar"
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
                                  actionListener="#{caracteristicaFrm.btnModificarHandler}"
                                  rendered="#{caracteristicaFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Eliminar"
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                  actionListener="#{caracteristicaFrm.btnEliminarHandler}"
                                  rendered="#{caracteristicaFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>

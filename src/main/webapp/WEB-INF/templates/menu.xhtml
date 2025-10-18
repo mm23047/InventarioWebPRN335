@@ -27,14 +27,15 @@
         <f:facet name="options">
             <h:form id="frmSeleccionarIdioma" style="margin-right: 1rem;">
                 <p:selectOneMenu value="#{sesionUsuarioBean.idiomaSeleccionado}"
-                                 valueChangeListener="#{sesionUsuarioBean.cambiarIdioma}"
-                                 style="min-width: 150px;"
-                                 title="Cambiar idioma">
-                    <f:selectItems value="#{sesionUsuarioBean.idiomasDisponibles}"
+                                 valueChangeListener="#{sesionUsuarioBean.cambiarIdioma}">
+
+                    <f:selectItem noSelectionOption="true" itemValue="#{null}" itemLabel="Idioma"/>
+                    <f:selectItems value="#{sesionUsuarioBean.idiomasDisponibles.entrySet()}"
                                    var="idioma"
-                                   itemLabel="#{idioma}"
-                                   itemValue="#{idioma}" />
-                    <f:ajax execute="@this" render="@all" />
+                                   itemLabel="#{idioma.key}"
+                                   itemValue="#{idioma.key}"/>
+                    <f:ajax execute="@form" render="@all"/>
+
                 </p:selectOneMenu>
             </h:form>
         </f:facet>
