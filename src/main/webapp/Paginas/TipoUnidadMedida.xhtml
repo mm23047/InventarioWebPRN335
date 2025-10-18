@@ -9,7 +9,7 @@
 
     <!-- Header -->
     <ui:define name="header">
-        <h1>#{tipoUnidadMedidaFrm.nombreBean}</h1>
+        <h1>#{crud['frm.botones.tipoUnidadMedida']}</h1>
     </ui:define>
 
     <!-- Tabla de registros -->
@@ -29,19 +29,19 @@
                         <h:outputText value="#{r.id}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="#{crud['frm.botones.nombre']}">
                         <h:outputText value="#{r.nombre}" />
                     </p:column>
 
-                    <p:column headerText="Unidad Base">
+                    <p:column headerText="#{crud['frm.botones.unidadBase']}">
                         <h:outputText value="#{r.unidadBase}" />
                     </p:column>
 
-                    <p:column headerText="Estado">
+                    <p:column headerText="#{crud['frm.botones.estado']}">
                         <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                     </p:column>
 
-                    <p:column headerText="Comentarios">
+                    <p:column headerText="#{crud['frm.botones.comentarios']}">
                         <h:outputText value="#{r.comentarios}" />
                     </p:column>
 
@@ -63,36 +63,36 @@
                 <p:outputLabel for="txtId" value="ID:"/>
                 <p:inputText id="txtId" value="#{tipoUnidadMedidaFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="txtNombre" value="Nombre:"/>
+                <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
                 <p:inputText id="txtNombre" value="#{tipoUnidadMedidaFrm.registro.nombre}"
                              size="75" required="true"
                              validator="#{tipoUnidadMedidaFrm.validarnombre}"/>
 
-                <p:outputLabel for="txtUnidadBase" value="Unidad Base:"/>
+                <p:outputLabel for="txtUnidadBase" value="#{crud['frm.botones.unidadBase']}:"/>
                 <p:inputText id="txtUnidadBase" value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
                              size="75" maxlength="155"/>
 
-                <p:outputLabel for="chkActivo" value="Activo:"/>
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
                 <p:selectBooleanCheckbox id="chkActivo" value="#{tipoUnidadMedidaFrm.registro.activo}"/>
 
-                <p:outputLabel for="txtComentarios" value="Comentarios:"/>
+                <p:outputLabel for="txtComentarios" value="#{crud['frm.botones.comentarios']}:"/>
                 <p:inputTextarea id="txtComentarios"
                                  value="#{tipoUnidadMedidaFrm.registro.comentarios}"
                                  rows="4" cols="50"/>
             </h:panelGrid>
 
             <h:panelGrid columns="#{tipoUnidadMedidaFrm.estado=='MODIFICAR' ? 1 : 2}">
-                <p:commandButton value="Guardar"
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
                                  actionListener="#{tipoUnidadMedidaFrm.btnGuardarHandler}"
                                  rendered="#{tipoUnidadMedidaFrm.estado=='CREAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Modificar"
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
                                  actionListener="#{tipoUnidadMedidaFrm.btnModificarHandler}"
                                  rendered="#{tipoUnidadMedidaFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Eliminar"
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                  actionListener="#{tipoUnidadMedidaFrm.btnEliminarHandler}"
                                  rendered="#{tipoUnidadMedidaFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
