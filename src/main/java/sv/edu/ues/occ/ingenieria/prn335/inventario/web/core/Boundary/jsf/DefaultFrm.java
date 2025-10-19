@@ -135,7 +135,7 @@ public abstract class DefaultFrm<T> implements Serializable {
         try{
             if(registro!=null){
                 getDao().crear(registro);
-                enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.creado"));
+                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.creado"));
                 this.estado= ESTADO_CRUD.NADA;
                 this.registro=null;
                 this.inicializarRegistros();
