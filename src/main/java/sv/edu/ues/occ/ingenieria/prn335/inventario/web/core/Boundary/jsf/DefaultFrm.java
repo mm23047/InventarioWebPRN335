@@ -120,7 +120,7 @@ public abstract class DefaultFrm<T> implements Serializable {
             configurarNuevoRegistro();
 
             // Informar al usuario que el formulario está listo
-            enviarMensajeExito("Formulario listo para crear nuevo registro");
+            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.formListo"));
 
         } catch (Exception e) {
             enviarMensajeError("Error al preparar nuevo registro: " + e.getMessage());
@@ -156,7 +156,7 @@ public abstract class DefaultFrm<T> implements Serializable {
             limpiarFormulario();
 
             // Informar al usuario que la operación se canceló
-            enviarMensajeExito("Operación cancelada exitosamente");
+            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opCancelar"));
 
         } catch (Exception e) {
             enviarMensajeError("Error al cancelar operación: " + e.getMessage());
@@ -189,7 +189,7 @@ public abstract class DefaultFrm<T> implements Serializable {
 
             // Actualizar la tabla y limpiar el formulario
             inicializarRegistros();
-            enviarMensajeExito("Registro modificado exitosamente");
+            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opModificar"));
             limpiarFormulario();
 
         } catch (Exception e) {
@@ -203,7 +203,7 @@ public abstract class DefaultFrm<T> implements Serializable {
             if (registro != null && getEntityId(registro) != null) {
                 getDao().eliminar(registro);
                 inicializarRegistros();
-                enviarMensajeExito("Registro eliminado exitosamente");
+                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opEliminar"));
                 limpiarFormulario();
             } else {
                 enviarMensajeError("No hay registro seleccionado para eliminar");
