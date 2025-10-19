@@ -69,12 +69,11 @@
                              validator="#{caracteristicaFrm.validarnombre}"/>
 
                 <p:outputLabel for="ddlTipoUnidadMedida" value="#{crud['frm.botones.tipoUnidadMedida']}:"/>
-                <p:selectOneMenu id="ddlTipoUnidadMedida" value="#{caracteristicaFrm.registro.idTipoUnidadMedida}">
-                    <f:selectItem itemLabel="-- Seleccione --" itemValue="#{null}" />
+                <p:selectOneMenu id="ddlTipoUnidadMedida" value="#{caracteristicaFrm.idTipoUnidadMedidaSeleccionado}">
                     <f:selectItems value="#{caracteristicaFrm.listaTipoUnidadMedida}"
-                                   var="tum"
-                                   itemLabel="#{tum.nombre}"
-                                   itemValue="#{tum}" />
+                                   var="tipo"
+                                   itemLabel="#{tipo.nombre}"
+                                   itemValue="#{tipo.id}" />
                 </p:selectOneMenu>
 
                 <p:outputLabel for="chkActivo" value="#{crud['frm.botones.estado']}:"/>

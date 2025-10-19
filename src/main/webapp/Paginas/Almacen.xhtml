@@ -60,15 +60,13 @@
                 <p:outputLabel for="txtId" value="ID:"/>
                 <p:inputText id="txtId" value="#{almacenFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="cmbTipoAlmacen" value="Tipo Almacén:"/>
-                <p:selectOneMenu id="cmbTipoAlmacen" value="#{almacenFrm.registro.idTipoAlmacen}"
-                                 converter="#{tipoAlmacenConverter}" required="true">
-                    <f:selectItem itemLabel="Seleccione..." itemValue="#{null}" noSelectionOption="true"/>
+                <p:outputLabel for="lstTipo" value="Tipo:"/>
+               <p:selectOneMenu id="lstTipo"  value="#{almacenFrm.idTipoAlmacenSeleccionado}">
                     <f:selectItems value="#{almacenFrm.listaTipoAlmacen}"
-                                   var="ta"
-                                   itemLabel="#{ta.nombre}"
-                                   itemValue="#{ta}"/>
-                </p:selectOneMenu>
+                                   var="tipo"
+                                   itemValue="#{tipo.id}"
+                                   itemLabel="#{tipo.nombre}"/>
+               </p:selectOneMenu>
 
                 <p:outputLabel for="chkActivo" value="Activo:"/>
                 <p:selectBooleanCheckbox id="chkActivo" value="#{almacenFrm.registro.activo}"/>
@@ -80,7 +78,7 @@
             </h:panelGrid>
 
             <h:panelGrid columns="#{almacenFrm.estado=='MODIFICAR' ? 1 : 2}">
-                <p:commandButton value="Crear"
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
                                  actionListener="#{almacenFrm.btnGuardarHandler}"
                                  rendered="#{almacenFrm.estado=='CREAR'}"
                                  update=":pnlTabla :pnlDetalle"/>

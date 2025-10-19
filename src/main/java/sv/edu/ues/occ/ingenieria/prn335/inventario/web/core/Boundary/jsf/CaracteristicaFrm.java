@@ -4,19 +4,21 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.primefaces.model.LazyDataModel;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CaracteristicaDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoUnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Caracteristica;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoUnidadMedida;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class CaracteristicaFrm extends DefaultFrm<Caracteristica> {
+public class CaracteristicaFrm extends DefaultFrm<Caracteristica> implements Serializable {
 
     @Inject
     CaracteristicaDAO caracteristicaDAO;
@@ -31,32 +33,49 @@ public class CaracteristicaFrm extends DefaultFrm<Caracteristica> {
     }
 
     @Override
+    protected InventarioDAOInterface<Caracteristica> getDao() {
+        return caracteristicaDAO;
+    }
+
+    @Override
+    protected Caracteristica createNewEntity() {
+        Caracteristica caracteristica = new Caracteristica();
+        caracteristica.setActivo(true);
+        if (this.listaTipoUnidadMedida != null && !this.listaTipoUnidadMedida.isEmpty()) {
+            caracteristica.setIdTipoUnidadMedida(this.listaTipoUnidadMedida.get(0));
+        }
+        return caracteristica;
+    }
+
+    @Override
     public void inicializarListas() {
-        super.inicializarListas();
-        // Cargar la lista de tipos de unidad de medida para el dropdown
         try {
-            this.listaTipoUnidadMedida = tipoUnidadMedidaDAO.findRange(0, 1000); // O usar un método específico para todos
+            this.listaTipoUnidadMedida = tipoUnidadMedidaDAO.findRange(0, Integer.MAX_VALUE);
+            Logger.getLogger(CaracteristicaFrm.class.getName()).log(Level.INFO,
+                    "Lista de tipos de unidad de medida cargada: {0} elementos",
+                    listaTipoUnidadMedida != null ? listaTipoUnidadMedida.size() : 0);
         } catch (Exception e) {
             Logger.getLogger(CaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al cargar tipos de unidad de medida", e);
+            listaTipoUnidadMedida = List.of();
         }
     }
 
     @Override
-    protected String getIdAsText(Caracteristica r) {
-        if(r != null && r.getId() != null){
-            return r.getId().toString();
+    protected String getIdAsText(Caracteristica dato) {
+        if (dato != null && dato.getId() != null) {
+            return dato.getId().toString();
         }
         return null;
     }
 
     @Override
     protected Caracteristica getIdByText(String id) {
-        if (id != null) {
+        if (id != null  && this.modelo!=null && this.modelo.getWrappedData()!=null && !this.modelo.getWrappedData().toString().isEmpty()) {
             try {
-                Integer buscado = Integer.parseInt(id);
-                return caracteristicaDAO.leer(buscado);
+                Integer buscado = Integer.valueOf(id);
+                return this.modelo.getWrappedData().stream().filter(Caracteristica -> Caracteristica.getId().equals(buscado)).findFirst().orElse(null);
             } catch (Exception e) {
-                Logger.getLogger(CaracteristicaFrm.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(CaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al convertir ID: " + id, e);
             }
         }
         return null;
@@ -65,11 +84,6 @@ public class CaracteristicaFrm extends DefaultFrm<Caracteristica> {
     @Override
     protected FacesContext getFacesContext() {
         return FacesContext.getCurrentInstance();
-    }
-
-    @Override
-    protected InventarioDAOInterface<Caracteristica> getDao() {
-        return caracteristicaDAO;
     }
 
     @Override
@@ -83,16 +97,6 @@ public class CaracteristicaFrm extends DefaultFrm<Caracteristica> {
             return caracteristicaDAO.leer(id);
         }
         return null;
-    }
-
-    @Override
-    protected Caracteristica createNewEntity() {
-        Caracteristica nuevo = new Caracteristica();
-        nuevo.setActivo(true);
-        nuevo.setNombre("");
-        nuevo.setDescripcion("");
-        // No establecer tipoUnidadMedida por defecto, puede ser null
-        return nuevo;
     }
 
     @Override
@@ -114,12 +118,49 @@ public class CaracteristicaFrm extends DefaultFrm<Caracteristica> {
     }
 
     @Override
-    protected void configurarNuevoRegistro() {
-        // Configuración específica para Caracteristica si es necesaria
+    public LazyDataModel<Caracteristica> getModelo() {
+        return super.getModelo();
     }
 
-    // Getter para la lista de tipos de unidad de medida
+
+    public Integer getIdTipoUnidadMedidaSeleccionado() {
+        if (registro != null && registro.getIdTipoUnidadMedida() != null) {
+            return registro.getIdTipoUnidadMedida().getId();
+        }
+        return null;
+    }
+
+    public void setIdTipoUnidadMedidaSeleccionado(Integer idTipoUnidadMedida) {
+        if (idTipoUnidadMedida != null && this.registro != null && this.listaTipoUnidadMedida != null && !this.listaTipoUnidadMedida.isEmpty()) {
+            this.registro.setIdTipoUnidadMedida(
+                    this.listaTipoUnidadMedida.stream()
+                            .filter(tum -> tum.getId().equals(idTipoUnidadMedida))
+                            .findFirst()
+                            .orElse(null)
+            );
+        }
+    }
+
+    @Override
+    protected void configurarNuevoRegistro() {
+        // Configuración adicional para nueva característica
+        if (this.registro != null) {
+            this.registro.setActivo(true);
+        }
+    }
+
+
     public List<TipoUnidadMedida> getListaTipoUnidadMedida() {
         return listaTipoUnidadMedida;
+    }
+
+    public void setListaTipoUnidadMedida(List<TipoUnidadMedida> listaTipoUnidadMedida) {
+        this.listaTipoUnidadMedida = listaTipoUnidadMedida;
+    }
+
+
+    @Override
+    public void selectionHandler(org.primefaces.event.SelectEvent<Caracteristica> event) {
+        super.selectionHandler(event);
     }
 }
