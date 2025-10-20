@@ -58,44 +58,103 @@
 
    <!-- Detalle (formulario de edición/creación) -->
    <ui:define name="contenido-detalle">
-      <h:form id="frmCrear" rendered="#{productoFrm.estado!='NADA'}">
-         <h:panelGrid columns="2">
+      <p:tabView id="tabProducto" cache="false" dynamic="true" rendered="#{productoFrm.estado!='NADA'}">
+         <p:tab closable="false" title="Generalidades">
 
-            <p:outputLabel for="txtId" value="ID:"/>
-            <p:inputText id="txtId" value="#{productoFrm.registro.id}" readonly="true" disabled="true"/>
+            <h:form id="frmCrear" >
+               <h:panelGrid columns="2">
 
-            <p:outputLabel for="txtNombre" value="Nombre Producto:"/>
-            <p:inputText id="txtNombre" value="#{productoFrm.registro.nombreProducto}" size="75"/>
+                  <p:outputLabel for="txtId" value="ID:"/>
+                  <p:inputText id="txtId" value="#{productoFrm.registro.id}" readonly="true" disabled="true"/>
 
-            <p:outputLabel for="txtReferencia" value="Referencia Externa:"/>
-            <p:inputText id="txtReferencia" value="#{productoFrm.registro.referenciaExterna}" size="50"/>
+                  <p:outputLabel for="txtNombre" value="Nombre Producto:"/>
+                  <p:inputText id="txtNombre" value="#{productoFrm.registro.nombreProducto}" size="75"/>
 
-            <p:outputLabel for="txtComentarios" value="Comentarios:"/>
-            <p:inputTextarea id="txtComentarios"
-                             value="#{productoFrm.registro.comentarios}"
-                             rows="4" cols="50"/>
+                  <p:outputLabel for="txtReferencia" value="Referencia Externa:"/>
+                  <p:inputText id="txtReferencia" value="#{productoFrm.registro.referenciaExterna}" size="50"/>
 
-            <p:outputLabel for="chkActivo" value="Activo:"/>
-            <p:selectBooleanCheckbox id="chkActivo" value="#{productoFrm.registro.activo}"/>
-         </h:panelGrid>
+                  <p:outputLabel for="txtComentarios" value="Comentarios:"/>
+                  <p:inputTextarea id="txtComentarios"
+                                   value="#{productoFrm.registro.comentarios}"
+                                   rows="4" cols="50"/>
 
-         <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
-            <p:commandButton value="Crear"
-                             actionListener="#{productoFrm.btnGuardarHandler}"
-                             rendered="#{productoFrm.estado=='CREAR'}"
-                             update=":pnlTabla :pnlDetalle"/>
+                  <p:outputLabel for="chkActivo" value="Activo:"/>
+                  <p:selectBooleanCheckbox id="chkActivo" value="#{productoFrm.registro.activo}"/>
+               </h:panelGrid>
 
-            <p:commandButton value="Modificar"
-                             actionListener="#{productoFrm.btnModificarHandler}"
-                             rendered="#{productoFrm.estado=='MODIFICAR'}"
-                             update=":pnlTabla :pnlDetalle"/>
+               <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
+                  <p:commandButton value="Crear"
+                                   actionListener="#{productoFrm.btnGuardarHandler}"
+                                   rendered="#{productoFrm.estado=='CREAR'}"
+                                   update=":pnlTabla :pnlDetalle"/>
 
-            <p:commandButton value="Eliminar"
-                             actionListener="#{productoFrm.btnEliminarHandler}"
-                             rendered="#{productoFrm.estado=='MODIFICAR'}"
-                             update=":pnlTabla :pnlDetalle"/>
-         </h:panelGrid>
-      </h:form>
+                  <p:commandButton value="Modificar"
+                                   actionListener="#{productoFrm.btnModificarHandler}"
+                                   rendered="#{productoFrm.estado=='MODIFICAR'}"
+                                   update=":pnlTabla :pnlDetalle"/>
+
+                  <p:commandButton value="Eliminar"
+                                   actionListener="#{productoFrm.btnEliminarHandler}"
+                                   rendered="#{productoFrm.estado=='MODIFICAR'}"
+                                   update=":pnlTabla :pnlDetalle"/>
+               </h:panelGrid>
+            </h:form>
+         </p:tab>
+         <p:tab closable="false" title="Tipos de Producto" disabled="#{productoFrm.estado!='MODIFICAR'}">
+            <h:panelGroup id="pnlTiposProducto">
+               <h:panelGrid>
+                  <h2>#{productoFrm.registro.nombreProducto}</h2>
+                  <h:form id="frmTablaProducto">
+                     <p:dataTable value="#{productoFrm.ptpFrm.modelo}" var="tp"
+                                  paginator="true"
+                                  paginatorPosition="bottom"
+                                  lazy="true"
+                                  selection="#{productoFrm.ptpFrm.registro}"
+                                  selectionMode="single"
+                                  rows="#{productoFrm.ptpFrm.registrosPorPagina}"
+                                  rendered="#{productoFrm.ptpFrm.estado=='NADA'}">
+
+                        <p:column headerText="ID">
+                           <h:outputText value="#{tp.id}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo">
+                           <h:outputText value="#{tp.idTipoProducto.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Fecha de Creacion">
+                           <h:outputText value="#{tp.fechaCreacion}">
+                              <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                           </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Estado">
+                           <h:outputText value="#{tp.activo ? 'ACTIVO' : 'INACTIVO'}" />
+                        </p:column>
+
+                        <p:column headerText="Observaciones">
+                           <h:outputText value="#{tp.observaciones}" />
+                        </p:column>
+
+                        <p:ajax event="rowSelect" listener="#{productoFrm.ptpFrm.seleccionarRegistro}"
+                                update=":tabProducto:pnlTipoProducto :tabProducto:pnlDetalleProducto"/>
+                     </p:dataTable>
+
+                     <!-- Botones tipo composite -->
+                     <ues:botones-top formulario="#{productoFrm.ptpFrm}" actualizar=":tabProducto:pnlTipoProducto :tabProducto:pnlDetalleProducto"/>
+                  </h:form>
+               </h:panelGrid>
+
+
+            </h:panelGroup>
+            <h:panelGroup id="pnlDetalleProducto">
+
+            </h:panelGroup>
+         </p:tab>
+
+      </p:tabView>
+
+
    </ui:define>
 
 </ui:composition>

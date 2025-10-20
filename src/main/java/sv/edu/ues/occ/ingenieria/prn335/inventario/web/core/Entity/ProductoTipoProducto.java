@@ -7,6 +7,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "producto_tipo_producto", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "ProductoTipoProducto.findByProducto", query = "SELECT p FROM ProductoTipoProducto p WHERE p.idProducto.id = :idProducto ORDER BY p.idTipoProducto.nombre ASC"),
+        @NamedQuery(name = "ProductoTipoProducto.countByProducto", query = "SELECT COUNT(p) FROM ProductoTipoProducto p WHERE p.idProducto.id = :idProducto")
+
+})
 public class ProductoTipoProducto {
     @Id
     @Column(name = "id_producto_tipo_producto", nullable = false)

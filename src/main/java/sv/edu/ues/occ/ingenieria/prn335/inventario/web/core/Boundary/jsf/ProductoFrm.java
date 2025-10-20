@@ -19,6 +19,9 @@ public class ProductoFrm extends DefaultFrm<Producto> {
     @Inject
     ProductoDAO productoDAO;
 
+    @Inject
+    protected ProductoTipoProductoFrm ptpFrm;
+
     public ProductoFrm() {
         this.nombreBean = "Producto";
     }
@@ -100,4 +103,13 @@ public class ProductoFrm extends DefaultFrm<Producto> {
     protected void configurarNuevoRegistro() {
         // Configuración específica si es necesaria
     }
+
+    public ProductoTipoProductoFrm getPtpFrm() {
+        if(this.registro!=null && this.registro.getId()!=null){
+            ptpFrm.setIdProducto(this.registro.getId());
+        }
+        return ptpFrm;
+    }
+
+
 }
