@@ -56,48 +56,161 @@
     </ui:define>
 
     <!-- Detalle (formulario de edición/creación) -->
-    <ui:define name="contenido-detalle">
-        <h:form id="frmCrear" rendered="#{tipoUnidadMedidaFrm.estado!='NADA'}">
-            <h:panelGrid columns="2">
+    <ui:define name="contenido-detalle" >
+        <p:tabView id="tabTipoUnidadMedida" cache="false" dynamic="true" rendered="#{tipoUnidadMedidaFrm.estado!='NADA'}">
+            <p:tab closable="false" title="Generalidades">
+                <h:form id="frmCrear">
+                    <h:panelGrid columns="2">
 
-                <p:outputLabel for="txtId" value="ID:"/>
-                <p:inputText id="txtId" value="#{tipoUnidadMedidaFrm.registro.id}" readonly="true" disabled="true"/>
+                        <p:outputLabel for="txtId" value="ID:"/>
+                        <p:inputText id="txtId" value="#{tipoUnidadMedidaFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
-                <p:inputText id="txtNombre" value="#{tipoUnidadMedidaFrm.registro.nombre}"
-                             size="75" required="true"
-                             validator="#{tipoUnidadMedidaFrm.validarnombre}"/>
+                        <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
+                        <p:inputText id="txtNombre" value="#{tipoUnidadMedidaFrm.registro.nombre}"
+                                     size="75" required="true"
+                                     validator="#{tipoUnidadMedidaFrm.validarnombre}"/>
 
-                <p:outputLabel for="txtUnidadBase" value="#{crud['frm.botones.unidadBase']}:"/>
-                <p:inputText id="txtUnidadBase" value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
-                             size="75" maxlength="155"/>
+                        <p:outputLabel for="txtUnidadBase" value="#{crud['frm.botones.unidadBase']}:"/>
+                        <p:inputText id="txtUnidadBase" value="#{tipoUnidadMedidaFrm.registro.unidadBase}"
+                                     size="75" maxlength="155"/>
 
-                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
-                <p:selectBooleanCheckbox id="chkActivo" value="#{tipoUnidadMedidaFrm.registro.activo}"/>
+                        <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
+                        <p:selectBooleanCheckbox id="chkActivo" value="#{tipoUnidadMedidaFrm.registro.activo}"/>
 
-                <p:outputLabel for="txtComentarios" value="#{crud['frm.botones.comentarios']}:"/>
-                <p:inputTextarea id="txtComentarios"
-                                 value="#{tipoUnidadMedidaFrm.registro.comentarios}"
-                                 rows="4" cols="50"/>
-            </h:panelGrid>
+                        <p:outputLabel for="txtComentarios" value="#{crud['frm.botones.comentarios']}:"/>
+                        <p:inputTextarea id="txtComentarios"
+                                         value="#{tipoUnidadMedidaFrm.registro.comentarios}"
+                                         rows="4" cols="50"/>
+                    </h:panelGrid>
 
-            <h:panelGrid columns="#{tipoUnidadMedidaFrm.estado=='MODIFICAR' ? 1 : 2}">
-                <p:commandButton value="#{crud['frm.botones.guardar']}"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnGuardarHandler}"
-                                 rendered="#{tipoUnidadMedidaFrm.estado=='CREAR'}"
-                                 update=":pnlTabla :pnlDetalle"/>
+                    <h:panelGrid columns="#{tipoUnidadMedidaFrm.estado=='MODIFICAR' ? 1 : 2}">
+                        <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                         actionListener="#{tipoUnidadMedidaFrm.btnGuardarHandler}"
+                                         rendered="#{tipoUnidadMedidaFrm.estado=='CREAR'}"
+                                         update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="#{crud['frm.botones.modificar']}"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnModificarHandler}"
-                                 rendered="#{tipoUnidadMedidaFrm.estado=='MODIFICAR'}"
-                                 update=":pnlTabla :pnlDetalle"/>
+                        <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                         actionListener="#{tipoUnidadMedidaFrm.btnModificarHandler}"
+                                         rendered="#{tipoUnidadMedidaFrm.estado=='MODIFICAR'}"
+                                         update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="#{crud['frm.botones.eliminar']}"
-                                 actionListener="#{tipoUnidadMedidaFrm.btnEliminarHandler}"
-                                 rendered="#{tipoUnidadMedidaFrm.estado=='MODIFICAR'}"
-                                 update=":pnlTabla :pnlDetalle"/>
-            </h:panelGrid>
-        </h:form>
+                        <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                         actionListener="#{tipoUnidadMedidaFrm.btnEliminarHandler}"
+                                         rendered="#{tipoUnidadMedidaFrm.estado=='MODIFICAR'}"
+                                         update=":pnlTabla :pnlDetalle"/>
+                    </h:panelGrid>
+                </h:form>
+            </p:tab>
+
+            <p:tab closable="false" title="Unidades de Medida" disabled="#{tipoUnidadMedidaFrm.estado!='MODIFICAR'}">
+                <h:panelGroup id="pnlUnidadesMedida">
+                    <h:panelGrid>
+                        <h2>Unidades de Medida</h2>
+                        <h:form id="frmTablaUnidadMedida">
+                            <p:dataTable value="#{tipoUnidadMedidaFrm.umFrm.modelo}" var="um"
+                                         paginator="true"
+                                         paginatorPosition="bottom"
+                                         lazy="true"
+                                         selection="#{tipoUnidadMedidaFrm.umFrm.registro}"
+                                         selectionMode="single"
+                                         rows="#{tipoUnidadMedidaFrm.umFrm.registrosPorPagina}"
+                                         rendered="#{tipoUnidadMedidaFrm.umFrm.estado=='NADA'}">
+
+                                <p:column headerText="ID">
+                                    <h:outputText value="#{um.id}" />
+                                </p:column>
+
+                                <p:column headerText="#{crud['frm.botones.equivalencia']}">
+                                    <h:outputText value="#{um.equivalencia}" />
+                                </p:column>
+
+                                <p:column headerText="#{crud['frm.botones.expresionRegular']}">
+                                    <h:outputText value="#{um.expresionRegular}" />
+                                </p:column>
+
+                                <p:column headerText="#{crud['frm.botones.estado']}">
+                                    <h:outputText value="#{um.activo ? 'ACTIVO' : 'INACTIVO'}" />
+                                </p:column>
+
+                                <p:column headerText="#{crud['frm.botones.comentarios']}">
+                                    <h:outputText value="#{um.comentarios}" />
+                                </p:column>
+
+                                <p:ajax event="rowSelect"
+                                        listener="#{tipoUnidadMedidaFrm.umFrm.seleccionarRegistro}"
+                                        update=":tabTipoUnidadMedida:pnlUnidadesMedida :tabTipoUnidadMedida:pnlDetalleUnidadMedida"/>
+                            </p:dataTable>
+
+                            <!-- Botones tipo composite -->
+                            <ues:botones-top formulario="#{tipoUnidadMedidaFrm.umFrm}"
+                                             actualizar=":tabTipoUnidadMedida:pnlUnidadesMedida :tabTipoUnidadMedida:pnlDetalleUnidadMedida"/>
+                        </h:form>
+                    </h:panelGrid>
+                </h:panelGroup>
+
+                <h:panelGroup id="pnlDetalleUnidadMedida">
+                    <h:form id="frmDetalleUnidadMedida" rendered="#{tipoUnidadMedidaFrm.umFrm.estado!='NADA'}">
+                        <p:panel header="Detalle de Unidad de Medida" style="margin-top: 20px;">
+                            <h:panelGrid columns="2" cellpadding="5" style="width: 100%;">
+
+                                <p:outputLabel for="txtUmId" value="ID:" />
+                                <p:inputText id="txtUmId"
+                                             value="#{tipoUnidadMedidaFrm.umFrm.registro.id}"
+                                             readonly="true"
+                                             disabled="true"
+                                             style="width: 100px;"/>
+
+                                <p:outputLabel for="txtUmEquivalencia" value="#{crud['frm.botones.equivalencia']}:" />
+                                <p:inputNumber id="txtUmEquivalencia"
+                                               value="#{tipoUnidadMedidaFrm.umFrm.registro.equivalencia}"
+                                               decimalPlaces="2"
+                                               minValue="0"
+                                               maxValue="999999.99"
+                                               style="width: 150px;"/>
+
+                                <p:outputLabel for="txtUmExpresionRegular" value="#{crud['frm.botones.expresionRegular']}:" />
+                                <p:inputText id="txtUmExpresionRegular"
+                                             value="#{tipoUnidadMedidaFrm.umFrm.registro.expresionRegular}"
+                                             maxlength="255"
+                                             style="width: 300px;"/>
+
+                                <p:outputLabel for="chkUmActivo" value="#{crud['frm.botones.activo']}:" />
+                                <p:selectBooleanCheckbox id="chkUmActivo"
+                                                         value="#{tipoUnidadMedidaFrm.umFrm.registro.activo}"/>
+
+                                <p:outputLabel for="txtUmComentarios" value="#{crud['frm.botones.comentarios']}:" />
+                                <p:inputTextarea id="txtUmComentarios"
+                                                 value="#{tipoUnidadMedidaFrm.umFrm.registro.comentarios}"
+                                                 rows="4"
+                                                 cols="50"
+                                                 maxlength="255"
+                                                 style="width: 300px;"/>
+
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" style="margin-top: 20px; text-align: center;">
+                                <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                                 actionListener="#{tipoUnidadMedidaFrm.umFrm.btnGuardarHandler}"
+                                                 rendered="#{tipoUnidadMedidaFrm.umFrm.estado=='CREAR'}"
+                                                 update=":tabTipoUnidadMedida:pnlUnidadesMedida :tabTipoUnidadMedida:pnlDetalleUnidadMedida"
+                                                 style="margin: 5px;"/>
+
+                                <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                                 actionListener="#{tipoUnidadMedidaFrm.umFrm.btnModificarHandler}"
+                                                 rendered="#{tipoUnidadMedidaFrm.umFrm.estado=='MODIFICAR'}"
+                                                 update=":tabTipoUnidadMedida:pnlUnidadesMedida :tabTipoUnidadMedida:pnlDetalleUnidadMedida"
+                                                 style="margin: 5px;"/>
+
+                                <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                                 actionListener="#{tipoUnidadMedidaFrm.umFrm.btnEliminarHandler}"
+                                                 rendered="#{tipoUnidadMedidaFrm.umFrm.estado=='MODIFICAR'}"
+                                                 update=":tabTipoUnidadMedida:pnlUnidadesMedida :tabTipoUnidadMedida:pnlDetalleUnidadMedida"
+                                                 style="margin: 5px;"/>
+                            </h:panelGrid>
+                        </p:panel>
+                    </h:form>
+                </h:panelGroup>
+            </p:tab>
+        </p:tabView>
     </ui:define>
-
 </ui:composition>

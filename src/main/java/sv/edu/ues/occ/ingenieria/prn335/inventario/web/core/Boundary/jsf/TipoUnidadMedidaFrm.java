@@ -19,6 +19,9 @@ public class TipoUnidadMedidaFrm extends DefaultFrm <TipoUnidadMedida> {
     @Inject
     TipoUnidadMedidaDAO tipoUnidadMedidaDAO;
 
+    @Inject
+    protected UnidadMedidaFrm umFrm;
+
     public TipoUnidadMedidaFrm() {
         this.nombreBean = "Tipo de Unidad Medida";
     }
@@ -100,4 +103,9 @@ public class TipoUnidadMedidaFrm extends DefaultFrm <TipoUnidadMedida> {
         // Configuración específica para TipoUnidadMedida si es necesaria
         // Por ejemplo, establecer valores por defecto adicionales
     }
+
+    public UnidadMedidaFrm getumFrm() {
+        return umFrm;
+    }
+
 }
