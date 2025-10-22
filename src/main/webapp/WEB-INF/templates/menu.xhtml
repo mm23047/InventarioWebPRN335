@@ -8,19 +8,20 @@
     <p:menubar styleClass="compact-menubar">
 
         <!-- Submenú Tipos -->
-        <p:submenu label="Tipos" icon="pi pi-tags" styleClass="compact-submenu">
+        <p:submenu label="#{crud['frm.botones.tipos']}" icon="pi pi-tags" styleClass="compact-submenu">
             <p:menuitem value="Tipo Almacén" url="#{request.contextPath}/Paginas/TipoAlmacen.jsf" icon="pi pi-building"/>
             <p:menuitem value="Tipo Producto" url="#{request.contextPath}/Paginas/TipoProducto.jsf" icon="pi pi-box"/>
-            <p:menuitem value="Tipo Unidad Medida" url="#{request.contextPath}/Paginas/TipoUnidadMedida.jsf" icon="pi pi-ruler"/>
+            <p:menuitem value="#{crud['frm.botones.tipoUnidadMedida']}" url="#{request.contextPath}/Paginas/TipoUnidadMedida.jsf" icon="pi pi-ruler"/>
         </p:submenu>
 
         <!-- Submenú Maestros -->
-        <p:submenu label="Maestros" icon="pi pi-database" styleClass="compact-submenu">
+        <p:submenu label="Especificos" icon="pi pi-database" styleClass="compact-submenu">
             <p:menuitem value="Almacén" url="#{request.contextPath}/Paginas/Almacen.jsf" icon="pi pi-warehouse"/>
             <p:menuitem value="Producto" url="#{request.contextPath}/Paginas/Producto.jsf" icon="pi pi-shopping-bag"/>
             <p:menuitem value="Cliente" url="#{request.contextPath}/Paginas/Cliente.jsf" icon="pi pi-user"/>
-            <p:menuitem value="Proveedores" url="#{request.contextPath}/Paginas/Proveedor.jsf" icon="pi pi-truck"/>
-            <p:menuitem value="Características" url="#{request.contextPath}/Paginas/Caracteristica.jsf" icon="pi pi-sliders-h"/>
+            <p:menuitem value="#{crud['frm.botones.proveedor']}" url="#{request.contextPath}/Paginas/Proveedor.jsf" icon="pi pi-truck"/>
+            <p:menuitem value="#{crud['frm.botones.caracteristica']}" url="#{request.contextPath}/Paginas/Caracteristica.jsf" icon="pi pi-sliders-h"/>
+            <p:menuitem value="#{crud['frm.botones.unidadMedida']}" url="#{request.contextPath}/Paginas/UnidadMedida.jsf"/>
         </p:submenu>
 
         <!-- Selector de idioma alineado a la derecha -->
