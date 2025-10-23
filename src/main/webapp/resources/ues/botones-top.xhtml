@@ -18,13 +18,13 @@
     <cc:implementation>
         <h:panelGrid>
             <p:commandButton id="btnNuevo"
-                             value="#{crud['frm.botones.nuevo']} #{cc.attrs.formulario.nombreBean}"
+                             value="#{crud['frm.botones.nuevo']}"
                              rendered="#{cc.attrs.formulario.estado=='NADA'}"
                              actionListener="#{cc.attrs.formulario.btnNuevoHandler}"
                              update="#{cc.attrs.actualizar}"/>
 
             <p:commandButton id="btnCancelar"
-                             value="#{crud['frm.botones.cancelar']} #{cc.attrs.formulario.nombreBean}"
+                             value="#{crud['frm.botones.cancelar']}"
                              rendered="#{cc.attrs.formulario.estado!='NADA'}"
                              actionListener="#{cc.attrs.formulario.btnCancelarHandler}"
                              update="#{cc.attrs.actualizar}"/>

@@ -9,7 +9,7 @@
 
    <!-- Header -->
    <ui:define name="header">
-      <h1>#{productoFrm.nombreBean}</h1>
+      <h1>#{crud['frm.botones.producto']}</h1>
    </ui:define>
 
    <!-- Tabla de registros -->
@@ -29,19 +29,19 @@
                   <h:outputText value="#{r.id}" />
                </p:column>
 
-               <p:column headerText="Nombre">
+               <p:column headerText="#{crud['frm.botones.nombre']}">
                   <h:outputText value="#{r.nombreProducto}" />
                </p:column>
 
-               <p:column headerText="Referencia">
+               <p:column headerText="#{crud['frm.botones.referencia']}">
                   <h:outputText value="#{r.referenciaExterna}" />
                </p:column>
 
-               <p:column headerText="Comentarios">
+               <p:column headerText="#{crud['frm.botones.comentarios']}">
                   <h:outputText value="#{r.comentarios}" />
                </p:column>
 
-               <p:column headerText="Activo">
+               <p:column headerText="#{crud['frm.botones.estado']}">
                   <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                </p:column>
 
@@ -59,7 +59,7 @@
    <!-- Detalle (formulario de edición/creación) -->
    <ui:define name="contenido-detalle">
       <p:tabView id="tabProducto" cache="false" dynamic="true" rendered="#{productoFrm.estado!='NADA'}">
-         <p:tab closable="false" title="Generalidades">
+         <p:tab closable="false" title="#{crud['frm.botones.generalidades']}">
 
             <h:form id="frmCrear" >
                <h:panelGrid columns="2">
@@ -67,40 +67,40 @@
                   <p:outputLabel for="txtId" value="ID:"/>
                   <p:inputText id="txtId" value="#{productoFrm.registro.id}" readonly="true" disabled="true"/>
 
-                  <p:outputLabel for="txtNombre" value="Nombre Producto:"/>
+                  <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombreProducto']}:"/>
                   <p:inputText id="txtNombre" value="#{productoFrm.registro.nombreProducto}" size="75"/>
 
-                  <p:outputLabel for="txtReferencia" value="Referencia Externa:"/>
+                  <p:outputLabel for="txtReferencia" value="#{crud['frm.botones.nombreReferencia']}:"/>
                   <p:inputText id="txtReferencia" value="#{productoFrm.registro.referenciaExterna}" size="50"/>
 
-                  <p:outputLabel for="txtComentarios" value="Comentarios:"/>
+                  <p:outputLabel for="txtComentarios" value="#{crud['frm.botones.comentarios']}:"/>
                   <p:inputTextarea id="txtComentarios"
                                    value="#{productoFrm.registro.comentarios}"
                                    rows="4" cols="50"/>
 
-                  <p:outputLabel for="chkActivo" value="Activo:"/>
+                  <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
                   <p:selectBooleanCheckbox id="chkActivo" value="#{productoFrm.registro.activo}"/>
                </h:panelGrid>
 
                <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
-                  <p:commandButton value="Crear"
+                  <p:commandButton value="#{crud['frm.botones.guardar']}"
                                    actionListener="#{productoFrm.btnGuardarHandler}"
                                    rendered="#{productoFrm.estado=='CREAR'}"
                                    update=":pnlTabla :pnlDetalle"/>
 
-                  <p:commandButton value="Modificar"
+                  <p:commandButton value="#{crud['frm.botones.modificar']}"
                                    actionListener="#{productoFrm.btnModificarHandler}"
                                    rendered="#{productoFrm.estado=='MODIFICAR'}"
                                    update=":pnlTabla :pnlDetalle"/>
 
-                  <p:commandButton value="Eliminar"
+                  <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                    actionListener="#{productoFrm.btnEliminarHandler}"
                                    rendered="#{productoFrm.estado=='MODIFICAR'}"
                                    update=":pnlTabla :pnlDetalle"/>
                </h:panelGrid>
             </h:form>
          </p:tab>
-         <p:tab closable="false" title="Tipos de Producto" disabled="#{productoFrm.estado!='MODIFICAR'}">
+         <p:tab closable="false" title="#{crud['frm.botones.tiposDeProductos']}" disabled="#{productoFrm.estado!='MODIFICAR'}">
             <h:panelGroup id="pnlTiposProducto">
                <h:panelGrid>
                   <h2>#{productoFrm.registro.nombreProducto}</h2>
@@ -128,7 +128,7 @@
                            </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Estado">
+                        <p:column headerText="#{crud['frm.botones.estado']}">
                            <h:outputText value="#{tp.activo ? 'ACTIVO' : 'INACTIVO'}" />
                         </p:column>
 

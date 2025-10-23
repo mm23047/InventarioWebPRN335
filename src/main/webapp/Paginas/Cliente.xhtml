@@ -9,7 +9,7 @@
 
    <!-- Header -->
    <ui:define name="header">
-      <h1>#{clienteFrm.nombreBean}</h1>
+      <h1>#{crud['frm.botones.cliente']}</h1>
    </ui:define>
 
    <!-- Tabla de registros -->
@@ -29,7 +29,7 @@
                   <h:outputText value="#{r.id}" />
                </p:column>
 
-               <p:column headerText="Nombre">
+               <p:column headerText="#{crud['frm.botones.nombre']}">
                   <h:outputText value="#{r.nombre}" />
                </p:column>
 
@@ -41,7 +41,7 @@
                   <h:outputText value="#{r.nit}" />
                </p:column>
 
-               <p:column headerText="Estado">
+               <p:column headerText="#{crud['frm.botones.estado']}">
                   <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                </p:column>
 
@@ -58,12 +58,15 @@
    <!-- Detalle (formulario de edición/creación) -->
    <ui:define name="contenido-detalle">
       <h:form id="frmCrear" rendered="#{clienteFrm.estado!='NADA'}">
+         <!-- Growl para mostrar mensajes -->
+         <p:growl id="growl" showSummary="true" showDetail="true" sticky="false" life="5000"/>
+
          <h:panelGrid columns="2">
 
             <p:outputLabel for="txtId" value="ID:"/>
             <p:inputText id="txtId" value="#{clienteFrm.registro.id}" readonly="true" disabled="true"/>
 
-            <p:outputLabel for="txtNombre" value="Nombre:"/>
+            <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
             <p:inputText id="txtNombre" value="#{clienteFrm.registro.nombre}" size="75"/>
 
             <p:outputLabel for="txtDui" value="DUI:"/>
@@ -72,26 +75,28 @@
             <p:outputLabel for="txtNit" value="NIT:"/>
             <p:inputText id="txtNit" value="#{clienteFrm.registro.nit}" size="15"/>
 
-            <p:outputLabel for="chkActivo" value="Activo:"/>
+            <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
             <p:selectBooleanCheckbox id="chkActivo" value="#{clienteFrm.registro.activo}"/>
 
          </h:panelGrid>
 
          <h:panelGrid columns="#{clienteFrm.estado=='MODIFICAR' ? 1 : 2}">
-            <p:commandButton value="Crear"
+            <p:commandButton value="#{crud['frm.botones.guardar']}"
                              actionListener="#{clienteFrm.btnGuardarHandler}"
                              rendered="#{clienteFrm.estado=='CREAR'}"
-                             update=":pnlTabla :pnlDetalle"/>
+                             update=":pnlTabla :pnlDetalle :frmCrear:growl"/>
 
-            <p:commandButton value="Modificar"
+            <p:commandButton value="#{crud['frm.botones.modificar']}"
                              actionListener="#{clienteFrm.btnModificarHandler}"
                              rendered="#{clienteFrm.estado=='MODIFICAR'}"
-                             update=":pnlTabla :pnlDetalle"/>
+                             update=":pnlTabla :pnlDetalle :frmCrear:growl"/>
 
-            <p:commandButton value="Eliminar"
+            <p:commandButton value="#{crud['frm.botones.eliminar']}"
                              actionListener="#{clienteFrm.btnEliminarHandler}"
                              rendered="#{clienteFrm.estado=='MODIFICAR'}"
-                             update=":pnlTabla :pnlDetalle"/>
+                             update=":pnlTabla :pnlDetalle :frmCrear:growl"/>
+
+
          </h:panelGrid>
       </h:form>
    </ui:define>
