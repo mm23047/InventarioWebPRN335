@@ -4,11 +4,10 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ValueChangeEvent;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -16,30 +15,47 @@ import java.util.Map;
 @Named
 public class SesionUsuarioBean implements Serializable {
 
-    @Inject
-    FacesContext facesContext;
-    Map<String, Locale >idiomasDisponibles = new HashMap<>();
-    String idiomaSeleccionado;
+    private Map<String, String> idiomasDisponibles; // clave = etiqueta visible, valor = código de idioma
+    private String idiomaSeleccionado; // almacena "es", "en", "fr" o "al"
 
     @PostConstruct
     public void inicializar() {
-       idiomasDisponibles.put("English", Locale.ENGLISH);
-       Locale espa = new Locale("es");
-       idiomasDisponibles.put("Español", espa);
-       this.idiomaSeleccionado = espa.toString();
+        idiomasDisponibles = new LinkedHashMap<>(); // mantiene orden
+        idiomasDisponibles.put("Español", "es");
+        idiomasDisponibles.put("English", "en");
+        idiomasDisponibles.put("Français", "fr");
+
+        // Idioma por defecto
+        idiomaSeleccionado = "es";
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(new Locale(idiomaSeleccionado));
     }
 
-
     public void cambiarIdioma(ValueChangeEvent event) {
-        String idioma = event.getNewValue().toString();
-        for (Map.Entry<String, Locale> entry : idiomasDisponibles.entrySet()) {
-            if (entry.getKey().equals(idioma)) {
-                facesContext.getViewRoot().setLocale(entry.getValue());
+        String nuevoIdioma = (String) event.getNewValue();
+        if (nuevoIdioma != null) {
+            idiomaSeleccionado = nuevoIdioma;
+
+            Locale locale;
+            switch (nuevoIdioma) {
+
+                case "fr":
+                    locale = new Locale("fr");
+                    break;
+                case "en":
+                    locale = Locale.ENGLISH;
+                    break;
+                case "es":
+                default:
+                    locale = new Locale("es");
+                    break;
             }
+
+            FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
         }
     }
 
-    public Map<String, Locale> getIdiomasDisponibles() {
+    // Getters y Setters
+    public Map<String, String> getIdiomasDisponibles() {
         return idiomasDisponibles;
     }
 
@@ -50,7 +66,4 @@ public class SesionUsuarioBean implements Serializable {
     public void setIdiomaSeleccionado(String idiomaSeleccionado) {
         this.idiomaSeleccionado = idiomaSeleccionado;
     }
-
-
-
 }

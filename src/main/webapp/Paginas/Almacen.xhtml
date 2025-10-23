@@ -10,7 +10,7 @@
 
     <!-- Header -->
     <ui:define name="header">
-        <h1>#{almacenFrm.nombreBean}</h1>
+        <h1>#{crud['frm.botones.almacen']}</h1>
     </ui:define>
 
     <!-- Tabla de registros -->
@@ -30,15 +30,15 @@
                         <h:outputText value="#{r.id}" />
                     </p:column>
 
-                    <p:column headerText="Tipo Almacén">
+                    <p:column headerText="#{crud['frm.botones.tipoAlmacen']}">
                         <h:outputText value="#{r.idTipoAlmacen.nombre}" />
                     </p:column>
 
-                    <p:column headerText="Estado">
+                    <p:column headerText="#{crud['frm.botones.estado']}">
                         <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                     </p:column>
 
-                    <p:column headerText="Observaciones">
+                    <p:column headerText="#{crud['frm.botones.observaciones']}">
                         <h:outputText value="#{r.observaciones}" />
                     </p:column>
 
@@ -60,7 +60,7 @@
                 <p:outputLabel for="txtId" value="ID:"/>
                 <p:inputText id="txtId" value="#{almacenFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="lstTipo" value="Tipo:"/>
+                <p:outputLabel for="lstTipo" value="#{crud['frm.botones.tipos']}:"/>
                <p:selectOneMenu id="lstTipo"  value="#{almacenFrm.idTipoAlmacenSeleccionado}">
                     <f:selectItems value="#{almacenFrm.listaTipoAlmacen}"
                                    var="tipo"
@@ -68,10 +68,10 @@
                                    itemLabel="#{tipo.nombre}"/>
                </p:selectOneMenu>
 
-                <p:outputLabel for="chkActivo" value="Activo:"/>
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
                 <p:selectBooleanCheckbox id="chkActivo" value="#{almacenFrm.registro.activo}"/>
 
-                <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                <p:outputLabel for="txtObservaciones" value="#{crud['frm.botones.observaciones']}:"/>
                 <p:inputTextarea id="txtObservaciones"
                                  value="#{almacenFrm.registro.observaciones}"
                                  rows="4" cols="50"/>
@@ -83,12 +83,12 @@
                                  rendered="#{almacenFrm.estado=='CREAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Modificar"
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
                                  actionListener="#{almacenFrm.btnModificarHandler}"
                                  rendered="#{almacenFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Eliminar"
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                  actionListener="#{almacenFrm.btnEliminarHandler}"
                                  rendered="#{almacenFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
