@@ -5,6 +5,11 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "tipo_producto", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "TipoProducto.findByNombreLike",query = "SELECT t FROM TipoProducto t WHERE upper(t.nombre) like :nombre ORDER BY t.nombre ASC"),
+
+
+})
 public class TipoProducto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @LocalBean
 public class ProductoTipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<ProductoTipoProductoCaracteristica> implements Serializable {
     @PersistenceContext(unitName = "inventarioPU")
-    EntityManager em;
+    protected EntityManager em;
 
     public ProductoTipoProductoCaracteristicaDAO(){super(ProductoTipoProductoCaracteristica.class);
     }

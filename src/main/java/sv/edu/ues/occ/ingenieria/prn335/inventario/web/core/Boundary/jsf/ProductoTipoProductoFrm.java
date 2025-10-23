@@ -2,16 +2,16 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.eclipse.persistence.jpa.jpql.parser.LocalDateTime;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoTipoProductoDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.ProductoTipoProducto;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.*;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -32,6 +32,20 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
     @Inject
     ProductoTipoProductoDAO productoTipoProductoDAO;
+
+    @Inject
+    ConversorDeFechas conversorDeFechas;
+
+    @Inject
+    TipoProductoDAO tipoProductoDAO;
+
+    @Inject
+    ProductoTipoProductoCaracteristicaDAO productoTipoProductoCaracteristicaDAO;
+
+    @Inject
+    TipoProductoCaracteristicaDAO tipoProductoCaracteristicaDAO;
+
+    List<TipoProductoCaracteristica> posibleCaracteristicas;
 
     @Override
     protected FacesContext getFacesContext() {
@@ -178,4 +192,48 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
     public String getNombreBean() {
         return "Tipos de Producto";
     }
+
+    public LocalDateTime getFechaCreacion() {
+        if(this.registro != null && this.registro.getFechaCreacion() != null){
+            return conversorDeFechas.convertirFecha(this.registro.getFechaCreacion());
+        }
+        return null;
+    }
+
+    public void setFechaCreacion(LocalDateTime fecha) {
+        if(this.registro != null){
+            if(fecha != null){
+                this.registro.getFechaCreacion(conversorDeFechas.convertirFecha(fecha));
+            }else{
+                this.registro.setFechaCreacion(null);
+            }
+        }
+    }
+
+    public List<TipoProducto> buscarTiposPorNombres(final String nombre) {
+        try {
+            if(nombre != null && !nombre.isBlank()){
+                return tipoProductoDAO.findByNombreLike(nombre,0,25);
+
+            }
+        }catch (Exception ex){
+            Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return List.of();
+    }
+
+    public void btnSeleccionarTipoProductoHandler(ActionEvent event) {
+        try{
+            this.posibleCaracteristicas = tipoProductoCaracteristicaDAO.findByTipoProducto(this.registro.getIdTipoProducto().getId);
+            return;
+        } catch (Exception ex) {
+            Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+this.posibleCaracteristicas=List.of();
+    }
+
+public List<TipoProductoCaracteristica> getPosibleCaracteristicas() {
+        return posibleCaracteristicas;
+}
+
 }
