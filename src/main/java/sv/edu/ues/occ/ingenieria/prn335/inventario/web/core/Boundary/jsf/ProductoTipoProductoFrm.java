@@ -3,13 +3,13 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 import jakarta.enterprise.context.Dependent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ActionEvent;
-import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.eclipse.persistence.jpa.jpql.parser.LocalDateTime;
+import java.time.LocalDateTime;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf.conversores.ConversorDeFechas;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.*;
 
@@ -44,6 +44,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
     @Inject
     TipoProductoCaracteristicaDAO tipoProductoCaracteristicaDAO;
+
 
     List<TipoProductoCaracteristica> posibleCaracteristicas;
 
@@ -203,8 +204,8 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
     public void setFechaCreacion(LocalDateTime fecha) {
         if(this.registro != null){
             if(fecha != null){
-                this.registro.getFechaCreacion(conversorDeFechas.convertirFecha(fecha));
-            }else{
+                this.registro.setFechaCreacion(conversorDeFechas.convertirFecha(fecha));
+            } else {
                 this.registro.setFechaCreacion(null);
             }
         }
@@ -214,7 +215,6 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
         try {
             if(nombre != null && !nombre.isBlank()){
                 return tipoProductoDAO.findByNombreLike(nombre,0,25);
-
             }
         }catch (Exception ex){
             Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -224,7 +224,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
     public void btnSeleccionarTipoProductoHandler(ActionEvent event) {
         try{
-            this.posibleCaracteristicas = tipoProductoCaracteristicaDAO.findByTipoProducto(this.registro.getIdTipoProducto().getId);
+            this.posibleCaracteristicas = tipoProductoCaracteristicaDAO.findByTipoProducto(this.registro.getIdTipoProducto().getId());
             return;
         } catch (Exception ex) {
             Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -235,5 +235,7 @@ this.posibleCaracteristicas=List.of();
 public List<TipoProductoCaracteristica> getPosibleCaracteristicas() {
         return posibleCaracteristicas;
 }
+
+
 
 }

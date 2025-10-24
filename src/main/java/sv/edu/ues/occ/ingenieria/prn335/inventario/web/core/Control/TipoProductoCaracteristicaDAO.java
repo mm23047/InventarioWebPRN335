@@ -62,4 +62,23 @@ try {
 return List.of();
     }
 
+    /**
+     * Busca todas las características de un tipo de producto (obligatorias y no obligatorias)
+     * @param idTipoProducto el id del tipo de producto
+     * @return lista de todas las características del tipo de producto
+     */
+    public List<TipoProductoCaracteristica> findByTipoProducto(final Long idTipoProducto) {
+        if (idTipoProducto != null) {
+            try {
+                TypedQuery<TipoProductoCaracteristica> query = em.createNamedQuery("TipoProductoCaracteristica.findByTipoProducto", TipoProductoCaracteristica.class);
+                query.setParameter("idTipoProducto", idTipoProducto);
+                return query.getResultList();
+            } catch (Exception ex) {
+                Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+        return List.of();
+    }
+
+
 }

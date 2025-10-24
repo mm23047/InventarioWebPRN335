@@ -59,7 +59,18 @@
             <div class="ui-g-12 ui-g-nopad">
                 <div class="ui-g">
                     <f:insert name="cuerpo">
-                        Cuerpo de la pagina
+                        <p:outputLabel for="dpFechaCreacion" value="Fecha de creación"/>
+                        <p:datePicker id="dpFechaCreacion"
+                                      value="#{frmTipoProductoCaracteristica.registro.fechaCreacion}"
+                                      showTime="true"
+                                      hourFormat="24"
+                                      timeInput="true"
+                                      timeZone="America/El_Salvador"
+                                      pattern="yyyy-MM-dd'T'HH:mm"
+                                      converter="offsetDateTimeConverter"
+                                      required="true"
+                                      requiredMessage="La fecha es obligatoria"
+                                      touchUI="false" />
                     </f:insert>
                 </div>
             </div>

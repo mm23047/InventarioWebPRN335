@@ -8,18 +8,23 @@
         template="../WEB-INF/templates/default.xhtml">
 
    <!-- Header -->
-   <ui:define name="header"><h1>#{productoFrm.nombreBean}</h1></ui:define>
+   <ui:define name="header">
+      <h1 class="titulo-formulario">#{productoFrm.nombreBean}</h1>
+   </ui:define>
 
    <!-- Tabla de registros -->
    <ui:define name="contenido-tabla">
-      <h:panelGrid>
-         <h:form id="frmTop">
-            <p:dataTable value="#{productoFrm.modelo}" var="r"
+      <h:panelGroup id="pnlProductoTabla">
+         <h:form id="frmProductoTop">
+            <p:dataTable id="tblProductos"
+                         value="#{productoFrm.modelo}"
+                         var="r"
                          paginator="true"
                          paginatorPosition="bottom"
                          lazy="true"
                          selection="#{productoFrm.registro}"
                          selectionMode="single"
+                         rowKey="#{r.id}"
                          rows="#{productoFrm.registrosPorPagina}"
                          rendered="#{productoFrm.estado=='NADA'}">
 
@@ -45,196 +50,230 @@
 
                <p:ajax event="rowSelect"
                        listener="#{productoFrm.seleccionarRegistro}"
-                       update=":pnlTabla :pnlDetalle"/>
+                       update=":pnlProductoTabla :pnlProductoDetalle"/>
             </p:dataTable>
 
-            <!-- Botones tipo composite -->
-            <ues:botones-top formulario="#{productoFrm}" />
+            <ues:botones-top formulario="#{productoFrm}"
+                             actualizar=":pnlProductoTabla :pnlProductoDetalle"/>
          </h:form>
-      </h:panelGrid>
+      </h:panelGroup>
    </ui:define>
 
-   <!-- Detalle (formulario de edición/creación) -->
+   <!-- Detalle -->
    <ui:define name="contenido-detalle">
-      <p:tabView id="tabProducto" cache="false" dynamic="true" rendered="#{productoFrm.estado!='NADA'}">
-         <p:tab closable="false" title="Generalidades">
+      <h:panelGroup id="pnlProductoDetalle">
+         <p:tabView id="tabProducto" cache="false" dynamic="true"
+                    rendered="#{productoFrm.estado!='NADA'}">
 
-            <h:form id="frmCrear" >
-               <h:panelGrid columns="2">
+            <p:tab id="tabGeneral" closable="false" title="Generalidades">
+               <h:form id="frmProductoCrear">
+                  <h:panelGrid columns="2">
+                     <p:outputLabel for="txtProductoId" value="ID:"/>
+                     <p:inputText id="txtProductoId" value="#{productoFrm.registro.id}"
+                                  readonly="true" disabled="true" size="75"/>
+                     <p:outputLabel for="txtProductoNombre" value="Nombre Producto:"/>
+                     <p:inputText id="txtProductoNombre" value="#{productoFrm.registro.nombreProducto}"
+                                  required="true" size="75"/>
+                     <p:outputLabel for="txtProductoReferencia" value="Referencia Externa:"/>
+                     <p:inputText id="txtProductoReferencia" value="#{productoFrm.registro.referenciaExterna}"
+                                  size="50"/>
+                     <p:outputLabel for="txtProductoComentarios" value="Comentarios:"/>
+                     <p:inputTextarea id="txtProductoComentarios" value="#{productoFrm.registro.comentarios}"
+                                      rows="4" cols="50"/>
+                     <p:outputLabel for="chkProductoActivo" value="Activo:"/>
+                     <p:selectBooleanCheckbox id="chkProductoActivo" value="#{productoFrm.registro.activo}"/>
+                  </h:panelGrid>
 
-                  <p:outputLabel for="txtId" value="ID:"/>
-                  <p:inputText id="txtId" value="#{productoFrm.registro.id}" readonly="true" disabled="true" size="75"/>
+                  <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
+                     <p:commandButton value="Crear"
+                                      action="#{productoFrm.btnGuardarHandler}"
+                                      rendered="#{productoFrm.estado=='CREAR'}"
+                                      update=":pnlProductoTabla :pnlProductoDetalle"
+                                      process="@form"/>
+                     <p:commandButton value="Modificar"
+                                      action="#{productoFrm.btnModificarHandler}"
+                                      rendered="#{productoFrm.estado=='MODIFICAR'}"
+                                      update=":pnlProductoTabla :pnlProductoDetalle"
+                                      process="@form"/>
+                     <p:commandButton value="Eliminar"
+                                      action="#{productoFrm.btnEliminarHandler}"
+                                      rendered="#{productoFrm.estado=='MODIFICAR'}"
+                                      update=":pnlProductoTabla :pnlProductoDetalle"
+                                      process="@form"/>
+                  </h:panelGrid>
+               </h:form>
+            </p:tab>
 
-                  <p:outputLabel for="txtNombre" value="Nombre Producto:"/>
-                  <p:inputText id="txtNombre" value="#{productoFrm.registro.nombreProducto}" size="75"/>
+            <!-- Pestaña de Tipos de Producto - CON p:datePicker Y OffsetDateTimeConverter -->
+            <p:tab id="tabTiposProducto" closable="false" title="Tipos de Producto"
+                   disabled="#{productoFrm.estado!='MODIFICAR'}">
 
-                  <p:outputLabel for="txtReferencia" value="Referencia Externa:"/>
-                  <p:inputText id="txtReferencia" value="#{productoFrm.registro.referenciaExterna}" roms="4" size="50"/>
-
-                  <p:outputLabel for="txtComentarios" value="Comentarios:"/>
-                  <p:inputTextarea id="txtComentarios" value="#{productoFrm.registro.comentarios}" rows="4" cols="50"/>
-
-                  <p:outputLabel for="chkActivo" value="Activo:"/>
-                  <p:selectBooleanCheckbox id="chkActivo" value="#{productoFrm.registro.activo}"/>
-               </h:panelGrid>
-
-               <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
-                  <p:commandButton value="Crear"
-                                   actionListener="#{productoFrm.btnGuardarHandler}"
-                                   rendered="#{productoFrm.estado=='CREAR'}"
-                                   update=":pnlTabla :pnlDetalle"/>
-
-                  <p:commandButton value="Modificar"
-                                   actionListener="#{productoFrm.btnModificarHandler}"
-                                   rendered="#{productoFrm.estado=='MODIFICAR'}"
-                                   update=":pnlTabla :pnlDetalle"/>
-
-                  <p:commandButton value="Eliminar"
-                                   actionListener="#{productoFrm.btnEliminarHandler}"
-                                   rendered="#{productoFrm.estado=='MODIFICAR'}"
-                                   update=":pnlTabla :pnlDetalle"/>
-               </h:panelGrid>
-
-            </h:form>
-         </p:tab>
-         <p:tab closable="false" title="Tipos de Producto" disabled="#{productoFrm.estado!='MODIFICAR'}">
-            <h:panelGroup id="pnlTipoProducto">
-               <h:panelGrid>
-                  <h2>#{productoFrm.registro.nombreProducto}</h2>
-                  <h:form id="frmTablaProducto">
-                     <p:dataTable value="#{productoFrm.ptpFrm.modelo}" var="tp"
+               <!-- Panel de Tabla -->
+               <h:panelGroup id="pnlTipoProductoTabla">
+                  <h:form id="frmTablaTipoProducto">
+                     <p:dataTable id="tblTiposProducto"
+                                  value="#{productoFrm.ptpFrm.modelo}"
+                                  var="tp"
                                   paginator="true"
                                   paginatorPosition="bottom"
                                   lazy="true"
                                   selection="#{productoFrm.ptpFrm.registro}"
                                   selectionMode="single"
+                                  rowKey="#{tp.id}"
                                   rows="#{productoFrm.ptpFrm.registrosPorPagina}"
                                   rendered="#{productoFrm.ptpFrm.estado=='NADA'}">
 
                         <p:column headerText="ID">
                            <h:outputText value="#{tp.id}" />
                         </p:column>
-
                         <p:column headerText="Tipo">
                            <h:outputText value="#{tp.idTipoProducto.nombre}" />
                         </p:column>
-
                         <p:column headerText="Fecha de Creacion">
                            <h:outputText value="#{tp.fechaCreacion}">
-                              <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss xxx"/>
+                              <f:converter converterId="offsetDateTimeConverter" />
                            </h:outputText>
                         </p:column>
-
                         <p:column headerText="Estado">
                            <h:outputText value="#{tp.activo ? 'ACTIVO' : 'INACTIVO'}" />
                         </p:column>
-
                         <p:column headerText="Observaciones">
                            <h:outputText value="#{tp.observaciones}" />
                         </p:column>
 
-                        <p:ajax event="rowSelect" listener="#{productoFrm.ptpFrm.seleccionarRegistro}"
-                                update=":tabProducto:pnlTipoProducto :tabProducto:pnlDetalleProducto"/>
+                        <p:ajax event="rowSelect"
+                                listener="#{productoFrm.ptpFrm.seleccionarRegistro}"
+                                update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"/>
                      </p:dataTable>
 
-                     <!-- Botones tipo composite -->
-                     <ues:botones-top formulario="#{productoFrm.ptpFrm}" actualizar=":tabProducto:pnlTipoProducto :tabProducto:pnlDetalleProducto"/>
+                     <ues:botones-top formulario="#{productoFrm.ptpFrm}"
+                                      actualizar=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"/>
                   </h:form>
+               </h:panelGroup>
 
-               </h:panelGrid>
-            </h:panelGroup>
-            <h:panelGroup id="pnlDetalleProducto">
-               <h:form id="frmDetalleTipoProducto" rendered="#{productoFrm.ptpFrm.estado!='NADA'}">
-                  <h:panelGrid columns="2">
+               <!-- Panel de Detalle - CON p:datePicker Y OffsetDateTimeConverter -->
+               <h:panelGroup id="pnlTipoProductoDetalle">
+                  <h:form id="frmDetalleTipoProducto"
+                          rendered="#{productoFrm.ptpFrm.estado!='NADA'}">
 
-                     <p:outputLabel for="txtId" value="ID:"/>
-                     <p:inputText id="txtId" value="#{productoFrm.ptpFrm.registro.id}" readonly="true" disabled="true" size="75"/>
+                     <h:panelGrid columns="2" style="margin-bottom: 20px;">
 
-                        <p:outputLabel for="txtNombre" value="Tipo:"/>
+                        <!-- ID -->
+                        <p:outputLabel for="txtIdTp" value="ID:"/>
+                        <p:inputText id="txtIdTp" value="#{productoFrm.ptpFrm.registro.id}"
+                                     readonly="true" disabled="true" size="75"/>
 
-                     <h:panelGroup id="pnlTipoProducto">
+                        <!-- Tipo de Producto -->
+                        <p:outputLabel for="txtTipoSeleccionado" value="Tipo de Producto:"/>
                         <h:panelGrid columns="2">
-                           <p:inputText id="txtNombre" value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}" size="75" readonly="true" disabled="true"/>
-                           <p:commandButton type="button" icon="pi pi-external-link" onclick="PF('dlgTipoProducto').show();" value="Seleccionar Tipo"/>
-                           <p:outputLabel value="Caracteristicas"/>
-                           <h:panelGrid columns="3">
-                              <h:panelGrid>
-                                 <h:outputLabel value="Disponibles"/>
-                                 <h:selectOneListbox>
-                                    <f:selectItems value="#{productoFrm.ptpFrm.posibleCaracteristicas}"
-                                                   var="pc"
-                                                   itemLabel="#{pc.idCaracteristica.nombre}"
-                                                   itemValue="#{pc}"
-
-                                    />
-                                 </h:selectOneListbox>
-                              </h:panelGrid>
-                           </h:panelGrid>
+                           <p:inputText id="txtTipoSeleccionado"
+                                        value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}"
+                                        size="75" readonly="true" disabled="true"/>
+                           <p:commandButton type="button" icon="pi pi-external-link"
+                                            onclick="PF('dlgTipoProducto').show();"
+                                            value="Seleccionar Tipo"
+                                            rendered="#{productoFrm.ptpFrm.estado=='CREAR' or productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
                         </h:panelGrid>
-                     </h:panelGroup>
 
-                        <p:outputLabel for="chkActivo" value="Activo:"/>
-                        <p:selectBooleanCheckbox id="chkActivo" value="#{productoFrm.ptpFrm.registro.activo}"/>
+                        <!-- Activo -->
+                        <p:outputLabel for="chkActivoTp" value="Activo:"/>
+                        <p:selectBooleanCheckbox id="chkActivoTp"
+                                                 value="#{productoFrm.ptpFrm.registro.activo}"/>
 
-                        <p:outputLabel for="txtFechaCreacion" value="Fecha de Creacion:"/>
-                     <p:datePicker value="#{productoFrm.ptpFrm.registro.fechaCreacion}"
-                                   id="txtFechaCreacion" pattern="dd/MM/yyyy HH:mm:ssXXX" showTime="true"/>
+                        <!-- Fecha de Creación - USANDO p:datePicker CON OffsetDateTimeConverter -->
+                        <p:outputLabel for="dpFechaCreacion" value="Fecha de Creación:"/>
+                        <p:datePicker id="dpFechaCreacion"
+                                      value="#{productoFrm.ptpFrm.registro.fechaCreacion}"
+                                      showTime="true"
+                                      hourFormat="24"
+                                      timeInput="true"
+                                      timeZone="America/El_Salvador"
+                                      pattern="yyyy-MM-dd'T'HH:mm"
+                                      converter="offsetDateTimeConverter"
+                                      required="true"
+                                      requiredMessage="La fecha es obligatoria"
+                                      touchUI="false"
+                                      readonly="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
 
-                        <p:outputLabel for="Comentarios" value="Comentarios:"/>
-                        <p:inputTextarea id="txtComentarios" value="#{productoFrm.ptpFrm.registro.observaciones}" rows="4" cols="50"/>
+                        <!-- Observaciones -->
+                        <p:outputLabel for="txtObservacionesTp" value="Observaciones:"/>
+                        <p:inputTextarea id="txtObservacionesTp"
+                                         value="#{productoFrm.ptpFrm.registro.observaciones}"
+                                         rows="4" cols="50"/>
 
+                     </h:panelGrid>
 
-                  </h:panelGrid>
-                  <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
-                     <p:commandButton value="Crear"
-                                      actionListener="#{productoFrm.btnGuardarHandler}"
-                                      rendered="#{productoFrm.estado=='CREAR'}"
-                                      update=":pnlTabla :pnlDetalle"/>
+                     <!-- Botones de acción -->
+                     <h:panelGrid columns="4" style="margin-top: 20px;">
+                        <p:commandButton value="Guardar"
+                                         action="#{productoFrm.ptpFrm.btnGuardarHandler}"
+                                         rendered="#{productoFrm.ptpFrm.estado=='CREAR'}"
+                                         update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
+                                         process="@form"/>
 
-                     <p:commandButton value="Modificar"
-                                      actionListener="#{productoFrm.btnModificarHandler}"
-                                      rendered="#{productoFrm.estado=='MODIFICAR'}"
-                                      update=":pnlTabla :pnlDetalle"/>
+                        <p:commandButton value="Modificar"
+                                         action="#{productoFrm.ptpFrm.btnModificarHandler}"
+                                         rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
+                                         update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
+                                         process="@form"/>
 
-                     <p:commandButton value="Eliminar"
-                                      actionListener="#{productoFrm.btnEliminarHandler}"
-                                      rendered="#{productoFrm.estado=='MODIFICAR'}"
-                                      update=":pnlTabla :pnlDetalle"/>
-                  </h:panelGrid>
-                  <ues:botones-top formulario="#{productoFrm.ptpFrm}" actualizar=":tabProducto:pnlTipoProducto :tabProducto:pnlDetalleProducto"/>
+                        <p:commandButton value="Eliminar"
+                                         action="#{productoFrm.ptpFrm.btnEliminarHandler}"
+                                         rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
+                                         update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
+                                         process="@form"/>
 
-
-               </h:form>
-
-            </h:panelGroup>
-         </p:tab>
-
-      </p:tabView>
-
+                        <p:commandButton value="Cancelar"
+                                         action="#{productoFrm.ptpFrm.btnCancelarHandler}"
+                                         rendered="#{productoFrm.ptpFrm.estado!='NADA'}"
+                                         update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
+                                         immediate="true"/>
+                     </h:panelGrid>
+                  </h:form>
+               </h:panelGroup>
+            </p:tab>
+         </p:tabView>
+      </h:panelGroup>
    </ui:define>
+
+   <!-- Diálogo -->
    <ui:define name="extras">
-      <p:dialog id="dlgTipoProducto" widgetVar="dlgTipoProducto" modal="true" closable="true">
+      <p:dialog id="dlgTipoProducto" widgetVar="dlgTipoProducto" modal="true"
+                closable="true" header="Seleccionar Tipo de Producto"
+                resizable="false" width="500" height="auto">
          <h:form id="frmDlgTipoProducto">
-            <h:panelGrid>
-            <h:panelGrid columns="2">
-               <h:outputLabel value="seleccione el Tipo de Producto:" for="txtTipoProducto"/>
+            <h:panelGrid columns="1" style="width: 100%;">
+               <h:panelGrid columns="2" style="margin-bottom: 15px; width: 100%;">
+                  <h:outputLabel value="Tipo de Producto:" for="txtTipoProducto"
+                                 style="font-weight: bold;"/>
                   <p:autoComplete id="txtTipoProducto"
                                   completeMethod="#{productoFrm.ptpFrm.buscarTiposPorNombres}"
-                                  var="tp"
                                   value="#{productoFrm.ptpFrm.registro.idTipoProducto}"
+                                  var="tp"
                                   converter="TipoProductoConverter"
                                   itemLabel="#{tp.nombre} (#{tp.id})"
                                   itemValue="#{tp}"
                                   forceSelection="true"
                                   dropdown="true"
-                                  size="40"/>
-            </h:panelGrid>
-               <p:commandButton value="Seleccionar"
-                                actionListener="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
-                                process="@form" update="tabProducto: frmDetalleTipoProducto:pnlTipoProducto" oncomplete="PF('dlgTipoProducto').hide():"/>
+                                  size="40"
+                                  required="true"
+                                  requiredMessage="Debe seleccionar un tipo de producto"/>
+               </h:panelGrid>
+
+               <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
+                  <p:commandButton value="Seleccionar"  columns="2" style="text-align: center; margin-top: 15px;"
+                                   action="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
+                                   process="@form"
+                                   update=":tabProducto:pnlTipoProductoDetalle"
+                                   oncomplete="PF('dlgTipoProducto').hide();"/>
+
+                  <p:commandButton value="Cancelar"
+                                   onclick="PF('dlgTipoProducto').hide();"
+                                   type="button"
+                                   immediate="true"/>
+               </h:panelGrid>
             </h:panelGrid>
          </h:form>
       </p:dialog>
    </ui:define>
-
 </ui:composition>
