@@ -126,7 +126,7 @@
                         <p:column headerText="ID">
                            <h:outputText value="#{tp.id}" />
                         </p:column>
-                        <p:column headerText="Tipo">
+                        <p:column headerText="Tipo" >
                            <h:outputText value="#{tp.idTipoProducto.nombre}" />
                         </p:column>
                         <p:column headerText="Fecha de Creacion">
@@ -153,10 +153,9 @@
 
                <!-- Panel de Detalle - CON p:datePicker Y OffsetDateTimeConverter -->
                <h:panelGroup id="pnlTipoProductoDetalle">
-                  <h:form id="frmDetalleTipoProducto"
-                          rendered="#{productoFrm.ptpFrm.estado!='NADA'}">
+                  <h:form id="frmDetalleTipoProducto" rendered="#{productoFrm.ptpFrm.estado!='NADA'}">
 
-                     <h:panelGrid columns="2" style="margin-bottom: 20px;">
+                     <h:panelGrid columns="1" style="margin-bottom: 20px;">
 
                         <!-- ID -->
                         <p:outputLabel for="txtIdTp" value="ID:"/>
@@ -164,16 +163,18 @@
                                      readonly="true" disabled="true" size="75"/>
 
                         <!-- Tipo de Producto -->
-                        <p:outputLabel for="txtTipoSeleccionado" value="Tipo de Producto:"/>
+                        <p:outputLabel for="txtNombre" value="Tipo de Producto:"/>
+                        <h:panelGroup id="pnlTipoProducto">
                         <h:panelGrid columns="2">
-                           <p:inputText id="txtTipoSeleccionado"
-                                        value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}"
+                           <p:inputText id="txtNombre" value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}"
                                         size="75" readonly="true" disabled="true"/>
-                           <p:commandButton type="button" icon="pi pi-external-link"
+                           <p:commandButton type="button"
+                                            icon="pi pi-external-link"
                                             onclick="PF('dlgTipoProducto').show();"
                                             value="Seleccionar Tipo"
                                             rendered="#{productoFrm.ptpFrm.estado=='CREAR' or productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
                         </h:panelGrid>
+                        </h:panelGroup>
 
                         <!-- Activo -->
                         <p:outputLabel for="chkActivoTp" value="Activo:"/>
@@ -243,7 +244,7 @@
                 resizable="false" width="500" height="auto">
          <h:form id="frmDlgTipoProducto">
             <h:panelGrid columns="1" style="width: 100%;">
-               <h:panelGrid columns="2" style="margin-bottom: 15px; width: 100%;">
+               <h:panelGrid columns="2" style="width: 100%; margin-bottom: 15px;">
                   <h:outputLabel value="Tipo de Producto:" for="txtTipoProducto"
                                  style="font-weight: bold;"/>
                   <p:autoComplete id="txtTipoProducto"
@@ -255,7 +256,7 @@
                                   itemValue="#{tp}"
                                   forceSelection="true"
                                   dropdown="true"
-                                  size="40"
+                                  size="20"
                                   required="true"
                                   requiredMessage="Debe seleccionar un tipo de producto"/>
                </h:panelGrid>
@@ -267,7 +268,7 @@
                                    update=":tabProducto:pnlTipoProductoDetalle"
                                    oncomplete="PF('dlgTipoProducto').hide();"/>
 
-                  <p:commandButton value="Cancelar"
+                  <p:commandButton value="Cancelar" columns="2" style="text-align: center; margin-top: 15px;"
                                    onclick="PF('dlgTipoProducto').hide();"
                                    type="button"
                                    immediate="true"/>
