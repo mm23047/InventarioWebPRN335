@@ -4,10 +4,22 @@ import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
 
+
+
 @Entity
 @Table(name = "tipo_producto_caracteristica", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "TipoProductoCaracteristica.findByTipoProducto", query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre= :idTipoProducto"),
+
+        @NamedQuery(name = "TipoProductoCaracteristica.countByTipoProducto", query = "SELECT COUNT(tpc.id) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto"),
+
+        @NamedQuery(name = "TipoProductoCaracteristica.findObligatoriasByTipoProducto", query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto AND tpc.obligatorio = true"),
+
+        @NamedQuery(name = "TipoProductoCaracteristica.countObligatoriasTipoProducto", query = "SELECT COUNT(tpc.id) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto AND tpc.obligatorio = true")
+})
 public class TipoProductoCaracteristica {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_tipo_producto_caracteristica", nullable = false)
     private Long id;
 

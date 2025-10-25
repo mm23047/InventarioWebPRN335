@@ -86,6 +86,7 @@ public class ProductoFrm extends DefaultFrm<Producto> {
         if (event != null && event.getObject() != null) {
             this.registro = event.getObject();
             this.estado = ESTADO_CRUD.MODIFICAR;
+            this.ptpFrm.setIdProducto(this.registro.getId());
         }
     }
 

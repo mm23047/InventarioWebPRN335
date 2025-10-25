@@ -10,7 +10,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf.ESTADO_CRUD;
 import org.primefaces.model.LazyDataModel;
 import java.io.Serializable;
 import java.util.Collections;
@@ -244,12 +243,6 @@ public abstract class DefaultFrm<T> implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", mensaje));
     }
 
-    // Sobrecarga del método enviarMensajeError para compatibilidad con btnGuardarHandler
-    protected void enviarMensajeError(String mensaje, String clientId) {
-        FacesContext.getCurrentInstance().addMessage(clientId,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", mensaje));
-    }
-
     // Método enviarMensaje faltante
     protected void enviarMensaje(String mensaje, FacesMessage.Severity severity) {
         FacesContext.getCurrentInstance().addMessage(null,
@@ -304,13 +297,6 @@ public abstract class DefaultFrm<T> implements Serializable {
         return this.pageSize;
     }
 
-    // Método genérico para manejo de selección de registros
-    public void seleccionarRegistro() {
-        // No verificar if (this.registro != null) porque en rowSelect
-        // el registro se asigna automáticamente por PrimeFaces
-        this.estado = ESTADO_CRUD.MODIFICAR;
-    }
-
     // Método alternativo que puede ser usado por eventos SelectEvent
     public void seleccionarRegistro(SelectEvent<T> event) {
         if (event != null && event.getObject() != null) {
@@ -318,6 +304,5 @@ public abstract class DefaultFrm<T> implements Serializable {
             this.estado = ESTADO_CRUD.MODIFICAR;
         }
     }
-
 
 }
