@@ -48,7 +48,7 @@ public class TipoProductoDAO extends InventarioDefaultDataAccess<TipoProducto> i
      */
     public List<TipoProducto> findByNombreLike(final String nombre, int first, int max) {
         try {
-            if (nombre != null && !nombre.isBlank() && first >= 0 && first <= max) { // Corregí la condición
+            if (nombre != null && !nombre.isBlank() && first >= 0 && first <= max) {
                 var q = em.createNamedQuery("TipoProducto.findByNombreLike", TipoProducto.class);
                 q.setParameter("nombre", "%" + nombre.trim().toUpperCase() + "%");
                 q.setFirstResult(first);

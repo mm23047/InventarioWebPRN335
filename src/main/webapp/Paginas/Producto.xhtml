@@ -207,28 +207,22 @@
                      <!-- Botones de acción -->
                      <h:panelGrid columns="4" style="margin-top: 20px;">
                         <p:commandButton value="Guardar"
-                                         action="#{productoFrm.ptpFrm.btnGuardarHandler}"
+                                         actionListener="#{productoFrm.ptpFrm.btnGuardarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='CREAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
                                          process="@form"/>
 
                         <p:commandButton value="Modificar"
-                                         action="#{productoFrm.ptpFrm.btnModificarHandler}"
+                                         actionListener="#{productoFrm.ptpFrm.btnModificarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
                                          process="@form"/>
 
                         <p:commandButton value="Eliminar"
-                                         action="#{productoFrm.ptpFrm.btnEliminarHandler}"
+                                         actionListener="#{productoFrm.ptpFrm.btnEliminarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
                                          process="@form"/>
-
-                        <p:commandButton value="Cancelar"
-                                         action="#{productoFrm.ptpFrm.btnCancelarHandler}"
-                                         rendered="#{productoFrm.ptpFrm.estado!='NADA'}"
-                                         update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
-                                         immediate="true"/>
                      </h:panelGrid>
                   </h:form>
                </h:panelGroup>
@@ -263,15 +257,9 @@
 
                <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
                   <p:commandButton value="Seleccionar"  columns="2" style="text-align: center; margin-top: 15px;"
-                                   action="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
                                    process="@form"
-                                   update=":tabProducto:pnlTipoProductoDetalle"
+                                   update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto"
                                    oncomplete="PF('dlgTipoProducto').hide();"/>
-
-                  <p:commandButton value="Cancelar" columns="2" style="text-align: center; margin-top: 15px;"
-                                   onclick="PF('dlgTipoProducto').hide();"
-                                   type="button"
-                                   immediate="true"/>
                </h:panelGrid>
             </h:panelGrid>
          </h:form>
