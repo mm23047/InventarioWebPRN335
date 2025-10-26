@@ -33,7 +33,7 @@
                         <h:outputText value="#{r.nombre}" />
                     </p:column>
 
-                    <p:column headerText="#{crud['frm.botones.tipoUnidadMedida']}">
+                    <p:column headerText="#{crud['frm.botones.caracteristica']}">
                         <h:outputText value="#{r.idTipoUnidadMedida.nombre}" />
                     </p:column>
 
@@ -68,7 +68,7 @@
                              required="true"
                              validator="#{caracteristicaFrm.validarnombre}"/>
 
-                <p:outputLabel for="ddlTipoUnidadMedida" value="#{crud['frm.botones.tipoUnidadMedida']}:"/>
+                <p:outputLabel for="ddlTipoUnidadMedida" value="#{crud['frm.botones.caracteristica']}:"/>
                 <p:selectOneMenu id="ddlTipoUnidadMedida" value="#{caracteristicaFrm.idTipoUnidadMedidaSeleccionado}">
                     <f:selectItems value="#{caracteristicaFrm.listaTipoUnidadMedida}"
                                    var="tipo"
