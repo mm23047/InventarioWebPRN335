@@ -60,4 +60,14 @@ public class TipoProductoDAO extends InventarioDefaultDataAccess<TipoProducto> i
         }
         return List.of();
     }
+
+    public List<TipoProducto> findAll() {
+        try {
+            return em.createQuery("SELECT t FROM TipoProducto t WHERE t.activo = true ORDER BY t.nombre", TipoProducto.class)
+                    .getResultList();
+        } catch (Exception ex) {
+            Logger.getLogger(TipoProductoDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            return List.of();
+        }
+    }
 }

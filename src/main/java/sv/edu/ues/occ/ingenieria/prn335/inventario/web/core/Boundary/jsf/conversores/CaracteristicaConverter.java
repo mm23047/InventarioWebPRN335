@@ -6,36 +6,36 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoProductoDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoProducto;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CaracteristicaDAO;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Caracteristica;
 
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@FacesConverter(value = "TipoProductoConverter", managed = true)
+@FacesConverter(value = "CaracteristicaConverter", managed = true)
 @Dependent
-public class TipoProductoConverter implements Converter<TipoProducto>, Serializable {
+public class CaracteristicaConverter implements Converter<Caracteristica>, Serializable {
 
     @Inject
-    TipoProductoDAO tipoProductoDAO;
+    CaracteristicaDAO caracteristicaDAO;
 
     @Override
-    public TipoProducto getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
-        Logger.getLogger(TipoProductoConverter.class.getName()).log(Level.INFO,
-                "Converter getAsObject recibió: '" + s + "'");
+    public Caracteristica getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
+        Logger.getLogger(CaracteristicaConverter.class.getName()).log(Level.INFO,
+                "CaracteristicaConverter getAsObject recibió: '" + s + "'");
 
         if (s != null && !s.isBlank()) {
             try {
                 // PRIMERO: Intentar como ID directo (para p:selectOneMenu)
-                Long id = Long.valueOf(s.trim());
-                TipoProducto resultado = tipoProductoDAO.buscarRegistroPorId(id);
+                Integer id = Integer.valueOf(s.trim());
+                Caracteristica resultado = caracteristicaDAO.leer(id);
                 if (resultado != null) {
                     return resultado;
                 }
             } catch (NumberFormatException e) {
                 // Si falla, intentar con formato "nombre (id)" (para p:autoComplete)
-                Logger.getLogger(TipoProductoConverter.class.getName()).log(Level.INFO,
+                Logger.getLogger(CaracteristicaConverter.class.getName()).log(Level.INFO,
                         "No es ID directo, intentando formato con paréntesis");
             }
 
@@ -45,10 +45,10 @@ public class TipoProductoConverter implements Converter<TipoProducto>, Serializa
             if (inicioId != -1 && finId != -1 && finId > inicioId) {
                 String idStr = s.substring(inicioId + 1, finId).trim();
                 try {
-                    Long id = Long.valueOf(idStr);
-                    return tipoProductoDAO.buscarRegistroPorId(id);
+                    Integer id = Integer.valueOf(idStr);
+                    return caracteristicaDAO.leer(id);
                 } catch (Exception ex) {
-                    Logger.getLogger(TipoProductoConverter.class.getName()).log(Level.SEVERE,
+                    Logger.getLogger(CaracteristicaConverter.class.getName()).log(Level.SEVERE,
                             "Error en converter para valor: " + s, ex);
                 }
             }
@@ -57,10 +57,9 @@ public class TipoProductoConverter implements Converter<TipoProducto>, Serializa
     }
 
     @Override
-    public String getAsString(FacesContext facesContext, UIComponent uiComponent, TipoProducto tipoProducto) {
-
-        if (tipoProducto != null && tipoProducto.getId() != null) {
-            return tipoProducto.getId().toString();
+    public String getAsString(FacesContext facesContext, UIComponent uiComponent, Caracteristica caracteristica) {
+        if (caracteristica != null && caracteristica.getId() != null) {
+            return caracteristica.getId().toString();
         }
         return "";
     }

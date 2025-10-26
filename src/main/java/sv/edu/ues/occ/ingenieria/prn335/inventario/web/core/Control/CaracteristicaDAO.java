@@ -21,4 +21,12 @@ public class CaracteristicaDAO extends InventarioDefaultDataAccess<Caracteristic
     public EntityManager getEntityManager(){
         return em;
     }
+
+    // AGREGAR ESTE MÉTODO
+    public Caracteristica buscarRegistroPorId(Integer id) {
+        if (id != null) {
+            return em.find(Caracteristica.class, id);
+        }
+        return null;
+    }
 }

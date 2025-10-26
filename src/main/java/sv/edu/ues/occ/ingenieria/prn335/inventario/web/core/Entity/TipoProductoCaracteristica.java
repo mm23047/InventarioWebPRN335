@@ -9,13 +9,25 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "tipo_producto_caracteristica", schema = "public")
 @NamedQueries({
-        @NamedQuery(name = "TipoProductoCaracteristica.findByTipoProducto", query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre= :idTipoProducto"),
+        // NUEVOS NAMED QUERIES para el formulario de características
+        @NamedQuery(name = "TipoProductoCaracteristica.findByTipoProductoId",
+                query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto"),
 
-        @NamedQuery(name = "TipoProductoCaracteristica.countByTipoProducto", query = "SELECT COUNT(tpc.id) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto"),
+        @NamedQuery(name = "TipoProductoCaracteristica.countByTipoProductoId",
+                query = "SELECT COUNT(tpc) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto"),
 
-        @NamedQuery(name = "TipoProductoCaracteristica.findObligatoriasByTipoProducto", query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto AND tpc.obligatorio = true"),
+        // Mantener los existentes SIN MODIFICAR
+        @NamedQuery(name = "TipoProductoCaracteristica.findByTipoProducto",
+                query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre= :idTipoProducto"),
 
-        @NamedQuery(name = "TipoProductoCaracteristica.countObligatoriasTipoProducto", query = "SELECT COUNT(tpc.id) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto AND tpc.obligatorio = true")
+        @NamedQuery(name = "TipoProductoCaracteristica.countByTipoProducto",
+                query = "SELECT COUNT(tpc.id) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto"),
+
+        @NamedQuery(name = "TipoProductoCaracteristica.findObligatoriasByTipoProducto",
+                query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto AND tpc.obligatorio = true"),
+
+        @NamedQuery(name = "TipoProductoCaracteristica.countObligatoriasTipoProducto",
+                query = "SELECT COUNT(tpc.id) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre = :idTipoProducto AND tpc.obligatorio = true")
 })
 public class TipoProductoCaracteristica {
     @Id

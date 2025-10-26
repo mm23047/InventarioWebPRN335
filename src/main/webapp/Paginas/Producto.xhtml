@@ -86,17 +86,17 @@
 
                   <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
                      <p:commandButton value="Crear"
-                                      action="#{productoFrm.btnGuardarHandler}"
+                                      actionListener="#{productoFrm.btnGuardarHandler}"
                                       rendered="#{productoFrm.estado=='CREAR'}"
                                       update=":pnlProductoTabla :pnlProductoDetalle"
                                       process="@form"/>
                      <p:commandButton value="Modificar"
-                                      action="#{productoFrm.btnModificarHandler}"
+                                      actionListener="#{productoFrm.btnModificarHandler}"
                                       rendered="#{productoFrm.estado=='MODIFICAR'}"
                                       update=":pnlProductoTabla :pnlProductoDetalle"
                                       process="@form"/>
                      <p:commandButton value="Eliminar"
-                                      action="#{productoFrm.btnEliminarHandler}"
+                                      actionListener="#{productoFrm.btnEliminarHandler}"
                                       rendered="#{productoFrm.estado=='MODIFICAR'}"
                                       update=":pnlProductoTabla :pnlProductoDetalle"
                                       process="@form"/>
@@ -165,15 +165,46 @@
                         <!-- Tipo de Producto -->
                         <p:outputLabel for="txtNombre" value="Tipo de Producto:"/>
                         <h:panelGroup id="pnlTipoProducto">
-                        <h:panelGrid columns="2">
-                           <p:inputText id="txtNombre" value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}"
-                                        size="75" readonly="true" disabled="true"/>
-                           <p:commandButton type="button"
-                                            icon="pi pi-external-link"
-                                            onclick="PF('dlgTipoProducto').show();"
-                                            value="Seleccionar Tipo"
-                                            rendered="#{productoFrm.ptpFrm.estado=='CREAR' or productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
-                        </h:panelGrid>
+                           <h:panelGrid columns="2" style="width: 100%;">
+                              <p:inputText id="txtNombre" value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}"
+                                           size="75" readonly="true" disabled="true"/>
+                              <p:commandButton type="button"
+                                               icon="pi pi-external-link"
+                                               onclick="PF('dlgTipoProducto').show();"
+                                               value="Seleccionar Tipo"
+                                               rendered="#{productoFrm.ptpFrm.estado=='CREAR' or productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
+                           </h:panelGrid>
+
+                           <!-- Características - SOLO se muestra cuando hay un tipo de producto seleccionado -->
+                           <h:panelGroup rendered="#{not empty productoFrm.ptpFrm.registro.idTipoProducto}"
+                                         style="margin-top: 15px;">
+                              <p:outputLabel value="Características" style="font-weight: bold; display: block; margin-bottom: 8px;"/>
+                              <h:panelGrid columns="2" style="width: 100%;">
+                                 <h:panelGrid>
+                                    <h:outputLabel value="Características Disponibles"/>
+                                    <h:selectOneListbox style="width: 300px; height: 150px;">
+                                       <f:selectItems value="#{productoFrm.ptpFrm.posibleCaracteristicas}"
+                                                      var="pc"
+                                                      itemLabel="#{pc.idCaracteristica.nombre}"
+                                                      itemValue="#{pc}"/>
+                                    </h:selectOneListbox>
+                                 </h:panelGrid>
+                                 <h:panelGrid style="vertical-align: middle; padding-left: 20px;">
+                                    <p:commandButton value="Agregar →"
+                                                     style="margin-bottom: 5px;"
+                                                     icon="pi pi-plus"/>
+                                    <p:commandButton value="← Remover"
+                                                     style="margin-bottom: 5px;"
+                                                     icon="pi pi-minus"/>
+                                 </h:panelGrid>
+                                 <h:panelGrid>
+                                    <h:outputLabel value="Características Seleccionadas"/>
+                                    <h:selectOneListbox style="width: 300px; height: 150px;">
+                                       <!-- Aquí irían las características seleccionadas -->
+                                    </h:selectOneListbox>
+                                 </h:panelGrid>
+                              </h:panelGrid>
+                           </h:panelGroup>
                         </h:panelGroup>
 
                         <!-- Activo -->
@@ -257,6 +288,7 @@
 
                <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
                   <p:commandButton value="Seleccionar"  columns="2" style="text-align: center; margin-top: 15px;"
+                                   actionListener="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
                                    process="@form"
                                    update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto"
                                    oncomplete="PF('dlgTipoProducto').hide();"/>

@@ -26,7 +26,6 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return em;
     }
 
-
     public Long countByTipoProducto(final Long idTipoProducto){
         if(idTipoProducto != null){
             try {
@@ -40,7 +39,6 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return 0L;
     }
 
-
     /**
      * Busca las caracteristicas marcadas como obligatorias para un tipo de producto
      * @param idTipoProducto el id del tipo de producto
@@ -50,16 +48,17 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
      */
     public List<TipoProductoCaracteristica> findObligatoriasByTipoProducto(final Long idTipoProducto,int first, int max) {
         if (idTipoProducto != null) {
-try {
-    TypedQuery<TipoProductoCaracteristica> query = em.createNamedQuery("TipoProductoCaracteristica.findObligatoriasByTipoProducto", TipoProductoCaracteristica.class);
-    query.setParameter("idTipoProducto", idTipoProducto);
-    query.setFirstResult(first);
-    query.setMaxResults(max);
-}catch (Exception ex){
-    Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
-}
+            try {
+                TypedQuery<TipoProductoCaracteristica> query = em.createNamedQuery("TipoProductoCaracteristica.findObligatoriasByTipoProducto", TipoProductoCaracteristica.class);
+                query.setParameter("idTipoProducto", idTipoProducto);
+                query.setFirstResult(first);
+                query.setMaxResults(max);
+                return query.getResultList();
+            }catch (Exception ex){
+                Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            }
         }
-return List.of();
+        return List.of();
     }
 
     /**
@@ -80,5 +79,55 @@ return List.of();
         return List.of();
     }
 
+    /**
+     * NUEVO MÉTODO: Busca características de un tipo de producto con paginación
+     * @param idTipoProducto el id del tipo de producto
+     * @param first primer registro
+     * @param max máximo de registros
+     * @return lista paginada de características
+     */
+    public List<TipoProductoCaracteristica> findByTipoProducto(final Long idTipoProducto, int first, int max) {
+        if (idTipoProducto != null) {
+            try {
+                TypedQuery<TipoProductoCaracteristica> query = em.createNamedQuery("TipoProductoCaracteristica.findByTipoProducto", TipoProductoCaracteristica.class);
+                query.setParameter("idTipoProducto", idTipoProducto);
+                query.setFirstResult(first);
+                query.setMaxResults(max);
+                return query.getResultList();
+            } catch (Exception ex) {
+                Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+        return List.of();
+    }
 
+    public List<TipoProductoCaracteristica> findByTipoProductoDirecto(final Long idTipoProducto) {
+        if (idTipoProducto != null) {
+            try {
+                return em.createQuery(
+                                "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto",
+                                TipoProductoCaracteristica.class)
+                        .setParameter("idTipoProducto", idTipoProducto)
+                        .getResultList();
+            } catch (Exception ex) {
+                Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+        return List.of();
+    }
+
+    public Long countByTipoProductoDirecto(final Long idTipoProducto) {
+        if (idTipoProducto != null) {
+            try {
+                return em.createQuery(
+                                "SELECT COUNT(tpc) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto",
+                                Long.class)
+                        .setParameter("idTipoProducto", idTipoProducto)
+                        .getSingleResult();
+            } catch (Exception ex) {
+                Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            }
+        }
+        return 0L;
+    }
 }
