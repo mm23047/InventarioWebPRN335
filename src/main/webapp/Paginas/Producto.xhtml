@@ -176,7 +176,7 @@
                            </h:panelGrid>
 
                            <!-- Características - SOLO se muestra cuando hay un tipo de producto seleccionado -->
-                           <h:panelGroup rendered="#{not empty productoFrm.ptpFrm.registro.idTipoProducto}"
+                           <h:panelGroup id="pnlCaracteristicas" rendered="#{not empty productoFrm.ptpFrm.registro.idTipoProducto}"
                                          style="margin-top: 15px;">
                               <p:outputLabel value="Características" style="font-weight: bold; display: block; margin-bottom: 8px;"/>
                               <h:panelGrid columns="2" style="width: 100%;">
@@ -290,7 +290,7 @@
                   <p:commandButton value="Seleccionar"  columns="2" style="text-align: center; margin-top: 15px;"
                                    actionListener="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
                                    process="@form"
-                                   update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto"
+                                   update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto :tabProducto:frmDetalleTipoProducto:pnlCaracteristicas"
                                    oncomplete="PF('dlgTipoProducto').hide();"/>
                </h:panelGrid>
             </h:panelGrid>
