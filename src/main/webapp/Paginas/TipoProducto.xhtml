@@ -175,46 +175,81 @@
                         <h:form id="tipoProductoCaracteristicaFrmDetalle"
                                 rendered="#{tipoProductoFrm.tpcFrm.estado!='NADA'}">
 
-                            <h:panelGrid columns="2" style="margin-bottom: 20px;">
+                            <h:panelGrid columns="1" style="margin-bottom: 20px; column-gap: 15px; row-gap: 10px;">
 
-                                <p:outputLabel for="tpcTxtId" value="ID:"/>
-                                <p:inputText id="tpcTxtId" value="#{tipoProductoFrm.tpcFrm.registro.id}"
-                                             readonly="true" disabled="true" size="75"/>
+                                <h:panelGrid columns="2" style="margin-bottom: 10px; column-gap: 10px;">
 
-                                <!-- Característica - CON CAMPO DE TEXTO Y BOTÓN COMO EN PRODUCTO -->
-                                <p:outputLabel for="txtCaracteristicaNombre" value="Característica:"/>
-                                <h:panelGroup id="pnlCaracteristica">
-                                    <h:panelGrid columns="2" style="width: 100%;">
-                                        <p:inputText id="txtCaracteristicaNombre"
-                                                     value="#{tipoProductoFrm.tpcFrm.registro.idCaracteristica.nombre}"
-                                                     size="75" readonly="true" disabled="true"/>
-                                        <p:commandButton type="button"
-                                                         icon="pi pi-external-link"
-                                                         onclick="PF('dlgCaracteristica').show();"
-                                                         value="Seleccionar Característica"
-                                                         rendered="#{tipoProductoFrm.tpcFrm.estado=='CREAR' or tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"/>
+                                    <h:panelGrid columns="2" style="width: 690%; column-gap: 5px; margin-bottom: 10px;">
+                                        <p:outputLabel for="tpcTxtId" value="ID:"/>
+                                        <p:inputText id="tpcTxtId"
+                                                     value="#{tipoProductoFrm.tpcFrm.registro.id}"
+                                                     readonly="true"
+                                                     disabled="true"
+                                                     size="20"
+                                                     style="margin-left:5px;"/>
                                     </h:panelGrid>
-                                </h:panelGroup>
 
-                                <p:outputLabel for="tpcChkObligatorio" value="Obligatorio:"/>
-                                <p:selectBooleanCheckbox id="tpcChkObligatorio"
-                                                         value="#{tipoProductoFrm.tpcFrm.registro.obligatorio}"/>
 
-                                <p:outputLabel for="tpcDpFechaCreacion" value="Fecha de Creación:"/>
-                                <p:datePicker id="tpcDpFechaCreacion"
-                                              value="#{tipoProductoFrm.tpcFrm.registro.fechaCreacion}"
-                                              showTime="true"
-                                              hourFormat="24"
-                                              timeInput="true"
-                                              timeZone="America/El_Salvador"
-                                              pattern="yyyy-MM-dd'T'HH:mm"
-                                              converter="offsetDateTimeConverter"
-                                              required="true"
-                                              requiredMessage="La fecha es obligatoria"
-                                              touchUI="false"
-                                              readonly="#{tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"/>
+                                </h:panelGrid>
+
+
+                                <h:panelGrid columns="2" style="width: 100%; margin-bottom: 10px; column-gap: 10px;">
+                                    <!-- Label Característica -->
+
+
+                                    <!-- Panel con cuadro y botón, movido a la derecha del label -->
+                                    <h:panelGroup id="pnlCaracteristica">
+
+                                        <h:panelGrid columns="2" style="width: 85%; column-gap: 5px;">
+                                            <p:outputLabel for="txtCaracteristicaNombre" value="Característica:" style="display:flex; align-items:center;" />
+                                            <p:inputText id="txtCaracteristicaNombre"
+                                                         value="#{tipoProductoFrm.tpcFrm.registro.idCaracteristica.nombre}"
+                                                         readonly="true"
+                                                         disabled="true"
+                                                         size="50"/>
+
+                                            <h:panelGrid columns="1" style="width: 1100%; column-gap: 5px;">
+                                                <p:commandButton type="button"
+                                                                 icon="pi pi-external-link"
+                                                                 onclick="PF('dlgCaracteristica').show();"
+                                                                 value="Seleccionar Característica"
+                                                                 rendered="#{tipoProductoFrm.tpcFrm.estado=='CREAR' or tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"/>
+                                            </h:panelGrid>
+
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+
+                                <!-- Obligatorio -->
+
+                                <h:panelGrid columns="2" style="width: 32%; column-gap: 5px; margin-bottom: 10px;">
+                                    <p:outputLabel for="tpcChkObligatorio" value="Obligatorio:"/>
+                                    <p:selectBooleanCheckbox id="tpcChkObligatorio"
+                                                             value="#{tipoProductoFrm.tpcFrm.registro.obligatorio}"/>
+                                </h:panelGrid>
+
+
+                                <!-- Fecha de Creación -->
+
+                                <h:panelGrid columns="2" style="width: 58%; margin-bottom: 10px; column-gap: 10px;">
+                                    <p:outputLabel for="tpcDpFechaCreacion" value="Fecha de Creación:"/>
+                                    <p:datePicker id="tpcDpFechaCreacion"
+                                                  value="#{tipoProductoFrm.tpcFrm.registro.fechaCreacion}"
+                                                  showTime="true"
+                                                  hourFormat="24"
+                                                  timeInput="true"
+                                                  timeZone="America/El_Salvador"
+                                                  pattern="yyyy-MM-dd'T'HH:mm"
+                                                  converter="offsetDateTimeConverter"
+                                                  required="true"
+                                                  requiredMessage="La fecha es obligatoria"
+                                                  touchUI="false"/>
+                                </h:panelGrid>
+
 
                             </h:panelGrid>
+
 
                             <h:panelGrid columns="3" style="margin-top: 20px;">
                                 <p:commandButton value="Guardar"
@@ -262,7 +297,7 @@
                                         itemValue="#{car}"
                                         forceSelection="true"
                                         dropdown="true"
-                                        size="50"
+                                        size="30"
                                         required="true"
                                         requiredMessage="Debe seleccionar una característica"/>
                     </h:panelGrid>

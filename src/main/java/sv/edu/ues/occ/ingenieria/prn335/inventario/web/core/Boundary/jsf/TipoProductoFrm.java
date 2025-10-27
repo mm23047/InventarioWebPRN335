@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-
 @Named
 @ViewScoped
 public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
@@ -23,7 +22,6 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
 
     @Inject
     protected TipoProductoCaracteristicaFrm tpcFrm;
-
 
     private List<TipoProducto> tiposProductoDisponibles;
 
@@ -145,18 +143,33 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
         return false;
     }
 
+    // Nuevo método para sincronizar la instancia del padre
+    public void sincronizarPadre() {
+        if (registro != null && registro.getIdTipoProductoPadre() != null && tiposProductoDisponibles != null) {
+            for (TipoProducto tp : tiposProductoDisponibles) {
+                if (tp.getId().equals(registro.getIdTipoProductoPadre().getId())) {
+                    registro.setIdTipoProductoPadre(tp);
+                    break;
+                }
+            }
+        }
+    }
+
     @Override
     public void seleccionarRegistro(org.primefaces.event.SelectEvent<TipoProducto> event) {
         if (event != null && event.getObject() != null) {
             this.registro = event.getObject();
             this.estado = ESTADO_CRUD.MODIFICAR;
+
             // Setear el idTipoProducto en el formulario de características
             if (this.tpcFrm != null) {
                 this.tpcFrm.setIdTipoProducto(this.registro.getId());
             }
+
+            // Sincronizar instancia del padre para que selectOneMenu funcione correctamente
+            sincronizarPadre();
         }
     }
-
 
     public String getAncestrosAsString(TipoProducto tipoProducto) {
         if(tipoProducto == null) {
@@ -176,5 +189,18 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
             tpcFrm.setIdTipoProducto(this.registro.getId());
         }
         return tpcFrm;
+    }
+
+    // Método adicional para obtener un tipo por su ID dentro de la lista de disponibles
+    public TipoProducto obtenerTipoProductoPorId(Long id) {
+        if (id == null) return null;
+        if (tiposProductoDisponibles != null) {
+            for (TipoProducto tp : tiposProductoDisponibles) {
+                if (tp.getId().equals(id)) {
+                    return tp;
+                }
+            }
+        }
+        return null;
     }
 }

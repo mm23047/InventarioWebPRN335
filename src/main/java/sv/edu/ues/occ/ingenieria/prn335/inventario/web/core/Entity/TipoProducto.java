@@ -1,4 +1,5 @@
-package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
+
+        package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
