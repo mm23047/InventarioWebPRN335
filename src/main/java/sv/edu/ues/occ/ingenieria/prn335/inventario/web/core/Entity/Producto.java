@@ -8,6 +8,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "producto", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "Producto.findByNombreLike",
+                query = "SELECT p FROM Producto p WHERE UPPER(p.nombreProducto) LIKE :nombre AND p.activo = true ORDER BY p.nombreProducto ASC")
+})
 public class Producto {
     @Id
     @Column(name = "id_producto", nullable = false)
@@ -21,10 +25,6 @@ public class Producto {
             message = "El nombre del producto solo puede contener letras y espacios internos, sin espacios al inicio o final")
     @Column(name = "nombre_producto", length = 155)
     private String nombreProducto;
-
-
-
-
 
 
     @Lob

@@ -7,8 +7,19 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "compra", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "Compra.findByEstado",
+                query = "SELECT c FROM Compra c WHERE c.estado = :estado ORDER BY c.fecha DESC"),
+        @NamedQuery(name = "Compra.findByProveedor",
+                query = "SELECT c FROM Compra c WHERE c.proveedor.id = :idProveedor ORDER BY c.fecha DESC"),
+        @NamedQuery(name = "Compra.findByFechaRange",
+                query = "SELECT c FROM Compra c WHERE c.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY c.fecha DESC"),
+        @NamedQuery(name = "Compra.calcularMontoTotal",
+                query = "SELECT SUM(d.cantidad * d.precio) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra AND d.estado != 'ANULADO'")
+})
 public class Compra {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_compra", nullable = false)
     private Long id;
 

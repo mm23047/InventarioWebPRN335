@@ -8,6 +8,16 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "compra_detalle", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "CompraDetalle.findByCompra",
+                query = "SELECT d FROM CompraDetalle d WHERE d.idCompra.id = :idCompra ORDER BY d.idProducto.nombreProducto ASC"),
+        @NamedQuery(name = "CompraDetalle.countByCompra",
+                query = "SELECT COUNT(d) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra"),
+        @NamedQuery(name = "CompraDetalle.findByProducto",
+                query = "SELECT d FROM CompraDetalle d WHERE d.idProducto.id = :idProducto AND d.estado != 'ANULADO' ORDER BY d.idCompra.fecha DESC"),
+        @NamedQuery(name = "CompraDetalle.calcularSubtotal",
+                query = "SELECT SUM(d.cantidad * d.precio) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra AND d.estado != 'ANULADO'")
+})
 public class CompraDetalle {
     @Id
     @Column(name = "id_compra_detalle", nullable = false)
