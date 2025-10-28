@@ -3,7 +3,7 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
-
+import java.util.Objects;
 
 
 @Entity
@@ -16,7 +16,17 @@ import java.time.OffsetDateTime;
         @NamedQuery(name = "TipoProductoCaracteristica.countByTipoProductoId",
                 query = "SELECT COUNT(tpc) FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto"),
 
-        // Mantener los existentes SIN MODIFICAR
+        @NamedQuery(name = "TipoProductoCaracteristica.findObligatoriasByTipoProductoDirecto",
+                query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto AND tpc.obligatorio = true"),
+
+        // Nueva consulta para características NO obligatorias de un tipo de producto
+        @NamedQuery(name = "TipoProductoCaracteristica.findNoObligatoriasByTipoProductoDirecto",
+                query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.id = :idTipoProducto AND (tpc.obligatorio = false OR tpc.obligatorio IS NULL)"),
+
+        @NamedQuery(name = "TipoProductoCaracteristica.esCaracteristicaObligatoria",
+                query = "SELECT COUNT(tpc) FROM TipoProductoCaracteristica tpc WHERE tpc.id = :id AND tpc.obligatorio = true"),
+
+              // Mantener los existentes SIN MODIFICAR
         @NamedQuery(name = "TipoProductoCaracteristica.findByTipoProducto",
                 query = "SELECT tpc FROM TipoProductoCaracteristica tpc WHERE tpc.idTipoProducto.idTipoProductoPadre= :idTipoProducto"),
 
@@ -87,6 +97,19 @@ public class TipoProductoCaracteristica {
 
     public void setFechaCreacion(OffsetDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TipoProductoCaracteristica that = (TipoProductoCaracteristica) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }

@@ -104,7 +104,7 @@
                </h:form>
             </p:tab>
 
-            <!-- Pestaña de Tipos de Producto - CON p:datePicker Y OffsetDateTimeConverter -->
+            <!-- Pestaña de Tipos de Producto -->
             <p:tab id="tabTiposProducto" closable="false" title="Tipos de Producto"
                    disabled="#{productoFrm.estado!='MODIFICAR'}">
 
@@ -151,7 +151,7 @@
                   </h:form>
                </h:panelGroup>
 
-               <!-- Panel de Detalle - CON p:datePicker Y OffsetDateTimeConverter -->
+               <!-- Panel de Detalle -->
                <h:panelGroup id="pnlTipoProductoDetalle">
                   <h:form id="frmDetalleTipoProducto" rendered="#{productoFrm.ptpFrm.estado!='NADA'}">
 
@@ -175,35 +175,59 @@
                                                rendered="#{productoFrm.ptpFrm.estado=='CREAR' or productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
                            </h:panelGrid>
 
-                           <!-- Características - SOLO se muestra cuando hay un tipo de producto seleccionado -->
-                           <h:panelGroup id="pnlCaracteristicas" rendered="#{not empty productoFrm.ptpFrm.registro.idTipoProducto}"
+                           <!-- Características - APLICANDO EL DISEÑO EXACTO DEL PRIMER FORMULARIO -->
+                           <h:panelGroup id="pnlCaracteristicas"
+                                         rendered="#{not empty productoFrm.ptpFrm.registro.idTipoProducto}"
                                          style="margin-top: 15px;">
                               <p:outputLabel value="Características" style="font-weight: bold; display: block; margin-bottom: 8px;"/>
-                              <h:panelGrid columns="2" style="width: 100%;">
+                              <h:panelGrid columns="3" style="width: 100%;">
                                  <h:panelGrid>
-                                    <h:outputLabel value="Características Disponibles"/>
-                                    <h:selectOneListbox style="width: 300px; height: 150px;">
+                                    <h:outputLabel value="Características Disponibles" />
+                                    <h:selectOneListbox id="listDisponibles"
+                                                        style="width: 300px; height: 150px;"
+                                                        value="#{productoFrm.ptpFrm.caracteristicaSeleccionadaDisponible}">
                                        <f:selectItems value="#{productoFrm.ptpFrm.posibleCaracteristicas}"
                                                       var="pc"
                                                       itemLabel="#{pc.idCaracteristica.nombre}"
                                                       itemValue="#{pc}"/>
+                                       <f:converter converterId="TipoProductoCaracteristicaConverter" />
                                     </h:selectOneListbox>
                                  </h:panelGrid>
+
                                  <h:panelGrid style="vertical-align: middle; padding-left: 20px;">
                                     <p:commandButton value="Agregar →"
                                                      style="margin-bottom: 5px;"
-                                                     icon="pi pi-plus"/>
+                                                     icon="pi pi-plus"
+                                                     actionListener="#{productoFrm.ptpFrm.agregarCaracteristica}"
+                                                     update="pnlCaracteristicas"
+                                                     process="listDisponibles @this"/>
                                     <p:commandButton value="← Remover"
                                                      style="margin-bottom: 5px;"
-                                                     icon="pi pi-minus"/>
+                                                     icon="pi pi-minus"
+                                                     actionListener="#{productoFrm.ptpFrm.eliminarCaracteristica}"
+                                                     update="pnlCaracteristicas"
+                                                     process="listSeleccionadas @this"
+                                                     disabled="#{not empty productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada and
+                                productoFrm.ptpFrm.esCaracteristicaObligatoria(productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada)}"/>
                                  </h:panelGrid>
+
                                  <h:panelGrid>
                                     <h:outputLabel value="Características Seleccionadas"/>
-                                    <h:selectOneListbox style="width: 300px; height: 150px;">
-                                       <!-- Aquí irían las características seleccionadas -->
+                                    <h:selectOneListbox id="listSeleccionadas"
+                                                        style="width: 300px; height: 150px"
+                                                        value="#{productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada}">
+                                       <f:selectItems value="#{productoFrm.ptpFrm.caracteristicasSeleccionadas}"
+                                                      var="cs"
+                                                      itemLabel="#{cs.idCaracteristica.nombre} #{cs.obligatorio ? '(Obligatoria)' : ''}"
+                                                      itemValue="#{cs}"/>
+                                       <f:converter converterId="TipoProductoCaracteristicaConverter" />
                                     </h:selectOneListbox>
                                  </h:panelGrid>
                               </h:panelGrid>
+
+                              <!-- Información de estado -->
+                              <p:outputLabel value="Total seleccionadas: #{productoFrm.ptpFrm.caracteristicasSeleccionadas.size()}"
+                                             style="display: block; margin-top: 10px; font-style: italic; color: #666;"/>
                            </h:panelGroup>
                         </h:panelGroup>
 
@@ -212,7 +236,7 @@
                         <p:selectBooleanCheckbox id="chkActivoTp"
                                                  value="#{productoFrm.ptpFrm.registro.activo}"/>
 
-                        <!-- Fecha de Creación - USANDO p:datePicker CON OffsetDateTimeConverter -->
+                        <!-- Fecha de Creación -->
                         <p:outputLabel for="dpFechaCreacion" value="Fecha de Creación:"/>
                         <p:datePicker id="dpFechaCreacion"
                                       value="#{productoFrm.ptpFrm.registro.fechaCreacion}"
@@ -287,7 +311,7 @@
                </h:panelGrid>
 
                <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
-                  <p:commandButton value="Seleccionar"  columns="2" style="text-align: center; margin-top: 15px;"
+                  <p:commandButton value="Seleccionar"
                                    actionListener="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
                                    process="@form"
                                    update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto :tabProducto:frmDetalleTipoProducto:pnlCaracteristicas"
