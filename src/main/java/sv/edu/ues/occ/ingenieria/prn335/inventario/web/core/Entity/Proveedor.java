@@ -1,6 +1,7 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -19,9 +20,13 @@ public class Proveedor {
     @Column(name = "razon_social", length = 155)
     private String razonSocial;
 
-    @Size(max = 14)
+    @Pattern(
+            regexp = "^$|^\\d{9}$|^\\d{14}$",
+            message = "El NIT debe tener 9 o 14 dígitos numéricos, o estar vacío"
+    )
     @Column(name = "nit", length = 14)
     private String nit;
+
 
     @Column(name = "activo")
     private Boolean activo;

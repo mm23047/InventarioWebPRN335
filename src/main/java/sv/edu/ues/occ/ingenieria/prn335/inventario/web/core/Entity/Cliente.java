@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
@@ -15,17 +16,31 @@ public class Cliente {
     @Column(name = "id_cliente", nullable = false)
     private UUID id;
 
+    @Pattern(
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",
+            message = "El nombre solo debe contener letras y espacios"
+    )
     @Size(max = 155)
     @Column(name = "nombre", length = 155)
     private String nombre;
 
-    @Size(max = 9)
+
+
+    @Pattern(
+            regexp = "^\\d{9}$",
+            message = "El DUI debe contener exactamente 9 dígitos numéricos"
+    )
     @Column(name = "dui", length = 9)
     private String dui;
 
-    @Size(max = 14)
+
+    @Pattern(
+            regexp = "^$|^\\d{9}$|^\\d{14}$",
+            message = "El NIT debe tener 9 o 14 dígitos numéricos, o estar vacío"
+    )
     @Column(name = "nit", length = 14)
     private String nit;
+
 
     @Column(name = "activo")
     private Boolean activo;
