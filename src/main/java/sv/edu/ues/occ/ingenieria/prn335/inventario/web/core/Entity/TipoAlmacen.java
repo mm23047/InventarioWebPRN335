@@ -2,6 +2,7 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -20,8 +21,13 @@ public class TipoAlmacen {
 
 
     @Size(max = 155)
+    @Pattern(
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+( [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$",
+            message = "El nombre solo debe contener letras y espacios internos, sin espacios al inicio o final"
+    )
     @Column(name = "nombre", length = 155)
     private String nombre;
+
 
     @Column(name = "activo")
     private Boolean activo;

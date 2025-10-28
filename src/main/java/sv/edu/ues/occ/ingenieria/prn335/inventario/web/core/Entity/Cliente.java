@@ -17,12 +17,13 @@ public class Cliente {
     private UUID id;
 
     @Pattern(
-            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",
-            message = "El nombre solo debe contener letras y espacios"
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+( [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$",
+            message = "El nombre solo debe contener letras y espacios internos, sin espacios al inicio o final"
     )
     @Size(max = 155)
     @Column(name = "nombre", length = 155)
     private String nombre;
+
 
 
 

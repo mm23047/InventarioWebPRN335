@@ -1,6 +1,7 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
@@ -12,9 +13,19 @@ public class Producto {
     @Column(name = "id_producto", nullable = false)
     private UUID id;
 
+
+
+
     @Size(max = 155)
+    @Pattern(regexp = "^[a-zA-ZÁÉÍÓÚáéíóúÑñ]+( [a-zA-ZÁÉÍÓÚáéíóúÑñ]+)*$",
+            message = "El nombre del producto solo puede contener letras y espacios internos, sin espacios al inicio o final")
     @Column(name = "nombre_producto", length = 155)
     private String nombreProducto;
+
+
+
+
+
 
     @Lob
     @Column(name = "referencia_externa")

@@ -1,6 +1,8 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "caracteristica", schema = "public")
@@ -11,8 +13,14 @@ public class Caracteristica {
     private Integer id;
 
     @Lob
-    @Column(name = "nombre")
+    @Pattern(
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+( [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$",
+            message = "El nombre solo debe contener letras y espacios internos, sin espacios al inicio o final"
+    )
+    @Size(max = 155)
+    @Column(name = "nombre", length = 155)
     private String nombre;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_unidad_medida")

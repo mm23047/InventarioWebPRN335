@@ -12,9 +12,14 @@ public class Proveedor {
     @Column(name = "id_proveedor", nullable = false)
     private Integer id;
 
+    @Pattern(
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+( [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$",
+            message = "El nombre solo debe contener letras y espacios internos, sin espacios al inicio o final"
+    )
     @Size(max = 155)
     @Column(name = "nombre", length = 155)
     private String nombre;
+
 
     @Size(max = 155)
     @Column(name = "razon_social", length = 155)
