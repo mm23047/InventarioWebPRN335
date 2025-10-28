@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Named
 @ViewScoped
@@ -36,13 +37,17 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
         return almacenDAO;
     }
 
-
     @Override
     protected Almacen createNewEntity() {
         Almacen almacen = new Almacen();
         almacen.setActivo(true);
         if(this.listaTipoAlmacen != null && !this.listaTipoAlmacen.isEmpty()){
-            almacen.setIdTipoAlmacen(this.listaTipoAlmacen.getFirst());
+            // Asigna el primer tipo activo como predeterminado
+            TipoAlmacen primerActivo = this.listaTipoAlmacen.stream()
+                    .filter(ta -> Boolean.TRUE.equals(ta.getActivo()))
+                    .findFirst()
+                    .orElse(null);
+            almacen.setIdTipoAlmacen(primerActivo);
         }
         return almacen;
     }
@@ -60,7 +65,7 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
                     listaTipoAlmacen != null ? listaTipoAlmacen.size() : 0);
         } catch (Exception e) {
             Logger.getLogger(AlmacenFrm.class.getName()).log(Level.SEVERE, "Error al cargar tipos de almacén", e);
-            listaTipoAlmacen= List.of();
+            listaTipoAlmacen = List.of();
         }
     }
 
@@ -74,10 +79,14 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
 
     @Override
     protected Almacen getIdByText(String id) {
-        if (id != null  && this.modelo!=null && this.modelo.getWrappedData()!=null && !this.modelo.getWrappedData().toString().isEmpty()) {
+        if (id != null && this.modelo != null && this.modelo.getWrappedData() != null
+                && !this.modelo.getWrappedData().toString().isEmpty()) {
             try {
                 Integer buscado = Integer.valueOf(id);
-                return this.modelo.getWrappedData().stream().filter(Almacen -> Almacen.getId().equals(buscado)).findFirst().orElse(null);
+                return this.modelo.getWrappedData().stream()
+                        .filter(almacen -> almacen.getId().equals(buscado))
+                        .findFirst()
+                        .orElse(null);
             } catch (Exception e) {
                 Logger.getLogger(AlmacenFrm.class.getName()).log(Level.SEVERE, null, e);
             }
@@ -89,8 +98,6 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
     protected FacesContext getFacesContext() {
         return FacesContext.getCurrentInstance();
     }
-
-
 
     @Override
     protected Almacen nuevoRegistro() {
@@ -104,7 +111,6 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
         }
         return null;
     }
-
 
     @Override
     public void seleccionarRegistro(org.primefaces.event.SelectEvent<Almacen> event) {
@@ -129,6 +135,7 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
         return super.getModelo();
     }
 
+    // ----------------- MÉTODOS PARA EL SELECTONE -----------------
     public Integer getIdTipoAlmacenSeleccionado() {
         if (registro != null && this.registro.getIdTipoAlmacen() != null) {
             return this.registro.getIdTipoAlmacen().getId();
@@ -137,10 +144,14 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
     }
 
     public void setIdTipoAlmacenSeleccionado(Integer idTipoAlmacen) {
-        if (idTipoAlmacen != null && this.registro!=null && this.listaTipoAlmacen != null && !this.listaTipoAlmacen.isEmpty()) {
-            this.registro.setIdTipoAlmacen(this.listaTipoAlmacen.stream().filter(ta -> ta.getId().equals(idTipoAlmacen)).findFirst().orElse(null));
+        if (idTipoAlmacen != null && this.registro != null && this.listaTipoAlmacen != null) {
+            // Solo asigna si el tipo está activo
+            TipoAlmacen tipo = this.listaTipoAlmacen.stream()
+                    .filter(ta -> ta.getId().equals(idTipoAlmacen) && Boolean.TRUE.equals(ta.getActivo()))
+                    .findFirst()
+                    .orElse(null);
+            this.registro.setIdTipoAlmacen(tipo);
         }
-
     }
 
     public List<TipoAlmacen> getListaTipoAlmacen() {
@@ -149,5 +160,15 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
 
     public void setListaTipoAlmacen(List<TipoAlmacen> listaTipoAlmacen) {
         this.listaTipoAlmacen = listaTipoAlmacen;
+    }
+
+    // Devuelve solo los tipos activos para el select
+    public List<TipoAlmacen> getListaTipoAlmacenActivos() {
+        if (listaTipoAlmacen == null) {
+            return List.of();
+        }
+        return listaTipoAlmacen.stream()
+                .filter(ta -> Boolean.TRUE.equals(ta.getActivo()))
+                .collect(Collectors.toList());
     }
 }
