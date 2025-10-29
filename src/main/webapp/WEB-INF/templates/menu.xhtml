@@ -1,47 +1,43 @@
 <ui:composition
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
         xmlns:p="http://primefaces.org/ui"
-        xmlns:f="jakarta.faces.core"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns="http://www.w3.org/1999/xhtml">
 
-    <p:menubar styleClass="compact-menubar">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <p:menubar styleClass="compact-menubar">
+            <!-- Submenú Tipos -->
+            <p:submenu label="#{crud['frm.botones.tipos']}" icon="pi pi-tags" styleClass="compact-submenu">
+                <p:menuitem value="#{crud['frm.botones.tipoAlmacen']}" url="#{request.contextPath}/Paginas/TipoAlmacen.jsf" icon="pi pi-building"/>
+                <p:menuitem value="#{crud['frm.botones.tipoProducto']}" url="#{request.contextPath}/Paginas/TipoProducto.jsf" icon="pi pi-box"/>
+                <p:menuitem value="#{crud['frm.botones.tipoUnidadMedida']}" url="#{request.contextPath}/Paginas/TipoUnidadMedida.jsf" icon="pi pi-ruler"/>
+            </p:submenu>
 
-        <!-- Submenú Tipos -->
-        <p:submenu label="#{crud['frm.botones.tipos']}" icon="pi pi-tags" styleClass="compact-submenu">
-            <p:menuitem value="#{crud['frm.botones.tipoAlmacen']}" url="#{request.contextPath}/Paginas/TipoAlmacen.jsf" icon="pi pi-building"/>
-            <p:menuitem value="#{crud['frm.botones.tipoProducto']}" url="#{request.contextPath}/Paginas/TipoProducto.jsf" icon="pi pi-box"/>
-            <p:menuitem value="#{crud['frm.botones.tipoUnidadMedida']}" url="#{request.contextPath}/Paginas/TipoUnidadMedida.jsf" icon="pi pi-ruler"/>
-        </p:submenu>
+            <!-- Submenú Maestros -->
+            <p:submenu label="#{crud['frm.botones.especificos']}" icon="pi pi-database" styleClass="compact-submenu">
+                <p:menuitem value="#{crud['frm.botones.almacen']}" url="#{request.contextPath}/Paginas/Almacen.jsf" icon="pi pi-warehouse"/>
+                <p:menuitem value="#{crud['frm.botones.producto']}" url="#{request.contextPath}/Paginas/Producto.jsf" icon="pi pi-shopping-bag"/>
+                <p:menuitem value="Compra" url="#{request.contextPath}/Paginas/Compra.jsf" icon="pi pi-shopping-cart"/>
+                <p:menuitem value="#{crud['frm.botones.cliente']}" url="#{request.contextPath}/Paginas/Cliente.jsf" icon="pi pi-user"/>
+                <p:menuitem value="#{crud['frm.botones.proveedor']}" url="#{request.contextPath}/Paginas/Proveedor.jsf" icon="pi pi-truck"/>
+                <p:menuitem value="#{crud['frm.botones.caracteristica']}" url="#{request.contextPath}/Paginas/Caracteristica.jsf" icon="pi pi-sliders-h"/>
+                <p:menuitem value="#{crud['frm.botones.unidadMedida']}" url="#{request.contextPath}/Paginas/UnidadMedida.jsf"/>
+            </p:submenu>
+        </p:menubar>
 
-        <!-- Submenú Maestros -->
-        <p:submenu label="#{crud['frm.botones.especificos']}" icon="pi pi-database" styleClass="compact-submenu">
-            <p:menuitem value="#{crud['frm.botones.almacen']}" url="#{request.contextPath}/Paginas/Almacen.jsf" icon="pi pi-warehouse"/>
-            <p:menuitem value="#{crud['frm.botones.producto']}" url="#{request.contextPath}/Paginas/Producto.jsf" icon="pi pi-shopping-bag"/>
-            <p:menuitem value="Cliente" url="#{request.contextPath}/Paginas/Cliente.jsf" icon="pi pi-user"/>
-            <p:menuitem value="Compra" url="#{request.contextPath}/Paginas/Compra.jsf" icon="pi pi-shopping-cart"/>
-            <p:menuitem value="#{crud['frm.botones.cliente']}" url="#{request.contextPath}/Paginas/Cliente.jsf" icon="pi pi-user"/>
-            <p:menuitem value="#{crud['frm.botones.proveedor']}" url="#{request.contextPath}/Paginas/Proveedor.jsf" icon="pi pi-truck"/>
-            <p:menuitem value="#{crud['frm.botones.caracteristica']}" url="#{request.contextPath}/Paginas/Caracteristica.jsf" icon="pi pi-sliders-h"/>
-            <p:menuitem value="#{crud['frm.botones.unidadMedida']}" url="#{request.contextPath}/Paginas/UnidadMedida.jsf"/>
-        </p:submenu>
-
-
-        <!-- Selector de idioma alineado a la derecha -->
-        <f:facet name="options">
-            <h:form id="frmSeleccionarIdioma" style="margin-right: 1rem;">
-                <p:selectOneMenu value="#{sesionUsuarioBean.idiomaSeleccionado}"
-                                 valueChangeListener="#{sesionUsuarioBean.cambiarIdioma}">
-
-                    <f:selectItem noSelectionOption="true" itemValue="#{null}" itemLabel="Idioma"/>
-                    <f:selectItems value="#{sesionUsuarioBean.idiomasDisponibles.entrySet()}"
-                                   var="idioma"
-                                   itemLabel="#{idioma.key}"
-                                   itemValue="#{idioma.value}"/>
-                    <f:ajax execute="@form" render="@all"/>
-                </p:selectOneMenu>
-            </h:form>
-        </f:facet>
-
-    </p:menubar>
+        <!-- Selector de idioma a la derecha - Versión con AJAX -->
+        <h:form id="frmSeleccionarIdioma" style="margin-left:1rem;">
+            <p:selectOneMenu value="#{sesionUsuarioBean.idiomaSeleccionado}"
+                             id="selectIdioma">
+                <f:selectItems value="#{sesionUsuarioBean.idiomasDisponibles.entrySet()}"
+                               var="idioma"
+                               itemLabel="#{idioma.key}"
+                               itemValue="#{idioma.value}"/>
+                <p:ajax listener="#{sesionUsuarioBean.cambiarIdiomaAjax}"
+                        update="@all"
+                        process="@this"/>
+            </p:selectOneMenu>
+        </h:form>
+    </div>
 </ui:composition>

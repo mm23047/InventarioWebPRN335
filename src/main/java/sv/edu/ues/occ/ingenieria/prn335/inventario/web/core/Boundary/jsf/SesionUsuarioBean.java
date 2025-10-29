@@ -1,4 +1,6 @@
-package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
+
+
+        package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
@@ -15,55 +17,100 @@ import java.util.Map;
 @Named
 public class SesionUsuarioBean implements Serializable {
 
-    private Map<String, String> idiomasDisponibles; // clave = etiqueta visible, valor = código de idioma
-    private String idiomaSeleccionado; // almacena "es", "en", "fr" o "al"
+    private Map<String, String> idiomasDisponibles;
+    private String idiomaSeleccionado;
 
     @PostConstruct
     public void inicializar() {
-        idiomasDisponibles = new LinkedHashMap<>(); // mantiene orden
+        idiomasDisponibles = new LinkedHashMap<>();
         idiomasDisponibles.put("Español", "es");
         idiomasDisponibles.put("English", "en");
         idiomasDisponibles.put("Français", "fr");
 
-        // Idioma por defecto
-        idiomaSeleccionado = "es";
-        FacesContext.getCurrentInstance().getViewRoot().setLocale(new Locale(idiomaSeleccionado));
+        // Obtener el locale actual del FacesContext (que viene del faces-config.xml)
+        Locale currentLocale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
+        if (currentLocale != null) {
+            idiomaSeleccionado = currentLocale.getLanguage();
+        } else {
+            idiomaSeleccionado = "es"; // Fallback
+        }
+
+        // Asegurar que el select muestre el idioma correcto
+        sincronizarSelectConLocale();
     }
 
     public void cambiarIdioma(ValueChangeEvent event) {
         String nuevoIdioma = (String) event.getNewValue();
-        if (nuevoIdioma != null) {
-            idiomaSeleccionado = nuevoIdioma;
-
-            Locale locale;
-            switch (nuevoIdioma) {
-
-                case "fr":
-                    locale = new Locale("fr");
-                    break;
-                case "en":
-                    locale = Locale.ENGLISH;
-                    break;
-                case "es":
-                default:
-                    locale = new Locale("es");
-                    break;
-            }
-
-            FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
+        if (nuevoIdioma != null && !nuevoIdioma.isEmpty()) {
+            cambiarIdioma(nuevoIdioma);
         }
     }
 
-    // Getters y Setters
-    public Map<String, String> getIdiomasDisponibles() {
-        return idiomasDisponibles;
+    // Método para cambiar idioma programáticamente
+    private void cambiarIdioma(String codigoIdioma) {
+        idiomaSeleccionado = codigoIdioma;
+        aplicarLocale(codigoIdioma);
+
+        // Forzar actualización de la página
+        FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("@all");
+    }
+
+    // Método para AJAX
+    public void cambiarIdiomaAjax() {
+        if (idiomaSeleccionado != null && !idiomaSeleccionado.isEmpty()) {
+            aplicarLocale(idiomaSeleccionado);
+
+            // Actualizar toda la página
+            FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("@all");
+        }
+    }
+
+    private void aplicarLocale(String idioma) {
+        Locale locale;
+        switch (idioma) {
+            case "fr":
+                locale = new Locale("fr");
+                break;
+            case "en":
+                locale = Locale.ENGLISH;
+                break;
+            case "es":
+            default:
+                locale = new Locale("es");
+                break;
+        }
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(locale);
+    }
+
+    // Método para sincronizar el select con el locale actual
+    private void sincronizarSelectConLocale() {
+        Locale currentLocale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
+        if (currentLocale != null) {
+            String currentLang = currentLocale.getLanguage();
+            // Verificar si el idioma actual está en nuestros disponibles
+            if (idiomasDisponibles.containsValue(currentLang)) {
+                idiomaSeleccionado = currentLang;
+            } else {
+                idiomaSeleccionado = "es";
+            }
+        }
     }
 
     public String getIdiomaSeleccionado() {
-        return idiomaSeleccionado;
+        // Siempre sincronizar antes de retornar
+        sincronizarSelectConLocale();
+        return idiomaSeleccionado != null ? idiomaSeleccionado : "es";
     }
 
     public void setIdiomaSeleccionado(String idiomaSeleccionado) {
         this.idiomaSeleccionado = idiomaSeleccionado;
+        // Aplicar inmediatamente el cambio
+        if (idiomaSeleccionado != null && !idiomaSeleccionado.isEmpty()) {
+            aplicarLocale(idiomaSeleccionado);
+        }
+    }
+
+    public Map<String, String> getIdiomasDisponibles() {
+        return idiomasDisponibles;
     }
 }
