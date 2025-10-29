@@ -43,6 +43,7 @@ public class Proveedor {
     @Column(name = "observaciones")
     private String observaciones;
 
+
     public Integer getId() {
         return id;
     }
@@ -90,5 +91,6 @@ public class Proveedor {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
+
 
 }

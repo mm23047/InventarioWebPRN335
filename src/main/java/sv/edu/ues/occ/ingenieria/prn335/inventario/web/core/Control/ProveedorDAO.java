@@ -43,4 +43,8 @@ public class ProveedorDAO extends InventarioDefaultDataAccess<Proveedor> impleme
         }
         return List.of();
     }
+
+    public Proveedor leer(Object id) {
+        return em.find(Proveedor.class, id);
+    }
 }

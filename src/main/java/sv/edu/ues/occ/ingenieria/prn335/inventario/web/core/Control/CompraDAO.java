@@ -19,11 +19,12 @@ public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Se
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
 
-    public CompraDAO(){super(Compra.class);
+    public CompraDAO() {
+        super(Compra.class);
     }
 
     @Override
-    public EntityManager getEntityManager(){
+    public EntityManager getEntityManager() {
         return em;
     }
 
@@ -57,13 +58,15 @@ public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Se
             return List.of();
         }
     }
+
     /**
      * Busca compras por proveedor
      */
+    // En el método findByProveedor, cambia el parámetro a Integer
     public List<Compra> findByProveedor(Integer idProveedor, int first, int max) {
         try {
             TypedQuery<Compra> query = em.createNamedQuery("Compra.findByProveedor", Compra.class);
-            query.setParameter("idProveedor", idProveedor);
+            query.setParameter("idProveedor", idProveedor); // ← Ahora recibe Integer
             query.setFirstResult(first);
             query.setMaxResults(max);
             return query.getResultList();

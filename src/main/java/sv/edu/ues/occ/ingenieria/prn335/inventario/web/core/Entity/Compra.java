@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
         @NamedQuery(name = "Compra.findByFechaRange",
                 query = "SELECT c FROM Compra c WHERE c.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY c.fecha DESC"),
         @NamedQuery(name = "Compra.calcularMontoTotal",
-                query = "SELECT SUM(d.cantidad * d.precio) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra AND d.estado != 'ANULADO'")
+                query = "SELECT SUM(d.cantidad * d.precio) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra AND d.estado = 'ANULADO' ")
 })
 public class Compra {
     @Id

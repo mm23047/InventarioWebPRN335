@@ -5,82 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="21326914-e5fc-4517-aee1-fde55bfaa8d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mvnw.cmd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/DefaultFrm.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/ESTADO_CRUD.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/SesionUsuarioBean.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/TipoAlmacenFrm.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/TipoProductoFrm.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/AlmacenDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CaracteristicaDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ClienteDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CompraDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CompraDetalleDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/InventarioDAOInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/InventarioDefaultDataAccess.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/KardexDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/KardexDetalleDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProductoDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProductoTipoProductoCaracteristicaDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProductoTipoProductoDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProveedorDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/TipoAlmacenDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/TipoProductoCaracteristicaDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/TipoProductoDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/TipoUnidadMedidaDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/UnidadMedidaDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/VentaDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/VentaDetalleDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Almacen.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Caracteristica.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Cliente.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Compra.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/CompraDetalle.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Kardex.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/KardexDetalle.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Producto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/ProductoTipoProducto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/ProductoTipoProductoCaracteristica.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Proveedor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/TipoAlmacen.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/TipoProducto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/TipoProductoCaracteristica.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/TipoUnidadMedida.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/UnidadMedida.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Venta.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/VentaDetalle.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/HelloServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Liberty/config/server.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/beans.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/crud.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/crud_en.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/crud_es.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/Paginas/TipoAlmacen.xhtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/Paginas/TipoProducto.xhtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/faces-config.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/templates/default.xhtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/templates/menu.xhtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/templates/template.xhtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/resources/estilos/crud.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/resources/estilos/login.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/resources/ues/botones-top.xhtml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/conversores/ProveedorConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/webContexts.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CompraDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CompraDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProveedorDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProveedorDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Compra.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Compra.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Proveedor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Proveedor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/Paginas/Compra.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/Paginas/Compra.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,12 +24,29 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="jsf" />
+        <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;mm23047&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/mm23047/InventarioWebPRN335.git&quot;,
+    &quot;accountId&quot;: &quot;a7d319e3-30e5-40b3-ac77-79601e854772&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -113,29 +63,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Maven.InventarioWebapprn335 [clean].executor": "Run",
-    "Maven.InventarioWebapprn335 [package].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/MINED/IdeaProjects/InventarioWebapprn335/src/main/webapp/WEB-INF/templates",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.InventarioWebapprn335 [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.InventarioWebapprn335 [package].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/MINED/IdeaProjects/InventarioWebapprn335/src/main/webapp/WEB-INF/templates&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\MINED\IdeaProjects\InventarioWebapprn335\src\main\webapp\WEB-INF\templates" />
@@ -150,8 +100,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19072.14" />
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19072.14" />
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19416.15" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19416.15" />
       </set>
     </attachedChunks>
   </component>
@@ -165,6 +115,8 @@
       <updated>1760389935016</updated>
       <workItem from="1760389936458" duration="37000" />
       <workItem from="1760462018553" duration="14843000" />
+      <workItem from="1761679996794" duration="5164000" />
+      <workItem from="1761712979630" duration="3976000" />
     </task>
     <servers />
   </component>

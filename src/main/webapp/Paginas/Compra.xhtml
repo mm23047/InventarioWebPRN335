@@ -90,26 +90,17 @@
                                   readonly="true" disabled="true" size="20"/>
 
                      <!-- Proveedor (Relación con Proveedores) -->
-                     <p:outputLabel for="autoProveedor" value="Proveedor:"/>
-                     <h:panelGroup id="pnlProveedor">
-                        <h:panelGrid columns="2">
-                           <p:autoComplete id="autoProveedor"
-                                           value="#{compraFrm.registro.proveedor}"
-                                           completeMethod="#{compraFrm.buscarProveedoresPorNombre}"
-                                           var="prov"
-                                           converter="ProveedorConverter"
-                                           itemLabel="#{prov.nombre}"
-                                           itemValue="#{prov}"
-                                           forceSelection="true"
-                                           dropdown="true"
-                                           size="50"
-                                           required="true"
-                                           requiredMessage="Seleccione un proveedor activo"/>
-
-                           <!-- Mostrar información adicional del proveedor seleccionado -->
-                           <h:panelGroup rendered="#{compraFrm.registro.proveedor != null}"/>
-                        </h:panelGrid>
-                     </h:panelGroup>
+                     <p:outputLabel for="selProveedor" value="Proveedor:"/>
+                     <p:selectOneMenu id="selProveedor" value="#{compraFrm.registro.proveedor}"
+                                      required="true" requiredMessage="Seleccione un proveedor">
+                        <f:converter converterId="proveedorConverter" />
+                        <f:attribute name="items" value="#{compraFrm.listaProveedores}" />
+                        <f:selectItem itemLabel="Seleccione proveedor..." itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{compraFrm.listaProveedores}"
+                                       var="proveedor"
+                                       itemLabel="#{proveedor.nombre}"
+                                       itemValue="#{proveedor}"/>
+                     </p:selectOneMenu>
 
                      <!-- Estado (Dropdown con opciones) -->
                      <p:outputLabel for="selEstado" value="Estado:"/>
