@@ -6,6 +6,25 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "producto_tipo_producto_caracteristica", schema = "public")
+@NamedQueries({
+        @NamedQuery(
+                name = "ProductoTipoProductoCaracteristica.eliminarPorProductoTipoProducto",
+                query = "DELETE FROM ProductoTipoProductoCaracteristica ptpc WHERE ptpc.idProductoTipoProducto.id = :idProductoTipoProducto"
+        ),
+        @NamedQuery(
+                name = "ProductoTipoProductoCaracteristica.findByProductoTipoProducto",
+                query = "SELECT ptpc FROM ProductoTipoProductoCaracteristica ptpc " +
+                        "LEFT JOIN FETCH ptpc.idTipoProductoCaracteristica " +
+                        "LEFT JOIN FETCH ptpc.idTipoProductoCaracteristica.idCaracteristica " +
+                        "WHERE ptpc.idProductoTipoProducto.id = :idProductoTipoProducto"
+        ),
+        @NamedQuery(
+                name = "ProductoTipoProductoCaracteristica.existeCaracteristica",
+                query = "SELECT COUNT(ptpc) FROM ProductoTipoProductoCaracteristica ptpc " +
+                        "WHERE ptpc.idProductoTipoProducto.id = :idProductoTipoProducto " +
+                        "AND ptpc.idTipoProductoCaracteristica.id = :idTipoProductoCaracteristica"
+        )
+})
 public class ProductoTipoProductoCaracteristica {
     @Id
     @Column(name = "id_producto_tipo_producto_caracteristica", nullable = false)

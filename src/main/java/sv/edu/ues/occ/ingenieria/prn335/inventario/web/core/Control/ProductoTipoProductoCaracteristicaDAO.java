@@ -28,18 +28,15 @@ public class ProductoTipoProductoCaracteristicaDAO extends InventarioDefaultData
         return em;
     }
 
-    /**
-     * Elimina todas las características de un ProductoTipoProducto
-     */
     public void eliminarPorProductoTipoProducto(UUID idProductoTipoProducto) {
         try {
-            int deleted = em.createQuery(
-                            "DELETE FROM ProductoTipoProductoCaracteristica ptpc WHERE ptpc.idProductoTipoProducto.id = :idProductoTipoProducto")
+            int deleted = em.createNamedQuery("ProductoTipoProductoCaracteristica.eliminarPorProductoTipoProducto")
                     .setParameter("idProductoTipoProducto", idProductoTipoProducto)
                     .executeUpdate();
-            Logger.getLogger(ProductoTipoProductoCaracteristicaDAO.class.getName()).log(Level.INFO,
-                    "Eliminadas {0} características del ProductoTipoProducto: {1}",
-                    new Object[]{deleted, idProductoTipoProducto});
+
+            em.flush();
+            em.clear();
+
         } catch (Exception ex) {
             Logger.getLogger(ProductoTipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE,
                     "Error al eliminar características del ProductoTipoProducto", ex);
@@ -47,13 +44,10 @@ public class ProductoTipoProductoCaracteristicaDAO extends InventarioDefaultData
         }
     }
 
-    /**
-     * Busca las características de un ProductoTipoProducto
-     */
     public List<ProductoTipoProductoCaracteristica> findByProductoTipoProducto(UUID idProductoTipoProducto) {
         try {
-            TypedQuery<ProductoTipoProductoCaracteristica> query = em.createQuery(
-                    "SELECT ptpc FROM ProductoTipoProductoCaracteristica ptpc WHERE ptpc.idProductoTipoProducto.id = :idProductoTipoProducto",
+            TypedQuery<ProductoTipoProductoCaracteristica> query = em.createNamedQuery(
+                    "ProductoTipoProductoCaracteristica.findByProductoTipoProducto",
                     ProductoTipoProductoCaracteristica.class);
             query.setParameter("idProductoTipoProducto", idProductoTipoProducto);
             return query.getResultList();
@@ -64,18 +58,15 @@ public class ProductoTipoProductoCaracteristicaDAO extends InventarioDefaultData
         }
     }
 
-    /**
-     * Verifica si ya existe una característica para un ProductoTipoProducto
-     */
     public boolean existeCaracteristica(UUID idProductoTipoProducto, Long idTipoProductoCaracteristica) {
         try {
-            Long count = em.createQuery(
-                            "SELECT COUNT(ptpc) FROM ProductoTipoProductoCaracteristica ptpc " +
-                                    "WHERE ptpc.idProductoTipoProducto.id = :idProductoTipoProducto " +
-                                    "AND ptpc.idTipoProductoCaracteristica.id = :idTipoProductoCaracteristica", Long.class)
-                    .setParameter("idProductoTipoProducto", idProductoTipoProducto)
-                    .setParameter("idTipoProductoCaracteristica", idTipoProductoCaracteristica)
-                    .getSingleResult();
+            TypedQuery<Long> query = em.createNamedQuery(
+                    "ProductoTipoProductoCaracteristica.existeCaracteristica",
+                    Long.class);
+            query.setParameter("idProductoTipoProducto", idProductoTipoProducto)
+                    .setParameter("idTipoProductoCaracteristica", idTipoProductoCaracteristica);
+
+            Long count = query.getSingleResult();
             return count > 0;
         } catch (Exception ex) {
             Logger.getLogger(ProductoTipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE,
