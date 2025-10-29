@@ -61,18 +61,16 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     @Override
     public void inicializarListas() {
         try {
-            // Cargar lista de proveedores activos
-            this.listaProveedores = proveedorDAO.findRange(0, Integer.MAX_VALUE);
+            // Ya no cargamos todos los proveedores, se buscarán dinámicamente
+            // this.listaProveedores = proveedorDAO.findRange(0, Integer.MAX_VALUE);
 
             // Definir estados disponibles
             this.estadosCompra = Arrays.asList("ORDEN", "CREADO", "APROBADO", "RECHAZADO", "ANULADO");
 
             Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
-                    "Lista de proveedores cargada: {0} elementos",
-                    listaProveedores != null ? listaProveedores.size() : 0);
+                    "Listas de compra inicializadas correctamente");
         } catch (Exception e) {
             Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al cargar listas", e);
-            listaProveedores = List.of();
             estadosCompra = Arrays.asList("CREADO");
         }
     }
@@ -173,5 +171,15 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
 
     public CompraDetalleFrm getCompraDetalleFrm() {
         return compraDetalleFrm;
+    }
+    public List<Proveedor> buscarProveedoresPorNombre(final String nombre) {
+        try {
+            if (nombre != null && !nombre.isBlank()) {
+                return proveedorDAO.findByNombreLike(nombre, 0, 25);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al buscar proveedores", ex);
+        }
+        return List.of();
     }
 }
