@@ -2,7 +2,6 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-
 import java.time.OffsetDateTime;
 
 @Entity
@@ -15,7 +14,7 @@ import java.time.OffsetDateTime;
         @NamedQuery(name = "Compra.findByFechaRange",
                 query = "SELECT c FROM Compra c WHERE c.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY c.fecha DESC"),
         @NamedQuery(name = "Compra.calcularMontoTotal",
-                query = "SELECT SUM(d.cantidad * d.precio) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra AND d.estado = 'ANULADO' ")
+                query = "SELECT SUM(d.cantidad * d.precio) FROM CompraDetalle d WHERE d.idCompra.id = :idCompra AND d.estado != 'ANULADO'")
 })
 public class Compra {
     @Id
@@ -23,16 +22,13 @@ public class Compra {
     @Column(name = "id_compra", nullable = false)
     private Long id;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_compra", nullable = false)
+    // CORRECCIÓN: Cambia @OneToOne con @MapsId por @ManyToOne simple
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_proveedor") // Esta es la columna real en la BD
     private Proveedor proveedor;
 
     @Column(name = "fecha")
     private OffsetDateTime fecha;
-
-    @Column(name = "id_proveedor")
-    private Integer idProveedor;
 
     @Size(max = 10)
     @Column(name = "estado", length = 10)
@@ -41,6 +37,10 @@ public class Compra {
     @Lob
     @Column(name = "observaciones")
     private String observaciones;
+
+    // ELIMINA completamente este campo - ES REDUNDANTE Y CAUSA EL ERROR
+    // @Column(name = "id_proveedor")
+    // private Integer idProveedor;
 
     public Long getId() {
         return id;
@@ -66,14 +66,6 @@ public class Compra {
         this.fecha = fecha;
     }
 
-    public Integer getIdProveedor() {
-        return idProveedor;
-    }
-
-    public void setIdProveedor(Integer idProveedor) {
-        this.idProveedor = idProveedor;
-    }
-
     public String getEstado() {
         return estado;
     }
@@ -90,4 +82,8 @@ public class Compra {
         this.observaciones = observaciones;
     }
 
+    // Método helper si necesitas obtener el ID del proveedor
+    public Integer getIdProveedor() {
+        return proveedor != null ? proveedor.getId() : null;
+    }
 }
