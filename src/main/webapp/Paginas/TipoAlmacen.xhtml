@@ -29,15 +29,15 @@
                         <h:outputText value="#{r.id}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="#{crud['frm.botones.nombre']}">
                         <h:outputText value="#{r.nombre}" />
                     </p:column>
 
-                    <p:column headerText="Estado">
+                    <p:column headerText="#{crud['frm.botones.estado']}">
                         <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                     </p:column>
 
-                    <p:column headerText="Observaciones">
+                    <p:column headerText="#{crud['frm.botones.observaciones']}">
                         <h:outputText value="#{r.obsevaciones}" />
                     </p:column>
 
@@ -59,30 +59,30 @@
                 <p:outputLabel for="txtId" value="ID:"/>
                 <p:inputText id="txtId" value="#{tipoAlmacenFrm.registro.id}" readonly="true" disabled="true"/>
 
-                <p:outputLabel for="txtNombre" value="Nombre:"/>
+                <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
                 <p:inputText id="txtNombre" value="#{tipoAlmacenFrm.registro.nombre}" size="75"/>
 
-                <p:outputLabel for="chkActivo" value="Activo:"/>
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
                 <p:selectBooleanCheckbox id="chkActivo" value="#{tipoAlmacenFrm.registro.activo}"/>
 
-                <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                <p:outputLabel for="txtObservaciones" value="#{crud['frm.botones.observaciones']}:"/>
                 <p:inputTextarea id="txtObservaciones"
                                  value="#{tipoAlmacenFrm.registro.obsevaciones}"
                                  rows="4" cols="50"/>
             </h:panelGrid>
 
             <h:panelGrid columns="#{tipoAlmacenFrm.estado=='MODIFICAR' ? 1 : 2}">
-                <p:commandButton value="Crear"
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
                                  actionListener="#{tipoAlmacenFrm.btnGuardarHandler}"
                                  rendered="#{tipoAlmacenFrm.estado=='CREAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Modificar"
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
                                  actionListener="#{tipoAlmacenFrm.btnModificarHandler}"
                                  rendered="#{tipoAlmacenFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>
 
-                <p:commandButton value="Eliminar"
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                  actionListener="#{tipoAlmacenFrm.btnEliminarHandler}"
                                  rendered="#{tipoAlmacenFrm.estado=='MODIFICAR'}"
                                  update=":pnlTabla :pnlDetalle"/>

@@ -9,7 +9,7 @@
 
    <!-- Header -->
    <ui:define name="header">
-      <h1 class="titulo-formulario">#{productoFrm.nombreBean}</h1>
+      <h1 class="titulo-formulario">#{crud['frm.botones.producto']}</h1>
    </ui:define>
 
    <!-- Tabla de registros -->
@@ -32,19 +32,19 @@
                   <h:outputText value="#{r.id}" />
                </p:column>
 
-               <p:column headerText="Nombre">
+               <p:column headerText="#{crud['frm.botones.nombre']}">
                   <h:outputText value="#{r.nombreProducto}" />
                </p:column>
 
-               <p:column headerText="Referencia">
+               <p:column headerText="#{crud['frm.botones.referencia']}">
                   <h:outputText value="#{r.referenciaExterna}" />
                </p:column>
 
-               <p:column headerText="Comentarios">
+               <p:column headerText="#{crud['frm.botones.comentarios']}">
                   <h:outputText value="#{r.comentarios}" />
                </p:column>
 
-               <p:column headerText="Activo">
+               <p:column headerText="#{crud['frm.botones.activo']}">
                   <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                </p:column>
 
@@ -65,37 +65,37 @@
          <p:tabView id="tabProducto" cache="false" dynamic="true"
                     rendered="#{productoFrm.estado!='NADA'}">
 
-            <p:tab id="tabGeneral" closable="false" title="Generalidades">
+            <p:tab id="tabGeneral" closable="false" title="#{crud['frm.botones.generalidades']}">
                <h:form id="frmProductoCrear">
                   <h:panelGrid columns="2">
                      <p:outputLabel for="txtProductoId" value="ID:"/>
                      <p:inputText id="txtProductoId" value="#{productoFrm.registro.id}"
                                   readonly="true" disabled="true" size="75"/>
-                     <p:outputLabel for="txtProductoNombre" value="Nombre Producto:"/>
+                     <p:outputLabel for="txtProductoNombre" value="#{crud['frm.botones.nombreProducto']}:"/>
                      <p:inputText id="txtProductoNombre" value="#{productoFrm.registro.nombreProducto}"
                                   required="true" size="75"/>
-                     <p:outputLabel for="txtProductoReferencia" value="Referencia Externa:"/>
+                     <p:outputLabel for="txtProductoReferencia" value="#{crud['frm.botones.referenciaExterna']}:"/>
                      <p:inputText id="txtProductoReferencia" value="#{productoFrm.registro.referenciaExterna}"
                                   size="50"/>
-                     <p:outputLabel for="txtProductoComentarios" value="Comentarios:"/>
+                     <p:outputLabel for="txtProductoComentarios" value="#{crud['frm.botones.comentarios']}:"/>
                      <p:inputTextarea id="txtProductoComentarios" value="#{productoFrm.registro.comentarios}"
                                       rows="4" cols="50"/>
-                     <p:outputLabel for="chkProductoActivo" value="Activo:"/>
+                     <p:outputLabel for="chkProductoActivo" value="#{crud['frm.botones.activo']}:"/>
                      <p:selectBooleanCheckbox id="chkProductoActivo" value="#{productoFrm.registro.activo}"/>
                   </h:panelGrid>
 
                   <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
-                     <p:commandButton value="Crear"
+                     <p:commandButton value="#{crud['frm.botones.guardar']}"
                                       actionListener="#{productoFrm.btnGuardarHandler}"
                                       rendered="#{productoFrm.estado=='CREAR'}"
                                       update=":pnlProductoTabla :pnlProductoDetalle"
                                       process="@form"/>
-                     <p:commandButton value="Modificar"
+                     <p:commandButton value="#{crud['frm.botones.modificar']}"
                                       actionListener="#{productoFrm.btnModificarHandler}"
                                       rendered="#{productoFrm.estado=='MODIFICAR'}"
                                       update=":pnlProductoTabla :pnlProductoDetalle"
                                       process="@form"/>
-                     <p:commandButton value="Eliminar"
+                     <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                       actionListener="#{productoFrm.btnEliminarHandler}"
                                       rendered="#{productoFrm.estado=='MODIFICAR'}"
                                       update=":pnlProductoTabla :pnlProductoDetalle"
@@ -105,7 +105,7 @@
             </p:tab>
 
             <!-- Pestaña de Tipos de Producto -->
-            <p:tab id="tabTiposProducto" closable="false" title="Tipos de Producto"
+            <p:tab id="tabTiposProducto" closable="false" title="#{crud['frm.botones.tiposDeProductos']}"
                    disabled="#{productoFrm.estado!='MODIFICAR'}">
 
                <!-- Panel de Tabla -->
@@ -126,18 +126,18 @@
                         <p:column headerText="ID">
                            <h:outputText value="#{tp.id}" />
                         </p:column>
-                        <p:column headerText="Tipo" >
+                        <p:column headerText="#{crud['frm.botones.tipos']}" >
                            <h:outputText value="#{tp.idTipoProducto.nombre}" />
                         </p:column>
-                        <p:column headerText="Fecha de Creacion">
+                        <p:column headerText="#{crud['frm.botones.fechaCreacion']}">
                            <h:outputText value="#{tp.fechaCreacion}">
                               <f:converter converterId="offsetDateTimeConverter" />
                            </h:outputText>
                         </p:column>
-                        <p:column headerText="Estado">
+                        <p:column headerText="#{crud['frm.botones.estado']}">
                            <h:outputText value="#{tp.activo ? 'ACTIVO' : 'INACTIVO'}" />
                         </p:column>
-                        <p:column headerText="Observaciones">
+                        <p:column headerText="#{crud['frm.botones.observaciones']}">
                            <h:outputText value="#{tp.observaciones}" />
                         </p:column>
 
@@ -163,7 +163,7 @@
                                      readonly="true" disabled="true" size="75"/>
 
                         <!-- Tipo de Producto -->
-                        <p:outputLabel for="txtNombre" value="Tipo de Producto:"/>
+                        <p:outputLabel for="txtNombre" value="#{crud['frm.botones.tiposDeProductos']}:"/>
                         <h:panelGroup id="pnlTipoProducto">
                            <h:panelGrid columns="2" style="width: 100%;">
                               <p:inputText id="txtNombre" value="#{productoFrm.ptpFrm.registro.idTipoProducto.nombre}"
@@ -171,14 +171,14 @@
                               <p:commandButton type="button"
                                                icon="pi pi-external-link"
                                                onclick="PF('dlgTipoProducto').show();"
-                                               value="Seleccionar Tipo"
+                                               value="#{crud['frm.botones.seleccionarTipo']}"
                                                rendered="#{productoFrm.ptpFrm.estado=='CREAR' or productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
                            </h:panelGrid>
 
                            <h:panelGroup id="pnlCaracteristicas"
                                          rendered="#{not empty productoFrm.ptpFrm.registro.idTipoProducto}"
                                          style="margin-top: 15px;">
-                              <p:outputLabel value="Características" style="font-weight: bold; display: block; margin-bottom: 8px;"/>
+                              <p:outputLabel value="#{crud['frm.botones.caracteristica']}" style="font-weight: bold; display: block; margin-bottom: 8px;"/>
                               <h:panelGrid columns="3" style="width: 100%;">
                                  <h:panelGrid>
                                     <h:outputLabel value="Características Disponibles" />
@@ -194,13 +194,13 @@
                                  </h:panelGrid>
 
                                  <h:panelGrid style="vertical-align: middle; padding-left: 20px;">
-                                    <p:commandButton value="Agregar →"
+                                    <p:commandButton value="#{crud['frm.botones.agregar']} →"
                                                      style="margin-bottom: 5px;"
                                                      icon="pi pi-plus"
                                                      actionListener="#{productoFrm.ptpFrm.agregarCaracteristica}"
                                                      update="pnlCaracteristicas"
                                                      process="listDisponibles @this"/>
-                                    <p:commandButton value="← Remover"
+                                    <p:commandButton value="← #{crud['frm.botones.remover']}"
                                                      style="margin-bottom: 5px;"
                                                      icon="pi pi-minus"
                                                      actionListener="#{productoFrm.ptpFrm.eliminarCaracteristica}"
@@ -211,7 +211,7 @@
                                  </h:panelGrid>
 
                                  <h:panelGrid>
-                                    <h:outputLabel value="Características Seleccionadas"/>
+                                    <h:outputLabel value="#{crud['frm.botones.caracteristicaSeleccionada']}"/>
                                     <h:selectOneListbox id="listSeleccionadas"
                                                         style="width: 300px; height: 150px"
                                                         value="#{productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada}">
@@ -225,18 +225,18 @@
                               </h:panelGrid>
 
                               <!-- Información de estado -->
-                              <p:outputLabel value="Total seleccionadas: #{productoFrm.ptpFrm.caracteristicasSeleccionadas.size()}"
+                              <p:outputLabel value="#{crud['frm.botones.totalSeleccionadas']}: #{productoFrm.ptpFrm.caracteristicasSeleccionadas.size()}"
                                              style="display: block; margin-top: 10px; font-style: italic; color: #666;"/>
                            </h:panelGroup>
                         </h:panelGroup>
 
                         <!-- Activo -->
-                        <p:outputLabel for="chkActivoTp" value="Activo:"/>
+                        <p:outputLabel for="chkActivoTp" value="#{crud['frm.botones.activo']}:"/>
                         <p:selectBooleanCheckbox id="chkActivoTp"
                                                  value="#{productoFrm.ptpFrm.registro.activo}"/>
 
                         <!-- Fecha de Creación -->
-                        <p:outputLabel for="dpFechaCreacion" value="Fecha de Creación:"/>
+                        <p:outputLabel for="dpFechaCreacion" value="#{crud['frm.botones.fechaCreacion']}:"/>
                         <p:datePicker id="dpFechaCreacion"
                                       value="#{productoFrm.ptpFrm.registro.fechaCreacion}"
                                       showTime="true"
@@ -246,12 +246,12 @@
                                       pattern="yyyy-MM-dd'T'HH:mm"
                                       converter="offsetDateTimeConverter"
                                       required="true"
-                                      requiredMessage="La fecha es obligatoria"
+                                      requiredMessage="#{crud['frm.botones.laFechaEsObligatoria']}"
                                       touchUI="false"
                                       readonly="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"/>
 
                         <!-- Observaciones -->
-                        <p:outputLabel for="txtObservacionesTp" value="Observaciones:"/>
+                        <p:outputLabel for="txtObservacionesTp" value="#{crud['frm.botones.observaciones']}:"/>
                         <p:inputTextarea id="txtObservacionesTp"
                                          value="#{productoFrm.ptpFrm.registro.observaciones}"
                                          rows="4" cols="50"/>
@@ -260,19 +260,19 @@
 
                      <!-- Botones de acción -->
                      <h:panelGrid columns="4" style="margin-top: 20px;">
-                        <p:commandButton value="Guardar"
+                        <p:commandButton value="#{crud['frm.botones.guardar']}"
                                          actionListener="#{productoFrm.ptpFrm.btnGuardarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='CREAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
                                          process="@form"/>
 
-                        <p:commandButton value="Modificar"
+                        <p:commandButton value="#{crud['frm.botones.modificar']}"
                                          actionListener="#{productoFrm.ptpFrm.btnModificarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
                                          process="@form"/>
 
-                        <p:commandButton value="Eliminar"
+                        <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                          actionListener="#{productoFrm.ptpFrm.btnEliminarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
@@ -288,12 +288,12 @@
    <!-- Diálogo -->
    <ui:define name="extras">
       <p:dialog id="dlgTipoProducto" widgetVar="dlgTipoProducto" modal="true"
-                closable="true" header="Seleccionar Tipo de Producto"
+                closable="true" header="#{crud['frm.botones.seleccionarTipoProducto']}"
                 resizable="false" width="500" height="auto">
          <h:form id="frmDlgTipoProducto">
             <h:panelGrid columns="1" style="width: 100%;">
                <h:panelGrid columns="2" style="width: 100%; margin-bottom: 15px;">
-                  <h:outputLabel value="Tipo de Producto:" for="txtTipoProducto"
+                  <h:outputLabel value="#{crud['frm.botones.tiposDeProductos']}:" for="txtTipoProducto"
                                  style="font-weight: bold;"/>
                   <p:autoComplete id="txtTipoProducto"
                                   completeMethod="#{productoFrm.ptpFrm.buscarTiposPorNombres}"
@@ -306,11 +306,11 @@
                                   dropdown="true"
                                   size="20"
                                   required="true"
-                                  requiredMessage="Debe seleccionar un tipo de producto"/>
+                                  requiredMessage="#{crud['frm.botones.debeSeleccionarUnTipoDeProducto']}"/>
                </h:panelGrid>
 
                <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
-                  <p:commandButton value="Seleccionar"
+                  <p:commandButton value="#{crud['frm.botones.seleccionar']}"
                                    actionListener="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
                                    process="@form"
                                    update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto :tabProducto:frmDetalleTipoProducto:pnlCaracteristicas"

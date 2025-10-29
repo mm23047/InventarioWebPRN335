@@ -28,11 +28,11 @@
                         <h:outputText value="#{r.id}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="#{crud['frm.botones.nombre']}">
                         <h:outputText value="#{r.nombre}" />
                     </p:column>
 
-                    <p:column headerText="Depende de">
+                    <p:column headerText="#{crud['frm.botones.dependeDe']}">
                         <h:outputText value="#{r.idTipoProductoPadre.nombre}"
                                       rendered="#{not empty r.idTipoProductoPadre}"/>
                         <h:outputText value="-- RAÍZ --"
@@ -40,11 +40,11 @@
                                       style="color: #666; font-style: italic;"/>
                     </p:column>
 
-                    <p:column headerText="Estado">
+                    <p:column headerText="#{crud['frm.botones.estado']}">
                         <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
                     </p:column>
 
-                    <p:column headerText="Observaciones">
+                    <p:column headerText="#{crud['frm.botones.observaciones']}">
                         <h:outputText value="#{r.comentarios}" />
                     </p:column>
 
@@ -66,7 +66,7 @@
                        rendered="#{tipoProductoFrm.estado!='NADA'}">
 
                 <!-- Pestaña General -->
-                <p:tab id="tipoProductoTabGeneral" closable="false" title="Generalidades">
+                <p:tab id="tipoProductoTabGeneral" closable="false" title="#{crud['frm.botones.generalidades']}">
                     <h:form id="tipoProductoFrmGeneral">
                         <h:panelGrid columns="2">
 
@@ -74,11 +74,11 @@
                             <p:inputText id="tipoProductoTxtId" value="#{tipoProductoFrm.registro.id}"
                                          readonly="true" disabled="true"/>
 
-                            <p:outputLabel for="tipoProductoTxtNombre" value="Nombre:"/>
+                            <p:outputLabel for="tipoProductoTxtNombre" value="#{crud['frm.botones.nombre']}:"/>
                             <p:inputText id="tipoProductoTxtNombre" value="#{tipoProductoFrm.registro.nombre}"
                                          size="75" required="true"/>
 
-                            <p:outputLabel for="tipoProductoSelPadre" value="Depende de:"/>
+                            <p:outputLabel for="tipoProductoSelPadre" value="#{crud['frm.botones.dependeDe']}:"/>
                             <p:selectOneMenu id="tipoProductoSelPadre"
                                              value="#{tipoProductoFrm.registro.idTipoProductoPadre}"
                                              converter="TipoProductoConverter"
@@ -92,10 +92,10 @@
                                                itemValue="#{tipoPadre}" />
                             </p:selectOneMenu>
 
-                            <p:outputLabel for="tipoProductoChkActivo" value="Activo:"/>
+                            <p:outputLabel for="tipoProductoChkActivo" value="#{crud['frm.botones.activo']}:"/>
                             <p:selectBooleanCheckbox id="tipoProductoChkActivo" value="#{tipoProductoFrm.registro.activo}"/>
 
-                            <p:outputLabel for="tipoProductoTxtObservaciones" value="Observaciones:"/>
+                            <p:outputLabel for="tipoProductoTxtObservaciones" value="#{crud['frm.botones.observaciones']}:"/>
                             <p:inputTextarea id="tipoProductoTxtObservaciones"
                                              value="#{tipoProductoFrm.registro.comentarios}"
                                              rows="4" cols="50"/>
@@ -103,18 +103,18 @@
                         </h:panelGrid>
 
                         <h:panelGrid columns="#{tipoProductoFrm.estado=='MODIFICAR' ? 1 : 2}" style="margin-top: 20px;">
-                            <p:commandButton value="Crear"
+                            <p:commandButton value="#{crud['frm.botones.guardar']}"
                                              actionListener="#{tipoProductoFrm.btnGuardarHandler}"
                                              rendered="#{tipoProductoFrm.estado=='CREAR'}"
                                              update="tipoProductoPnlTabla tipoProductoPnlDetalle"/>
 
-                            <p:commandButton value="Modificar"
+                            <p:commandButton value="#{crud['frm.botones.modificar']}"
                                              actionListener="#{tipoProductoFrm.btnModificarHandler}"
                                              rendered="#{tipoProductoFrm.estado=='MODIFICAR'}"
                                              update="tipoProductoPnlTabla tipoProductoPnlDetalle"
                                              process="@form"/>
 
-                            <p:commandButton value="Eliminar"
+                            <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                              actionListener="#{tipoProductoFrm.btnEliminarHandler}"
                                              rendered="#{tipoProductoFrm.estado=='MODIFICAR'}"
                                              update="tipoProductoPnlTabla tipoProductoPnlDetalle"
@@ -124,7 +124,7 @@
                 </p:tab>
 
                 <!-- Pestaña Características -->
-                <p:tab id="tipoProductoTabCaracteristicas" closable="false" title="Características"
+                <p:tab id="tipoProductoTabCaracteristicas" closable="false" title="#{crud['frm.botones.caracteristica']}"
                        disabled="#{tipoProductoFrm.estado!='MODIFICAR'}">
 
                     <!-- Panel de Tabla -->
@@ -146,15 +146,15 @@
                                     <h:outputText value="#{tpc.id}" />
                                 </p:column>
 
-                                <p:column headerText="Característica">
+                                <p:column headerText="#{crud['frm.botones.caracteristica']}">
                                     <h:outputText value="#{tpc.idCaracteristica.nombre}" />
                                 </p:column>
 
-                                <p:column headerText="Obligatorio">
+                                <p:column headerText="#{crud['frm.botones.obligatorio']}">
                                     <h:outputText value="#{tpc.obligatorio ? 'SÍ' : 'NO'}" />
                                 </p:column>
 
-                                <p:column headerText="Fecha Creación">
+                                <p:column headerText="#{crud['frm.botones.fechaCreacion']}">
                                     <h:outputText value="#{tpc.fechaCreacion}">
                                         <f:converter converterId="offsetDateTimeConverter" />
                                     </h:outputText>
@@ -201,7 +201,7 @@
                                     <h:panelGroup id="pnlCaracteristica">
 
                                         <h:panelGrid columns="2" style="width: 85%; column-gap: 5px;">
-                                            <p:outputLabel for="txtCaracteristicaNombre" value="Característica:" style="display:flex; align-items:center;" />
+                                            <p:outputLabel for="txtCaracteristicaNombre" value="#{crud['frm.botones.caracteristica']}:" style="display:flex; align-items:center;" />
                                             <p:inputText id="txtCaracteristicaNombre"
                                                          value="#{tipoProductoFrm.tpcFrm.registro.idCaracteristica.nombre}"
                                                          readonly="true"
@@ -212,7 +212,7 @@
                                                 <p:commandButton type="button"
                                                                  icon="pi pi-external-link"
                                                                  onclick="PF('dlgCaracteristica').show();"
-                                                                 value="Seleccionar Característica"
+                                                                 value="#{crud['frm.botones.seleccionarcaracteristica']}"
                                                                  rendered="#{tipoProductoFrm.tpcFrm.estado=='CREAR' or tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"/>
                                             </h:panelGrid>
 
@@ -224,7 +224,7 @@
                                 <!-- Obligatorio -->
 
                                 <h:panelGrid columns="2" style="width: 32%; column-gap: 5px; margin-bottom: 10px;">
-                                    <p:outputLabel for="tpcChkObligatorio" value="Obligatorio:"/>
+                                    <p:outputLabel for="tpcChkObligatorio" value="#{crud['frm.botones.obligatorio']}:"/>
                                     <p:selectBooleanCheckbox id="tpcChkObligatorio"
                                                              value="#{tipoProductoFrm.tpcFrm.registro.obligatorio}"/>
                                 </h:panelGrid>
@@ -233,7 +233,7 @@
                                 <!-- Fecha de Creación -->
 
                                 <h:panelGrid columns="2" style="width: 58%; margin-bottom: 10px; column-gap: 10px;">
-                                    <p:outputLabel for="tpcDpFechaCreacion" value="Fecha de Creación:"/>
+                                    <p:outputLabel for="tpcDpFechaCreacion" value="#{crud['frm.botones.fechaCreacion']}:"/>
                                     <p:datePicker id="tpcDpFechaCreacion"
                                                   value="#{tipoProductoFrm.tpcFrm.registro.fechaCreacion}"
                                                   showTime="true"
@@ -252,19 +252,19 @@
 
 
                             <h:panelGrid columns="3" style="margin-top: 20px;">
-                                <p:commandButton value="Guardar"
+                                <p:commandButton value="#{crud['frm.botones.guardar']}"
                                                  actionListener="#{tipoProductoFrm.tpcFrm.btnGuardarHandler}"
                                                  rendered="#{tipoProductoFrm.tpcFrm.estado=='CREAR'}"
                                                  update="tipoProductoCaracteristicaPnlTabla tipoProductoCaracteristicaPnlDetalle"
                                                  process="@form"/>
 
-                                <p:commandButton value="Modificar"
+                                <p:commandButton value="#{crud['frm.botones.modificar']}"
                                                  actionListener="#{tipoProductoFrm.tpcFrm.btnModificarHandler}"
                                                  rendered="#{tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"
                                                  update="tipoProductoCaracteristicaPnlTabla tipoProductoCaracteristicaPnlDetalle"
                                                  process="@form"/>
 
-                                <p:commandButton value="Eliminar"
+                                <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                                  actionListener="#{tipoProductoFrm.tpcFrm.btnEliminarHandler}"
                                                  rendered="#{tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"
                                                  update="tipoProductoCaracteristicaPnlTabla tipoProductoCaracteristicaPnlDetalle"
@@ -281,12 +281,12 @@
     <!-- Diálogo de Característica - RUTAS CORREGIDAS -->
     <ui:define name="extras">
         <p:dialog id="dlgCaracteristica" widgetVar="dlgCaracteristica" modal="true"
-                  closable="true" header="Seleccionar Característica"
+                  closable="true" header="#{crud['frm.botones.seleccionarcaracteristica']}"
                   resizable="false" width="500" height="auto">
             <h:form id="frmDlgCaracteristica">
                 <h:panelGrid columns="1" style="width: 100%;">
                     <h:panelGrid columns="2" style="width: 100%; margin-bottom: 15px;">
-                        <h:outputLabel value="Característica:" for="txtCaracteristica"
+                        <h:outputLabel value="#{crud['frm.botones.caracteristica']}:" for="txtCaracteristica"
                                        style="font-weight: bold;"/>
                         <p:autoComplete id="txtCaracteristica"
                                         completeMethod="#{tipoProductoFrm.tpcFrm.buscarCaracteristicasPorNombres}"
@@ -299,16 +299,16 @@
                                         dropdown="true"
                                         size="30"
                                         required="true"
-                                        requiredMessage="Debe seleccionar una característica"/>
+                                        requiredMessage="#{crud['frm.botones.debeSeleccionarUnaCaracteristica']}"/>
                     </h:panelGrid>
 
                     <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
-                        <p:commandButton value="Seleccionar"
+                        <p:commandButton value="#{crud['frm.botones.seleccionar']}"
                                          actionListener="#{tipoProductoFrm.tpcFrm.btnSeleccionarCaracteristicaHandler}"
                                          process="@form"
                                          update="tipoProductoTabView:tipoProductoCaracteristicaFrmDetalle:pnlCaracteristica"
                                          oncomplete="PF('dlgCaracteristica').hide();"/>
-                        <p:commandButton value="Cancelar"
+                        <p:commandButton value="#{crud['frm.botones.cancelar']}"
                                          onclick="PF('dlgCaracteristica').hide();"
                                          type="button"/>
                     </h:panelGrid>

@@ -58,7 +58,7 @@
     <!-- Detalle (formulario de edición/creación) -->
     <ui:define name="contenido-detalle" >
         <p:tabView id="tabTipoUnidadMedida" cache="false" dynamic="true" rendered="#{tipoUnidadMedidaFrm.estado!='NADA'}">
-            <p:tab closable="false" title="Generalidades">
+            <p:tab closable="false" title="#{crud['frm.botones.generalidades']}">
                 <h:form id="frmCrear">
                     <h:panelGrid columns="2">
 
@@ -102,7 +102,7 @@
                 </h:form>
             </p:tab>
 
-            <p:tab closable="false" title="Unidades de Medida" disabled="#{tipoUnidadMedidaFrm.estado!='MODIFICAR'}">
+            <p:tab closable="false" title="#{crud['frm.botones.unidadesDeMedida']}" disabled="#{tipoUnidadMedidaFrm.estado!='MODIFICAR'}">
                 <h:panelGroup id="pnlUnidadesMedida">
                     <h:panelGrid>
                         <h2>Unidades de Medida</h2>
