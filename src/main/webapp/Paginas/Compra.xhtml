@@ -90,17 +90,23 @@
                                   readonly="true" disabled="true" size="20"/>
 
                      <!-- Proveedor (Relación con Proveedores) -->
-                     <p:outputLabel for="selProveedor" value="Proveedor:"/>
-                     <p:selectOneMenu id="selProveedor" value="#{compraFrm.registro.proveedor}"
-                                      required="true" requiredMessage="Seleccione un proveedor">
-                        <f:converter converterId="proveedorConverter" />
-                        <f:attribute name="items" value="#{compraFrm.listaProveedores}" />
-                        <f:selectItem itemLabel="Seleccione proveedor..." itemValue="#{null}" noSelectionOption="true"/>
-                        <f:selectItems value="#{compraFrm.listaProveedores}"
-                                       var="proveedor"
-                                       itemLabel="#{proveedor.nombre}"
-                                       itemValue="#{proveedor}"/>
-                     </p:selectOneMenu>
+                     <h:panelGroup>
+                        <p:autoComplete id="autoProveedor"
+                                        value="#{compraFrm.registro.proveedor}"
+                                        completeMethod="#{compraFrm.buscarProveedoresPorNombre}"
+                                        var="proveedor"
+                                        itemLabel="#{proveedor.nombre} "
+                                        itemValue="#{proveedor}"
+                                        forceSelection="true"
+                                        dropdown="true"
+                                        required="true"
+                                        requiredMessage="Seleccione un proveedor"
+                                        size="50"
+                                        placeholder="Escriba el nombre...">
+                           />
+                        </p:autoComplete>
+                        <p:message for="autoProveedor" display="icon"/>
+                     </h:panelGroup>
 
                      <!-- Estado (Dropdown con opciones) -->
                      <p:outputLabel for="selEstado" value="Estado:"/>

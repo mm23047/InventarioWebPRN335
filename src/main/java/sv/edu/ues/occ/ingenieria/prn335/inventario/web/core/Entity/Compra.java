@@ -22,7 +22,6 @@ public class Compra {
     @Column(name = "id_compra", nullable = false)
     private Long id;
 
-    // CORRECCIÓN: Cambia @OneToOne con @MapsId por @ManyToOne simple
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proveedor") // Esta es la columna real en la BD
     private Proveedor proveedor;
@@ -37,10 +36,6 @@ public class Compra {
     @Lob
     @Column(name = "observaciones")
     private String observaciones;
-
-    // ELIMINA completamente este campo - ES REDUNDANTE Y CAUSA EL ERROR
-    // @Column(name = "id_proveedor")
-    // private Integer idProveedor;
 
     public Long getId() {
         return id;
@@ -82,7 +77,6 @@ public class Compra {
         this.observaciones = observaciones;
     }
 
-    // Método helper si necesitas obtener el ID del proveedor
     public Integer getIdProveedor() {
         return proveedor != null ? proveedor.getId() : null;
     }

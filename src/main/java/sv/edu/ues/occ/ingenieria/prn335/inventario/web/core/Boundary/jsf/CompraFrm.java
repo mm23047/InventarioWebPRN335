@@ -17,6 +17,7 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -61,17 +62,18 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     @Override
     public void inicializarListas() {
         try {
-            // Ya no cargamos todos los proveedores, se buscarán dinámicamente
-            // this.listaProveedores = proveedorDAO.findRange(0, Integer.MAX_VALUE);
+            // Cargar solo proveedores activos
+            this.listaProveedores = proveedorDAO.findByActivos(0, Integer.MAX_VALUE);
 
             // Definir estados disponibles
             this.estadosCompra = Arrays.asList("ORDEN", "CREADO", "APROBADO", "RECHAZADO", "ANULADO");
 
             Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
-                    "Listas de compra inicializadas correctamente");
+                    "Listas de compra inicializadas correctamente. Proveedores activos cargados: " + listaProveedores.size());
         } catch (Exception e) {
             Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al cargar listas", e);
             estadosCompra = Arrays.asList("CREADO");
+            listaProveedores = new ArrayList<>(); // Lista vacía en caso de error
         }
     }
 

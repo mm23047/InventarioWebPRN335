@@ -47,4 +47,19 @@ public class ProveedorDAO extends InventarioDefaultDataAccess<Proveedor> impleme
     public Proveedor leer(Object id) {
         return em.find(Proveedor.class, id);
     }
+
+    //metodo para buscar proveedores activos
+    public List<Proveedor> findByActivos(int first, int max) {
+        try {
+            TypedQuery<Proveedor> q = em.createNamedQuery("Proveedor.findByActivos", Proveedor.class);
+            q.setFirstResult(first);
+            q.setMaxResults(max);
+            return q.getResultList();
+        } catch (Exception ex) {
+            Logger.getLogger(ProveedorDAO.class.getName()).log(Level.SEVERE, "Error al buscar proveedores activos", ex);
+            return List.of();
+        }
+    }
+
+
 }
