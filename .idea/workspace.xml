@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="21326914-e5fc-4517-aee1-fde55bfaa8d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/jsf/conversores/ProveedorConverter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/webContexts.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CompraDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/CompraDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProveedorDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Control/ProveedorDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Compra.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Compra.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Proveedor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Entity/Proveedor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/Paginas/Compra.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/Paginas/Compra.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,10 +36,10 @@
     &quot;accountId&quot;: &quot;a7d319e3-30e5-40b3-ac77-79601e854772&quot;
   }
 }</component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -100,8 +93,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19416.15" />
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19416.15" />
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19072.14" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19072.14" />
       </set>
     </attachedChunks>
   </component>
@@ -117,6 +110,7 @@
       <workItem from="1760462018553" duration="14843000" />
       <workItem from="1761679996794" duration="5164000" />
       <workItem from="1761712979630" duration="3976000" />
+      <workItem from="1761812141678" duration="520000" />
     </task>
     <servers />
   </component>
