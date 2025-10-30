@@ -1,0 +1,162 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:ues="jakarta.faces.composite/ues"
+                template="../WEB-INF/templates/default.xhtml">
+
+    <!-- Header -->
+    <ui:define name="header">
+        <h1>#{ventaFrm.nombreBean}</h1>
+    </ui:define>
+
+    <!-- Tabla de ventas -->
+    <ui:define name="contenido-tabla">
+        <h:panelGroup id="ventaPnlTabla">
+            <h:form id="ventaFrmTop">
+                <p:dataTable value="#{ventaFrm.modelo}" var="v"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             lazy="true"
+                             selection="#{ventaFrm.registro}"
+                             selectionMode="single"
+                             rows="#{ventaFrm.registrosPorPagina}"
+                             rendered="#{ventaFrm.estado=='NADA'}">
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{v.id}" />
+                    </p:column>
+
+                    <p:column headerText="Cliente">
+                        <h:outputText value="#{v.idCliente.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Total">
+                        <h:outputText value="#{v.total}" />
+                    </p:column>
+
+                    <p:column headerText="Estado">
+                        <h:outputText value="#{v.estado}" />
+                    </p:column>
+
+                    <p:column headerText="Observaciones">
+                        <h:outputText value="#{v.observaciones}" />
+                    </p:column>
+
+                    <p:ajax event="rowSelect"
+                            listener="#{ventaFrm.seleccionarRegistro}"
+                            update="ventaPnlTabla ventaPnlDetalle"/>
+                </p:dataTable>
+
+                <ues:botones-top formulario="#{ventaFrm}"
+                                 actualizar="ventaPnlTabla ventaPnlDetalle"/>
+            </h:form>
+        </h:panelGroup>
+    </ui:define>
+
+    <!-- Detalle -->
+    <ui:define name="contenido-detalle">
+        <h:panelGroup id="ventaPnlDetalle">
+            <p:tabView id="ventaTabView" cache="false" dynamic="true"
+                       rendered="#{ventaFrm.estado!='NADA'}">
+
+                <!-- Pestaña General -->
+                <p:tab id="ventaTabGeneral" closable="false" title="General">
+                    <h:form id="ventaFrmGeneral">
+                        <h:panelGrid columns="2" columnClasses="label,value">
+
+                            <p:outputLabel for="ventaTxtId" value="ID:"/>
+                            <p:inputText id="ventaTxtId" value="#{ventaFrm.registro.id}" readonly="true"/>
+
+                            <p:outputLabel for="ventaCliente" value="Cliente:"/>
+                            <p:autoComplete id="ventaCliente"
+                                            value="#{ventaFrm.clienteSeleccionado}"
+                                            completeMethod="#{ventaFrm.completarClientes}"
+                                            var="c"
+                                            itemLabel="#{c.nombre} (#{c.id})"
+                                            itemValue="#{c}"
+                                            converter="clienteConverter"
+                                            forceSelection="true"
+                                            size="50"/>
+
+                            <p:outputLabel for="ventaObservaciones" value="Observaciones:"/>
+                            <p:inputTextarea id="ventaObservaciones"
+                                             value="#{ventaFrm.registro.observaciones}"
+                                             rows="4" cols="50"/>
+
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="3" style="margin-top:20px;">
+                            <p:commandButton value="Guardar"
+                                             actionListener="#{ventaFrm.btnGuardarHandler}"
+                                             rendered="#{ventaFrm.estado=='CREAR'}"
+                                             update="ventaPnlTabla ventaPnlDetalle"/>
+                            <p:commandButton value="Modificar"
+                                             actionListener="#{ventaFrm.btnModificarHandler}"
+                                             rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                             update="ventaPnlTabla ventaPnlDetalle"
+                                             process="@form"/>
+                            <p:commandButton value="Eliminar"
+                                             actionListener="#{ventaFrm.btnEliminarHandler}"
+                                             rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                             update="ventaPnlTabla ventaPnlDetalle"
+                                             process="@form"/>
+                        </h:panelGrid>
+                    </h:form>
+                </p:tab>
+
+                <!-- Pestaña Detalles -->
+                <p:tab id="ventaTabDetalle" closable="false" title="Detalles">
+                    <h:form id="ventaFrmDetalle">
+                        <h:panelGrid columns="2">
+
+                            <p:outputLabel for="productoSel" value="Producto:"/>
+                            <p:autoComplete id="productoSel"
+                                            value="#{ventaFrm.productoSeleccionado}"
+                                            completeMethod="#{ventaFrm.completarProductos}"
+                                            var="p"
+                                            itemLabel="#{p.nombreProducto} (#{p.id})"
+                                            itemValue="#{p}"
+                                            converter="productoConverter"
+                                            forceSelection="true"
+                                            size="50"/>
+
+                            <p:outputLabel for="cantidadSel" value="Cantidad:"/>
+                            <p:inputText id="cantidadSel" value="#{ventaFrm.cantidadSeleccionada}" />
+
+                        </h:panelGrid>
+
+                        <p:commandButton value="Agregar Detalle"
+                                         actionListener="#{ventaFrm.agregarDetalle}"
+                                         update="tablaDetalles"
+                                         process="@form"/>
+
+                        <p:dataTable id="tablaDetalles" value="#{ventaFrm.detalles}" var="d" editable="true">
+                            <p:column headerText="Producto">
+                                <h:outputText value="#{d.idProducto.nombreProducto}" />
+                            </p:column>
+                            <p:column headerText="Cantidad">
+                                <h:outputText value="#{d.cantidad}" />
+                            </p:column>
+                            <p:column headerText="Precio">
+                                <h:outputText value="#{d.precio}" />
+                            </p:column>
+                            <p:column headerText="Subtotal">
+                                <h:outputText value="#{d.cantidad.multiply(d.precio)}" />
+                            </p:column>
+                            <p:column headerText="Acciones">
+                                <p:commandButton icon="pi pi-times"
+                                                 actionListener="#{ventaFrm.eliminarDetalle(d)}"
+                                                 update="tablaDetalles"/>
+                            </p:column>
+                        </p:dataTable>
+
+                        <h:outputText value="Total: #{ventaFrm.registro.total}" style="font-weight:bold; margin-top:10px;"/>
+                    </h:form>
+                </p:tab>
+
+            </p:tabView>
+        </h:panelGroup>
+    </ui:define>
+</ui:composition>
