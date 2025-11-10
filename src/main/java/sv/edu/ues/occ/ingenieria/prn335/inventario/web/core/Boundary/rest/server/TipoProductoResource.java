@@ -58,7 +58,7 @@ public class TipoProductoResource {
         return Response.status(422).header("Missing-parameter", "id").build();
     }
 
-    @GET
+    @DELETE
     @Path("{id}")
 
     public Response delete(@PathParam("id") Long id){
