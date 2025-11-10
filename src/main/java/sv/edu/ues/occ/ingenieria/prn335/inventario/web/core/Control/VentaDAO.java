@@ -8,6 +8,7 @@ import jakarta.persistence.TypedQuery;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Venta;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -83,6 +84,31 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> implements Seri
         } catch (Exception ex) {
             Logger.getLogger(VentaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             return List.of();
+        }
+    }
+
+    // --- MÉTODO SIMPLE: Calcular manualmente ---
+    public BigDecimal getSumaTotalVentas() {
+        try {
+            System.out.println("=== DEBUG VentaDAO: Método manual ===");
+
+            List<Venta> todasVentas = findAll();
+            System.out.println("=== DEBUG VentaDAO: Total ventas encontradas: " + todasVentas.size() + " ===");
+
+            BigDecimal suma = BigDecimal.ZERO;
+            for (Venta venta : todasVentas) {
+                if (venta.getTotal() != null) {
+                    suma = suma.add(venta.getTotal());
+                }
+            }
+
+            System.out.println("=== DEBUG VentaDAO: Suma manual: " + suma + " ===");
+            return suma;
+
+        } catch (Exception e) {
+            System.out.println("=== DEBUG VentaDAO: ERROR en método manual - " + e.getMessage() + " ===");
+            e.printStackTrace();
+            return BigDecimal.ZERO;
         }
     }
 }

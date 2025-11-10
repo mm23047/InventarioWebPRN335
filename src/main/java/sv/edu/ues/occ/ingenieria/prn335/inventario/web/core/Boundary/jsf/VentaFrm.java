@@ -380,6 +380,20 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         return BigDecimal.ZERO;
     }
 
+    // --- MÉTODO CORREGIDO: Para obtener el total general de TODAS las ventas ---
+    public BigDecimal getTotalGeneralVentas() {
+        try {
+            // Usar el método del DAO que consulta TODAS las ventas en la base de datos
+            // sin importar la paginación
+            return ventaDAO.getSumaTotalVentas();
+        } catch (Exception e) {
+            System.out.println("=== DEBUG VentaFrm: ERROR - " + e.getMessage() + " ===");
+            e.printStackTrace();
+            enviarMensajeError("Error calculando total general: " + e.getMessage());
+            return BigDecimal.ZERO;
+        }
+    }
+
     // --- Getters para controlar la visualización en XHTML ---
     public boolean isEsNuevo() {
         return esNuevo;
