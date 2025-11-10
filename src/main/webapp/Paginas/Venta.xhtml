@@ -11,7 +11,7 @@
         <h1>#{ventaFrm.nombreBean}</h1>
     </ui:define>
 
-    <!-- Tabla de ventas -->
+    <!-- Tabla de registros (siempre visible) -->
     <ui:define name="contenido-tabla">
         <h:panelGroup id="ventaPnlTabla">
             <h:form id="ventaFrmTop">
@@ -55,7 +55,7 @@
         </h:panelGroup>
     </ui:define>
 
-    <!-- Detalle -->
+    <!-- Panel de detalle y general unificado -->
     <ui:define name="contenido-detalle">
         <h:panelGroup id="ventaPnlDetalle">
             <p:tabView id="ventaTabView" cache="false" dynamic="true"
@@ -63,7 +63,8 @@
 
                 <!-- Pestaña General -->
                 <p:tab id="ventaTabGeneral" closable="false" title="General">
-                    <h:form id="ventaFrmGeneral">
+                    <h:form id="ventaFrmPrincipal">
+
                         <h:panelGrid columns="2" columnClasses="label,value">
 
                             <p:outputLabel for="ventaTxtId" value="ID:"/>
@@ -74,7 +75,7 @@
                                             value="#{ventaFrm.clienteSeleccionado}"
                                             completeMethod="#{ventaFrm.completarClientes}"
                                             var="c"
-                                            itemLabel="#{c.nombre} (#{c.id})"
+                                            itemLabel="#{c.nombre}"
                                             itemValue="#{c}"
                                             converter="clienteConverter"
                                             forceSelection="true"
@@ -84,31 +85,30 @@
                             <p:inputTextarea id="ventaObservaciones"
                                              value="#{ventaFrm.registro.observaciones}"
                                              rows="4" cols="50"/>
-
                         </h:panelGrid>
 
+                        <!-- Botones de acción -->
                         <h:panelGrid columns="3" style="margin-top:20px;">
                             <p:commandButton value="Guardar"
                                              actionListener="#{ventaFrm.btnGuardarHandler}"
                                              rendered="#{ventaFrm.estado=='CREAR'}"
-                                             update="ventaPnlTabla ventaPnlDetalle"/>
+                                             update=":ventaPnlTabla, :ventaPnlDetalle"
+                                             process="@form"/>
                             <p:commandButton value="Modificar"
                                              actionListener="#{ventaFrm.btnModificarHandler}"
                                              rendered="#{ventaFrm.estado=='MODIFICAR'}"
-                                             update="ventaPnlTabla ventaPnlDetalle"
+                                             update=":ventaPnlTabla, :ventaPnlDetalle"
                                              process="@form"/>
                             <p:commandButton value="Eliminar"
                                              actionListener="#{ventaFrm.btnEliminarHandler}"
                                              rendered="#{ventaFrm.estado=='MODIFICAR'}"
-                                             update="ventaPnlTabla ventaPnlDetalle"
+                                             update=":ventaPnlTabla, :ventaPnlDetalle"
                                              process="@form"/>
                         </h:panelGrid>
-                    </h:form>
-                </p:tab>
 
-                <!-- Pestaña Detalles -->
-                <p:tab id="ventaTabDetalle" closable="false" title="Detalles">
-                    <h:form id="ventaFrmDetalle">
+                        <p:separator style="margin:20px 0"/>
+
+                        <!-- Pestaña Detalles dentro del mismo formulario -->
                         <h:panelGrid columns="2">
 
                             <p:outputLabel for="productoSel" value="Producto:"/>
@@ -116,7 +116,7 @@
                                             value="#{ventaFrm.productoSeleccionado}"
                                             completeMethod="#{ventaFrm.completarProductos}"
                                             var="p"
-                                            itemLabel="#{p.nombreProducto} (#{p.id})"
+                                            itemLabel="#{p.nombreProducto}"
                                             itemValue="#{p}"
                                             converter="productoConverter"
                                             forceSelection="true"
@@ -130,9 +130,11 @@
                         <p:commandButton value="Agregar Detalle"
                                          actionListener="#{ventaFrm.agregarDetalle}"
                                          update="tablaDetalles"
-                                         process="@form"/>
+                                         process="@form"
+                                         style="margin-top:10px"/>
 
-                        <p:dataTable id="tablaDetalles" value="#{ventaFrm.detalles}" var="d" editable="true">
+                        <p:dataTable id="tablaDetalles" value="#{ventaFrm.detalles}" var="d" editable="true"
+                                     style="margin-top:10px">
                             <p:column headerText="Producto">
                                 <h:outputText value="#{d.idProducto.nombreProducto}" />
                             </p:column>
@@ -152,11 +154,13 @@
                             </p:column>
                         </p:dataTable>
 
-                        <h:outputText value="Total: #{ventaFrm.registro.total}" style="font-weight:bold; margin-top:10px;"/>
+                        <h:outputText value="Total: #{ventaFrm.registro.total}"
+                                      style="font-weight:bold; margin-top:10px; display:block"/>
                     </h:form>
                 </p:tab>
 
             </p:tabView>
         </h:panelGroup>
     </ui:define>
+
 </ui:composition>
