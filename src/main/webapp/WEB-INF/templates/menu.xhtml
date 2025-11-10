@@ -1,8 +1,8 @@
 <ui:composition
-        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:ui="jakarta.faces.facelets"
         xmlns:p="http://primefaces.org/ui"
-        xmlns:f="http://xmlns.jcp.org/jsf/core"
-        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:h="jakarta.faces.html"
         xmlns="http://www.w3.org/1999/xhtml">
 
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -14,11 +14,12 @@
                 <p:menuitem value="#{crud['frm.botones.tipoUnidadMedida']}" url="#{request.contextPath}/Paginas/TipoUnidadMedida.jsf" icon="pi pi-ruler"/>
             </p:submenu>
 
-            <!-- Submenú Maestros -->
+            <!-- Submenú Maestros / Específicos -->
             <p:submenu label="#{crud['frm.botones.especificos']}" icon="pi pi-database" styleClass="compact-submenu">
                 <p:menuitem value="#{crud['frm.botones.almacen']}" url="#{request.contextPath}/Paginas/Almacen.jsf" icon="pi pi-warehouse"/>
                 <p:menuitem value="#{crud['frm.botones.producto']}" url="#{request.contextPath}/Paginas/Producto.jsf" icon="pi pi-shopping-bag"/>
                 <p:menuitem value="Compra" url="#{request.contextPath}/Paginas/Compra.jsf" icon="pi pi-shopping-cart"/>
+                <p:menuitem value="Venta" url="#{request.contextPath}/Paginas/Venta.jsf" icon="pi pi-credit-card"/> <!-- NUEVO -->
                 <p:menuitem value="#{crud['frm.botones.cliente']}" url="#{request.contextPath}/Paginas/Cliente.jsf" icon="pi pi-user"/>
                 <p:menuitem value="#{crud['frm.botones.proveedor']}" url="#{request.contextPath}/Paginas/Proveedor.jsf" icon="pi pi-truck"/>
                 <p:menuitem value="#{crud['frm.botones.caracteristica']}" url="#{request.contextPath}/Paginas/Caracteristica.jsf" icon="pi pi-sliders-h"/>

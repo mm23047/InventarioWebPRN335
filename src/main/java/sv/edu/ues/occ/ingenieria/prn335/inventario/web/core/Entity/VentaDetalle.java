@@ -9,6 +9,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "venta_detalle", schema = "public")
 public class VentaDetalle {
+
     @Id
     @Column(name = "id_venta_detalle", nullable = false)
     private UUID id;
@@ -35,6 +36,7 @@ public class VentaDetalle {
     @Column(name = "observaciones")
     private String observaciones;
 
+    // --- Getters y Setters ---
     public UUID getId() {
         return id;
     }
@@ -90,5 +92,4 @@ public class VentaDetalle {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
-
 }
