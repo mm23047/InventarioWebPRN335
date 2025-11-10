@@ -9,22 +9,38 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
-public  class ProductoDAO extends InventarioDefaultDataAccess<Producto> implements Serializable {
+public class ProductoDAO extends InventarioDefaultDataAccess<Producto> implements Serializable {
+
     @PersistenceContext(unitName = "inventarioPU")
     EntityManager em;
 
-    public ProductoDAO(){super(Producto.class);
+    public ProductoDAO() {
+        super(Producto.class);
     }
 
     @Override
-    public EntityManager getEntityManager(){
+    public EntityManager getEntityManager() {
         return em;
     }
+
+    // --- NUEVO MÉTODO: Buscar producto por ID ---
+    public Producto buscarPorId(UUID id) {
+        try {
+            if (id != null) {
+                return em.find(Producto.class, id);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ProductoDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return null;
+    }
+
     /**
      * Busca productos cuyo nombre coincida con el parámetro dado
      * @param nombre el nombre o parte del nombre a buscar

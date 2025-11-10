@@ -5,15 +5,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 import org.primefaces.event.SelectEvent;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ClienteDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CompraDetalleDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.VentaDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.VentaDetalleDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Cliente;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Venta;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.VentaDetalle;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -45,6 +38,8 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     private Cliente clienteSeleccionado;
     private Producto productoSeleccionado;
     private BigDecimal cantidadSeleccionada = BigDecimal.ONE;
+    private boolean esNuevo = true; // Para diferenciar entre nuevo y modificar
+    private boolean mostrarFormulario = false; // NUEVO: Controla qué panel mostrar
 
     public VentaFrm() {
         this.nombreBean = "Venta";
@@ -60,14 +55,75 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         Venta venta = new Venta();
         venta.setId(UUID.randomUUID());
         venta.setFecha(OffsetDateTime.now());
-        venta.setEstado("ACTIVO");
         venta.setObservaciones("Venta creada desde JSF");
-        venta.setTotal(BigDecimal.ZERO);
+        venta.setDetalles(new ArrayList<>());
         detalles.clear();
         clienteSeleccionado = null;
         productoSeleccionado = null;
         cantidadSeleccionada = BigDecimal.ONE;
+        esNuevo = true;
+        mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
         return venta;
+    }
+
+    @Override
+    protected void configurarNuevoRegistro() {
+        detalles.clear();
+        clienteSeleccionado = null;
+        productoSeleccionado = null;
+        cantidadSeleccionada = BigDecimal.ONE;
+        esNuevo = true;
+        mostrarFormulario = false; // NUEVO: Volver a mostrar la tabla
+    }
+
+    // --- Sobrescribir btnNuevoHandler para crear nueva venta ---
+    @Override
+    public void btnNuevoHandler(jakarta.faces.event.ActionEvent actionEvent) {
+        try {
+            this.registro = nuevoRegistro();
+            this.esNuevo = true;
+            this.mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
+        } catch (Exception e) {
+            enviarMensajeError("Error al crear nueva venta: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void seleccionarRegistro(SelectEvent<Venta> event) {
+        if (event != null && event.getObject() != null) {
+            Venta ventaSeleccionada = event.getObject();
+
+            try {
+                Venta ventaCompleta = ventaDAO.buscarVentaCompleta(ventaSeleccionada.getId());
+
+                if (ventaCompleta != null) {
+                    this.registro = ventaCompleta;
+                    this.clienteSeleccionado = ventaCompleta.getIdCliente();
+                    this.detalles = new ArrayList<>(ventaCompleta.getDetalles());
+                    this.esNuevo = false; // Es una modificación
+                    this.mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
+                } else {
+                    this.registro = ventaDAO.buscarPorId(ventaSeleccionada.getId());
+                    if (this.registro != null) {
+                        this.clienteSeleccionado = this.registro.getIdCliente();
+                        if (this.registro.getDetalles() != null) {
+                            this.detalles = new ArrayList<>(this.registro.getDetalles());
+                            for (VentaDetalle detalle : this.detalles) {
+                                if (detalle.getIdProducto() != null) {
+                                    detalle.getIdProducto().getNombreProducto();
+                                }
+                            }
+                        }
+                        this.esNuevo = false; // Es una modificación
+                        this.mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                enviarMensajeError("Error al cargar la venta: " + e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -75,7 +131,27 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         if (id == null) return null;
         try {
             UUID idUUID = (id instanceof UUID) ? (UUID) id : UUID.fromString(id.toString());
-            return ventaDAO.leer(idUUID);
+
+            Venta venta = ventaDAO.buscarVentaCompleta(idUUID);
+            if (venta == null) {
+                venta = ventaDAO.buscarPorId(idUUID);
+            }
+
+            if (venta != null) {
+                this.clienteSeleccionado = venta.getIdCliente();
+                if (venta.getDetalles() != null) {
+                    this.detalles = new ArrayList<>(venta.getDetalles());
+                    for (VentaDetalle detalle : this.detalles) {
+                        if (detalle.getIdProducto() != null) {
+                            detalle.getIdProducto().getNombreProducto();
+                        }
+                    }
+                }
+                this.esNuevo = false;
+                this.mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
+            }
+
+            return venta;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -92,7 +168,26 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         if (id == null) return null;
         try {
             UUID idUUID = UUID.fromString(id);
-            return ventaDAO.leer(idUUID);
+            Venta venta = ventaDAO.buscarVentaCompleta(idUUID);
+            if (venta == null) {
+                venta = ventaDAO.buscarPorId(idUUID);
+            }
+
+            if (venta != null) {
+                this.clienteSeleccionado = venta.getIdCliente();
+                if (venta.getDetalles() != null) {
+                    this.detalles = new ArrayList<>(venta.getDetalles());
+                    for (VentaDetalle detalle : this.detalles) {
+                        if (detalle.getIdProducto() != null) {
+                            detalle.getIdProducto().getNombreProducto();
+                        }
+                    }
+                }
+                this.esNuevo = false;
+                this.mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
+            }
+
+            return venta;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -115,22 +210,87 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     }
 
     @Override
-    protected void configurarNuevoRegistro() {
-        detalles.clear();
-        clienteSeleccionado = null;
-        productoSeleccionado = null;
-        cantidadSeleccionada = BigDecimal.ONE;
-    }
-
-    @Override
     protected VentaDAO getDao() {
         return ventaDAO;
     }
 
-    // --- Métodos para manejar detalles ---
+    // --- Método unificado para guardar/modificar ---
+    @Override
+    public void btnGuardarHandler(jakarta.faces.event.ActionEvent actionEvent) {
+        if (registro == null) {
+            enviarMensajeError("No hay venta para guardar");
+            return;
+        }
+
+        if (clienteSeleccionado == null) {
+            enviarMensajeError("Debe seleccionar un cliente");
+            return;
+        }
+
+        if (detalles.isEmpty()) {
+            enviarMensajeError("Debe agregar al menos un detalle de venta");
+            return;
+        }
+
+        try {
+            // Asignar cliente y detalles
+            registro.setIdCliente(clienteSeleccionado);
+            registro.setDetalles(detalles);
+
+            if (esNuevo) {
+                // Crear nueva venta
+                ventaDAO.crear(registro);
+                enviarMensajeExito("Venta guardada correctamente con " + detalles.size() + " detalles.");
+            } else {
+                // Actualizar venta existente
+                ventaDAO.actualizar(registro);
+                enviarMensajeExito("Venta modificada correctamente con " + detalles.size() + " detalles.");
+            }
+
+            // Limpiar después de guardar/modificar
+            registro = null;
+            detalles.clear();
+            clienteSeleccionado = null;
+            productoSeleccionado = null;
+            cantidadSeleccionada = BigDecimal.ONE;
+            esNuevo = true;
+            mostrarFormulario = false; // NUEVO: Volver a mostrar la tabla
+
+            inicializarRegistros();
+
+        } catch (Exception e) {
+            enviarMensajeError("Error al procesar venta: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void btnModificarHandler(jakarta.faces.event.ActionEvent actionEvent) {
+        // Redirigir al método principal de guardar
+        btnGuardarHandler(actionEvent);
+    }
+
+    public void btnCancelarHandler(jakarta.faces.event.ActionEvent actionEvent) {
+        try {
+            // Limpiar todo y volver al estado inicial
+            registro = null;
+            detalles.clear();
+            clienteSeleccionado = null;
+            productoSeleccionado = null;
+            cantidadSeleccionada = BigDecimal.ONE;
+            esNuevo = true;
+            mostrarFormulario = false; // NUEVO: Volver a mostrar la tabla
+
+            inicializarRegistros();
+
+        } catch (Exception e) {
+            enviarMensajeError("Error al cancelar: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public void agregarDetalle() {
         if (registro == null || productoSeleccionado == null || cantidadSeleccionada == null) {
-            enviarMensajeError("Debe seleccionar un producto y cantidad");
+            enviarMensajeError("Debe seleccionar un producto y una cantidad válida");
             return;
         }
 
@@ -146,17 +306,14 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
             detalle.setIdProducto(productoSeleccionado);
             detalle.setCantidad(cantidadSeleccionada);
 
-            // Tomar precio desde compra_detalle
             BigDecimal precioBase = compraDetalleDAO.findPrecioRecientePorProducto(productoSeleccionado);
             detalle.setPrecio(precioBase != null ? precioBase : BigDecimal.ZERO);
 
-            detalle.setEstado("ACTIVO");
             detalle.setObservaciones("Detalle agregado desde JSF");
 
             detalles.add(detalle);
-            calcularTotal();
+            registro.agregarDetalle(detalle);
 
-            // Limpiar selección
             productoSeleccionado = null;
             cantidadSeleccionada = BigDecimal.ONE;
 
@@ -169,23 +326,10 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     public void eliminarDetalle(VentaDetalle detalle) {
         if (detalle != null) {
             detalles.remove(detalle);
-            calcularTotal();
-
+            registro.quitarDetalle(detalle);
         }
     }
 
-    private void calcularTotal() {
-        if (registro == null) return;
-        BigDecimal total = BigDecimal.ZERO;
-        for (VentaDetalle d : detalles) {
-            if (d.getPrecio() != null && d.getCantidad() != null) {
-                total = total.add(d.getPrecio().multiply(d.getCantidad()));
-            }
-        }
-        registro.setTotal(total);
-    }
-
-    // --- Selección de cliente y producto ---
     public void seleccionarCliente(SelectEvent<Cliente> event) {
         if (event != null && event.getObject() != null) {
             clienteSeleccionado = event.getObject();
@@ -201,7 +345,6 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         }
     }
 
-    // --- Métodos de autocompletar ---
     public List<Cliente> completarClientes(String query) {
         if (query == null || query.isBlank()) return List.of();
         try {
@@ -222,71 +365,54 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         }
     }
 
-    // --- Guardar venta con detalles ---
-    @Override
-    public void btnGuardarHandler(jakarta.faces.event.ActionEvent actionEvent) {
-        if (registro == null) {
-            enviarMensajeError("No hay venta para guardar");
-            return;
+    // --- Método para obtener el total formateado con 2 decimales ---
+    public String getTotalVentaFormateado() {
+        if (registro != null && registro.getTotal() != null) {
+            return String.format("%.2f", registro.getTotal());
         }
-
-        if (clienteSeleccionado == null) {
-            enviarMensajeError("Debe seleccionar un cliente");
-            return;
-        }
-
-        if (detalles.isEmpty()) {
-            enviarMensajeError("Debe agregar al menos un detalle de venta");
-            return;
-        }
-
-        try {
-            // Asignar cliente si no está asignado
-            if (registro.getIdCliente() == null) {
-                registro.setIdCliente(clienteSeleccionado);
-            }
-
-            // Guardar la venta principal
-            ventaDAO.crear(registro);
-
-            // Guardar los detalles
-            for (VentaDetalle d : detalles) {
-                d.setIdVenta(registro);
-                ventaDetalleDAO.crear(d);
-            }
-
-            enviarMensajeExito("Venta guardada correctamente con " + detalles.size() + " detalles.");
-
-            // Limpiar formulario
-            configurarNuevoRegistro();
-            registro = null;
-            detalles.clear();
-            clienteSeleccionado = null;
-            inicializarRegistros();
-
-        } catch (Exception e) {
-            enviarMensajeError("Error al guardar venta: " + e.getMessage());
-            e.printStackTrace();
-        }
+        return "0.00";
     }
 
-    // --- Getters y Setters ---
+    public BigDecimal getTotalVenta() {
+        if (registro != null) {
+            return registro.getTotal();
+        }
+        return BigDecimal.ZERO;
+    }
+
+    // --- Getters para controlar la visualización en XHTML ---
+    public boolean isEsNuevo() {
+        return esNuevo;
+    }
+
+    public boolean isModificando() {
+        return !esNuevo;
+    }
+
+    // NUEVO: Getter para controlar qué panel mostrar
+    public boolean isMostrarFormulario() {
+        return mostrarFormulario;
+    }
+
+    // NUEVO: Getter para mostrar la tabla
+    public boolean isMostrarTabla() {
+        return !mostrarFormulario;
+    }
+
     public List<VentaDetalle> getDetalles() { return detalles; }
     public void setDetalles(List<VentaDetalle> detalles) { this.detalles = detalles; }
 
     public Cliente getClienteSeleccionado() { return clienteSeleccionado; }
     public void setClienteSeleccionado(Cliente clienteSeleccionado) {
         this.clienteSeleccionado = clienteSeleccionado;
-        if (registro != null) registro.setIdCliente(clienteSeleccionado);
+        if (registro != null) {
+            registro.setIdCliente(clienteSeleccionado);
+        }
     }
 
     public Producto getProductoSeleccionado() { return productoSeleccionado; }
-    public void setProductoSeleccionado(Producto productoSeleccionado) {
-        this.productoSeleccionado = productoSeleccionado;
-    }
+    public void setProductoSeleccionado(Producto productoSeleccionado) { this.productoSeleccionado = productoSeleccionado; }
 
     public BigDecimal getCantidadSeleccionada() { return cantidadSeleccionada; }
-    public void setCantidadSeleccionada(BigDecimal cantidadSeleccionada) {
-        this.cantidadSeleccionada = cantidadSeleccionada;
-    }
+    public void setCantidadSeleccionada(BigDecimal cantidadSeleccionada) { this.cantidadSeleccionada = cantidadSeleccionada; }
 }

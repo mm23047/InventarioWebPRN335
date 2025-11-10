@@ -20,14 +20,20 @@ public class Venta {
     @Column(name = "fecha")
     private OffsetDateTime fecha;
 
-    @Size(max = 10)
-    @Column(name = "estado", length = 10)
-    private String estado;
-
     @Lob
     @Column(name = "observaciones")
     private String observaciones;
 
+<<<<<<< Updated upstream
+=======
+    @Transient
+    private BigDecimal total;
+
+    @OneToMany(mappedBy = "idVenta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VentaDetalle> detalles = new ArrayList<>();
+
+    // --- Getters y Setters ---
+>>>>>>> Stashed changes
     public UUID getId() {
         return id;
     }
@@ -52,14 +58,6 @@ public class Venta {
         this.fecha = fecha;
     }
 
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
     public String getObservaciones() {
         return observaciones;
     }
@@ -68,4 +66,41 @@ public class Venta {
         this.observaciones = observaciones;
     }
 
+<<<<<<< Updated upstream
+=======
+    public BigDecimal getTotal() {
+        if (detalles != null && !detalles.isEmpty()) {
+            return detalles.stream()
+                    .map(d -> d.getPrecio().multiply(d.getCantidad()))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public List<VentaDetalle> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<VentaDetalle> detalles) {
+        this.detalles = detalles;
+    }
+
+    public void agregarDetalle(VentaDetalle detalle) {
+        detalle.setIdVenta(this);
+        detalles.add(detalle);
+    }
+
+    public void quitarDetalle(VentaDetalle detalle) {
+        detalles.remove(detalle);
+        detalle.setIdVenta(null);
+    }
+
+    public void calcularTotal() {
+        // No hacer nada - el total se calcula en getTotal()
+    }
+>>>>>>> Stashed changes
 }
