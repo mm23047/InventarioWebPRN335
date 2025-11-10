@@ -8,23 +8,26 @@ import jakarta.persistence.TypedQuery;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Venta;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
 public class VentaDAO extends InventarioDefaultDataAccess<Venta> implements Serializable {
+
     @PersistenceContext(unitName = "inventarioPU")
     private EntityManager em;
 
-    public VentaDAO(){super(Venta.class);
+    public VentaDAO() {
+        super(Venta.class);
     }
 
     @Override
-    public EntityManager getEntityManager(){
+    public EntityManager getEntityManager() {
         return em;
     }
-<<<<<<< Updated upstream
-}
-=======
 
     // --- Método para crear venta correctamente ---
     public void crear(Venta venta) {
@@ -83,4 +86,3 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> implements Seri
         }
     }
 }
->>>>>>> Stashed changes

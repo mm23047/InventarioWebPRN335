@@ -3,12 +3,16 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "venta", schema = "public")
 public class Venta {
+
     @Id
     @Column(name = "id_venta", nullable = false)
     private UUID id;
@@ -24,8 +28,6 @@ public class Venta {
     @Column(name = "observaciones")
     private String observaciones;
 
-<<<<<<< Updated upstream
-=======
     @Transient
     private BigDecimal total;
 
@@ -33,7 +35,6 @@ public class Venta {
     private List<VentaDetalle> detalles = new ArrayList<>();
 
     // --- Getters y Setters ---
->>>>>>> Stashed changes
     public UUID getId() {
         return id;
     }
@@ -66,8 +67,6 @@ public class Venta {
         this.observaciones = observaciones;
     }
 
-<<<<<<< Updated upstream
-=======
     public BigDecimal getTotal() {
         if (detalles != null && !detalles.isEmpty()) {
             return detalles.stream()
@@ -102,5 +101,4 @@ public class Venta {
     public void calcularTotal() {
         // No hacer nada - el total se calcula en getTotal()
     }
->>>>>>> Stashed changes
 }
