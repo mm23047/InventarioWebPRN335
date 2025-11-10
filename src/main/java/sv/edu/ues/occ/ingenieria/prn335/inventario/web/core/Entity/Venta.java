@@ -3,16 +3,12 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "venta", schema = "public")
 public class Venta {
-
     @Id
     @Column(name = "id_venta", nullable = false)
     private UUID id;
@@ -32,13 +28,6 @@ public class Venta {
     @Column(name = "observaciones")
     private String observaciones;
 
-    @Column(name = "total", precision = 12, scale = 2)
-    private BigDecimal total;
-
-    @OneToMany(mappedBy = "idVenta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VentaDetalle> detalles = new ArrayList<>();
-
-    // --- Getters y Setters ---
     public UUID getId() {
         return id;
     }
@@ -79,39 +68,4 @@ public class Venta {
         this.observaciones = observaciones;
     }
 
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public List<VentaDetalle> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<VentaDetalle> detalles) {
-        this.detalles = detalles;
-        calcularTotal();
-    }
-
-    public void agregarDetalle(VentaDetalle detalle) {
-        detalle.setIdVenta(this);
-        detalles.add(detalle);
-        calcularTotal();
-    }
-
-    public void quitarDetalle(VentaDetalle detalle) {
-        detalles.remove(detalle);
-        detalle.setIdVenta(null);
-        calcularTotal();
-    }
-
-    // Calcula el total sumando todos los detalles
-    public void calcularTotal() {
-        total = detalles.stream()
-                .map(d -> d.getPrecio().multiply(d.getCantidad()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }
