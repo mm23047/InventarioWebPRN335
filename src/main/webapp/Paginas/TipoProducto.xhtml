@@ -11,48 +11,49 @@
         <h1>#{tipoProductoFrm.nombreBean}</h1>
     </ui:define>
 
-    <!-- Tabla de registros -->
+    <!-- Tabla de registros jerárquica -->
     <ui:define name="contenido-tabla">
         <h:panelGroup id="tipoProductoPnlTabla">
             <h:form id="tipoProductoFrmTop">
-                <p:dataTable value="#{tipoProductoFrm.modelo}" var="r"
-                             paginator="true"
-                             paginatorPosition="bottom"
-                             lazy="true"
-                             selection="#{tipoProductoFrm.registro}"
+                <p:treeTable id="treeTiposProducto"
+                             value="#{tipoProductoFrm.root}"
+                             var="n"
                              selectionMode="single"
+                             selection="#{tipoProductoFrm.selectedNode}"
+                             paginator="true"
                              rows="#{tipoProductoFrm.registrosPorPagina}"
+                             paginatorPosition="bottom"
                              rendered="#{tipoProductoFrm.estado=='NADA'}">
 
-                    <p:column headerText="ID">
-                        <h:outputText value="#{r.id}" />
+                    <p:column headerText="Nombre" expander="true">
+                        <h:outputText value="#{n.nombre}"
+                                      style="#{not n.activo ? 'color: #999; font-style: italic; text-decoration: line-through;' : ''}"/>
                     </p:column>
 
-                    <p:column headerText="#{crud['frm.botones.nombre']}">
-                        <h:outputText value="#{r.nombre}" />
+                    <p:column headerText="ID" style="width:110px">
+                        <h:outputText value="#{n.id}"
+                                      style="#{not n.activo ? 'color: #999;' : ''}"/>
                     </p:column>
 
-                    <p:column headerText="#{crud['frm.botones.dependeDe']}">
-                        <h:outputText value="#{r.idTipoProductoPadre.nombre}"
-                                      rendered="#{not empty r.idTipoProductoPadre}"/>
-                        <h:outputText value="-- RAÍZ --"
-                                      rendered="#{empty r.idTipoProductoPadre}"
-                                      style="color: #666; font-style: italic;"/>
+                    <p:column headerText="#{crud['frm.botones.estado']}" style="width:120px">
+                        <h:outputText value="#{n.activo ? 'ACTIVO' : 'INACTIVO'}"
+                                      style="#{not n.activo ?
+                           'color: #ffd6d6; font-weight: bold;' :
+                           'color: #999; font-weight: bold;'}"/>
                     </p:column>
 
-                    <p:column headerText="#{crud['frm.botones.estado']}">
-                        <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
-                    </p:column>
 
                     <p:column headerText="#{crud['frm.botones.observaciones']}">
-                        <h:outputText value="#{r.comentarios}" />
+                        <h:outputText value="#{n.comentarios}"
+                                      style="#{not n.activo ? 'color: #999;' : ''}"/>
                     </p:column>
 
-                    <p:ajax event="rowSelect"
-                            listener="#{tipoProductoFrm.seleccionarRegistro}"
+                    <p:ajax event="select"
+                            listener="#{tipoProductoFrm.onTreeRowSelect}"
                             update="tipoProductoPnlTabla tipoProductoPnlDetalle"/>
-                </p:dataTable>
+                </p:treeTable>
 
+                <!-- Botones superiores -->
                 <ues:botones-top formulario="#{tipoProductoFrm}"
                                  actualizar="tipoProductoPnlTabla tipoProductoPnlDetalle"/>
             </h:form>
@@ -71,8 +72,14 @@
                         <h:panelGrid columns="2">
 
                             <p:outputLabel for="tipoProductoTxtId" value="ID:"/>
-                            <p:inputText id="tipoProductoTxtId" value="#{tipoProductoFrm.registro.id}"
-                                         readonly="true" disabled="true"/>
+                            <h:panelGroup id="tipoProductoTxtIdPanel">
+                                <h:outputText value="(Se asignará automáticamente al guardar)"
+                                              rendered="#{empty tipoProductoFrm.registro.id}"
+                                              style="color: #666; font-style: italic;"/>
+                                <p:inputText id="tipoProductoTxtId" value="#{tipoProductoFrm.registro.id}"
+                                             rendered="#{not empty tipoProductoFrm.registro.id}"
+                                             readonly="true" disabled="true"/>
+                            </h:panelGroup>
 
                             <p:outputLabel for="tipoProductoTxtNombre" value="#{crud['frm.botones.nombre']}:"/>
                             <p:inputText id="tipoProductoTxtNombre" value="#{tipoProductoFrm.registro.nombre}"
@@ -80,16 +87,11 @@
 
                             <p:outputLabel for="tipoProductoSelPadre" value="#{crud['frm.botones.dependeDe']}:"/>
                             <p:selectOneMenu id="tipoProductoSelPadre"
-                                             value="#{tipoProductoFrm.registro.idTipoProductoPadre}"
-                                             converter="TipoProductoConverter"
-                                             required="false"
+                                             value="#{tipoProductoFrm.padreSeleccionadoId}"
                                              style="width: 300px;"
                                              forceSelection="true">
-                                <f:selectItem itemLabel="-- SIN PADRE (RAÍZ) --"  />
-                                <f:selectItems value="#{tipoProductoFrm.tiposProductoDisponibles}"
-                                               var="tipoPadre"
-                                               itemLabel="#{tipoPadre.nombre} (#{tipoPadre.id})"
-                                               itemValue="#{tipoPadre}" />
+                                <f:selectItem itemLabel="-- SIN PADRE (RAÍZ) --" itemValue="#{null}" />
+                                <f:selectItems value="#{tipoProductoFrm.opcionesPadreJerarquicas}"/>
                             </p:selectOneMenu>
 
                             <p:outputLabel for="tipoProductoChkActivo" value="#{crud['frm.botones.activo']}:"/>
@@ -123,7 +125,7 @@
                     </h:form>
                 </p:tab>
 
-                <!-- Pestaña Características -->
+                <!-- Pestaña Características (se mantiene igual) -->
                 <p:tab id="tipoProductoTabCaracteristicas" closable="false" title="#{crud['frm.botones.caracteristica']}"
                        disabled="#{tipoProductoFrm.estado!='MODIFICAR'}">
 
@@ -189,17 +191,10 @@
                                                      style="margin-left:5px;"/>
                                     </h:panelGrid>
 
-
                                 </h:panelGrid>
 
-
                                 <h:panelGrid columns="2" style="width: 100%; margin-bottom: 10px; column-gap: 10px;">
-                                    <!-- Label Característica -->
-
-
-                                    <!-- Panel con cuadro y botón, movido a la derecha del label -->
                                     <h:panelGroup id="pnlCaracteristica">
-
                                         <h:panelGrid columns="2" style="width: 85%; column-gap: 5px;">
                                             <p:outputLabel for="txtCaracteristicaNombre" value="#{crud['frm.botones.caracteristica']}:" style="display:flex; align-items:center;" />
                                             <p:inputText id="txtCaracteristicaNombre"
@@ -215,22 +210,15 @@
                                                                  value="#{crud['frm.botones.seleccionarcaracteristica']}"
                                                                  rendered="#{tipoProductoFrm.tpcFrm.estado=='CREAR' or tipoProductoFrm.tpcFrm.estado=='MODIFICAR'}"/>
                                             </h:panelGrid>
-
                                         </h:panelGrid>
                                     </h:panelGroup>
                                 </h:panelGrid>
-
-
-                                <!-- Obligatorio -->
 
                                 <h:panelGrid columns="2" style="width: 32%; column-gap: 5px; margin-bottom: 10px;">
                                     <p:outputLabel for="tpcChkObligatorio" value="#{crud['frm.botones.obligatorio']}:"/>
                                     <p:selectBooleanCheckbox id="tpcChkObligatorio"
                                                              value="#{tipoProductoFrm.tpcFrm.registro.obligatorio}"/>
                                 </h:panelGrid>
-
-
-                                <!-- Fecha de Creación -->
 
                                 <h:panelGrid columns="2" style="width: 58%; margin-bottom: 10px; column-gap: 10px;">
                                     <p:outputLabel for="tpcDpFechaCreacion" value="#{crud['frm.botones.fechaCreacion']}:"/>
@@ -247,9 +235,7 @@
                                                   touchUI="false"/>
                                 </h:panelGrid>
 
-
                             </h:panelGrid>
-
 
                             <h:panelGrid columns="3" style="margin-top: 20px;">
                                 <p:commandButton value="#{crud['frm.botones.guardar']}"
@@ -278,7 +264,7 @@
         </h:panelGroup>
     </ui:define>
 
-    <!-- Diálogo de Característica - RUTAS CORREGIDAS -->
+    <!-- Diálogo de Característica -->
     <ui:define name="extras">
         <p:dialog id="dlgCaracteristica" widgetVar="dlgCaracteristica" modal="true"
                   closable="true" header="#{crud['frm.botones.seleccionarcaracteristica']}"

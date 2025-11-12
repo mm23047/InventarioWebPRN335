@@ -54,6 +54,7 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     protected Venta nuevoRegistro() {
         Venta venta = new Venta();
         venta.setId(UUID.randomUUID());
+        // Fecha actual del sistema
         venta.setFecha(OffsetDateTime.now());
         venta.setObservaciones("Venta creada desde JSF");
         venta.setDetalles(new ArrayList<>());
@@ -62,7 +63,7 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
         productoSeleccionado = null;
         cantidadSeleccionada = BigDecimal.ONE;
         esNuevo = true;
-        mostrarFormulario = true; // NUEVO: Mostrar panel de formulario
+        mostrarFormulario = true;
         return venta;
     }
 
@@ -392,6 +393,14 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
             enviarMensajeError("Error calculando total general: " + e.getMessage());
             return BigDecimal.ZERO;
         }
+    }
+
+    // Método para obtener la fecha como LocalDateTime (para el datePicker)
+    public java.time.LocalDateTime getFechaVenta() {
+        if (this.registro != null && this.registro.getFecha() != null) {
+            return this.registro.getFecha().toLocalDateTime();
+        }
+        return java.time.LocalDateTime.now();
     }
 
     // --- Getters para controlar la visualización en XHTML ---

@@ -4,14 +4,19 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import jakarta.faces.model.SelectItem;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoProducto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import jakarta.faces.event.ActionEvent;
 
 @Named
 @ViewScoped
@@ -25,10 +30,299 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
 
     private List<TipoProducto> tiposProductoDisponibles;
 
+    // NUEVAS PROPIEDADES PARA EL TREE TABLE
+    private TreeNode root;
+    private TreeNode selectedNode;
+    private Long padreSeleccionadoId;
+    private List<SelectItem> opcionesPadreJerarquicas;
+
     public TipoProductoFrm() {
         this.nombreBean = "Tipo de Producto";
     }
 
+    // GETTERS Y SETTERS PARA LAS NUEVAS PROPIEDADES
+    public TreeNode getRoot() {
+        if (root == null) {
+            construirArbol();
+        }
+        return root;
+    }
+
+    public void setRoot(TreeNode root) {
+        this.root = root;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public Long getPadreSeleccionadoId() {
+        return padreSeleccionadoId;
+    }
+
+    public void setPadreSeleccionadoId(Long padreSeleccionadoId) {
+        this.padreSeleccionadoId = padreSeleccionadoId;
+    }
+
+    public List<SelectItem> getOpcionesPadreJerarquicas() {
+        if (opcionesPadreJerarquicas == null) {
+            construirOpcionesPadre();
+        }
+        return opcionesPadreJerarquicas;
+    }
+
+    public void setOpcionesPadreJerarquicas(List<SelectItem> opcionesPadreJerarquicas) {
+        this.opcionesPadreJerarquicas = opcionesPadreJerarquicas;
+    }
+
+    // MÉTODOS PARA CONSTRUIR EL ÁRBOL JERÁRQUICO
+    private void construirArbol() {
+        try {
+            List<TipoProducto> todos = tPDAO.findAll();
+            List<TipoProducto> raices = todos.stream()
+                    .filter(tp -> tp.getIdTipoProductoPadre() == null)
+                    .collect(Collectors.toList());
+
+            root = new DefaultTreeNode();
+
+            for (TipoProducto raiz : raices) {
+                TreeNode nodoRaiz = new DefaultTreeNode(raiz, root);
+                agregarHijos(nodoRaiz, raiz, todos);
+            }
+        } catch (Exception e) {
+            Logger.getLogger(TipoProductoFrm.class.getName()).log(Level.SEVERE, "Error al construir árbol", e);
+            root = new DefaultTreeNode();
+        }
+    }
+
+    private void agregarHijos(TreeNode nodoPadre, TipoProducto tipoPadre, List<TipoProducto> todos) {
+        List<TipoProducto> hijos = todos.stream()
+                .filter(tp -> tp.getIdTipoProductoPadre() != null &&
+                        tp.getIdTipoProductoPadre().getId().equals(tipoPadre.getId()))
+                .collect(Collectors.toList());
+
+        for (TipoProducto hijo : hijos) {
+            TreeNode nodoHijo = new DefaultTreeNode(hijo, nodoPadre);
+            agregarHijos(nodoHijo, hijo, todos);
+        }
+    }
+
+    private void construirOpcionesPadre() {
+        opcionesPadreJerarquicas = new ArrayList<>();
+        opcionesPadreJerarquicas.add(new SelectItem(null, "-- SIN PADRE (RAÍZ) --"));
+
+        try {
+            List<TipoProducto> todos = tPDAO.findAll();
+            // CORREGIDO: Incluir TODOS los tipos (activos e inactivos)
+            List<TipoProducto> raices = todos.stream()
+                    .filter(tp -> tp.getIdTipoProductoPadre() == null)
+                    .collect(Collectors.toList());
+
+            for (TipoProducto raiz : raices) {
+                agregarOpcionConHijos(raiz, todos, "");
+            }
+        } catch (Exception e) {
+            Logger.getLogger(TipoProductoFrm.class.getName()).log(Level.SEVERE, "Error al construir opciones padre", e);
+        }
+    }
+
+    private void agregarOpcionConHijos(TipoProducto tipo, List<TipoProducto> todos, String prefijo) {
+        // Si estamos editando, excluir el registro actual y sus descendientes
+        if (this.registro != null && this.registro.getId() != null &&
+                tipo.getId().equals(this.registro.getId())) {
+            return;
+        }
+
+        // CORREGIDO: Incluir tanto tipos activos como inactivos
+        String estadoLabel = tipo.getActivo() ? "" : " (INACTIVO)";
+        String label = prefijo + tipo.getNombre() + " (" + tipo.getId() + ")" + estadoLabel;
+        opcionesPadreJerarquicas.add(new SelectItem(tipo.getId(), label));
+
+        List<TipoProducto> hijos = todos.stream()
+                .filter(tp -> tp.getIdTipoProductoPadre() != null &&
+                        tp.getIdTipoProductoPadre().getId().equals(tipo.getId()))
+                // CORREGIDO: Incluir TODOS los hijos (activos e inactivos)
+                .collect(Collectors.toList());
+
+        for (TipoProducto hijo : hijos) {
+            agregarOpcionConHijos(hijo, todos, prefijo + "--- ");
+        }
+    }
+
+    // MÉTODO PARA VERIFICAR SI TIENE HIJOS
+    public boolean tieneHijos(Long idTipoProducto) {
+        if (idTipoProducto == null) {
+            return false;
+        }
+        try {
+            List<TipoProducto> todos = tPDAO.findAll();
+            return todos.stream()
+                    .anyMatch(tp -> tp.getIdTipoProductoPadre() != null &&
+                            tp.getIdTipoProductoPadre().getId().equals(idTipoProducto));
+        } catch (Exception e) {
+            Logger.getLogger(TipoProductoFrm.class.getName()).log(Level.SEVERE, "Error al verificar hijos", e);
+            return false;
+        }
+    }
+
+    // MÉTODO DE DEPURACIÓN PARA VERIFICAR HIJOS
+    public void verificarHijos() {
+        if (registro != null && registro.getId() != null) {
+            boolean tieneHijos = tieneHijos(registro.getId());
+            System.out.println("TipoProducto ID: " + registro.getId() + " - Tiene hijos: " + tieneHijos);
+            Logger.getLogger(TipoProductoFrm.class.getName()).log(Level.INFO,
+                    "TipoProducto ID: {0} - Tiene hijos: {1}", new Object[]{registro.getId(), tieneHijos});
+        }
+    }
+
+    // MÉTODOS PARA OBTENER ESTILOS
+    public String getEstiloNodo(TipoProducto tipo) {
+        if (tipo == null) {
+            return "";
+        }
+        if (!tipo.getActivo()) {
+            return "color: #999; font-style: italic; text-decoration: line-through;";
+        }
+        return "";
+    }
+
+    public String getEstiloEstado(TipoProducto tipo) {
+        if (tipo == null) {
+            return "";
+        }
+        if (!tipo.getActivo()) {
+            return "color: #cc0000; font-weight: bold;";
+        }
+        return "color: #00aa00; font-weight: bold;";
+    }
+
+    // MÉTODO CORREGIDO PARA MANEJAR LA SELECCIÓN EN EL TREE
+    public void onTreeRowSelect(org.primefaces.event.NodeSelectEvent event) {
+        if (event != null && event.getTreeNode() != null) {
+            TreeNode selected = event.getTreeNode();
+            Object data = selected.getData();
+
+            if (data instanceof TipoProducto) {
+                this.registro = (TipoProducto) data;
+                this.estado = ESTADO_CRUD.MODIFICAR;
+
+                // DEPURACIÓN - verificar hijos
+                verificarHijos();
+
+                // Setear el idTipoProducto en el formulario de características
+                if (this.tpcFrm != null) {
+                    this.tpcFrm.setIdTipoProducto(this.registro.getId());
+                }
+
+                // Sincronizar el padre seleccionado
+                if (this.registro.getIdTipoProductoPadre() != null) {
+                    this.padreSeleccionadoId = this.registro.getIdTipoProductoPadre().getId();
+                } else {
+                    this.padreSeleccionadoId = null;
+                }
+
+                // Resetear las opciones para excluir el registro actual
+                this.opcionesPadreJerarquicas = null;
+            }
+        }
+    }
+
+    // MÉTODO PARA MANEJAR LA DESELECCIÓN EN EL TREE
+    public void onTreeRowUnselect(org.primefaces.event.NodeUnselectEvent event) {
+        this.selectedNode = null;
+    }
+
+    // MÉTODOS SOBREESCRITOS PARA MANEJAR EL PADRE
+    public void btnGuardarHandler(ActionEvent actionEvent) {
+        // Asignar el padre seleccionado antes de guardar
+        if (this.padreSeleccionadoId != null) {
+            TipoProducto padre = tPDAO.leer(this.padreSeleccionadoId);
+            this.registro.setIdTipoProductoPadre(padre);
+        } else {
+            this.registro.setIdTipoProductoPadre(null);
+        }
+
+        super.btnGuardarHandler(actionEvent);
+
+        // Resetear el árbol después de guardar
+        this.root = null;
+        this.opcionesPadreJerarquicas = null;
+        this.selectedNode = null;
+    }
+
+    public void btnModificarHandler(ActionEvent actionEvent) {
+        // Asignar el padre seleccionado antes de modificar
+        if (this.padreSeleccionadoId != null) {
+            TipoProducto padre = tPDAO.leer(this.padreSeleccionadoId);
+            this.registro.setIdTipoProductoPadre(padre);
+        } else {
+            this.registro.setIdTipoProductoPadre(null);
+        }
+
+        super.btnModificarHandler(actionEvent);
+
+        // Resetear el árbol después de modificar
+        this.root = null;
+        this.opcionesPadreJerarquicas = null;
+        this.selectedNode = null;
+    }
+
+    public void btnNuevoHandler(ActionEvent actionEvent) {
+        super.btnNuevoHandler(actionEvent);
+        this.padreSeleccionadoId = null;
+        this.opcionesPadreJerarquicas = null;
+        this.selectedNode = null;
+    }
+
+    public void btnCancelarHandler(ActionEvent actionEvent) {
+        super.btnCancelarHandler(actionEvent);
+        this.selectedNode = null;
+        this.padreSeleccionadoId = null;
+        this.root = null;
+        this.opcionesPadreJerarquicas = null;
+    }
+
+    // MÉTODO ELIMINAR MEJORADO PARA MANEJAR INTEGRIDAD REFERENCIAL Y HIJOS
+    public void btnEliminarHandler(ActionEvent actionEvent) {
+        try {
+            if (registro != null && getEntityId(registro) != null) {
+
+                // Verificar si tiene hijos antes de eliminar
+                if (tieneHijos(registro.getId())) {
+                    enviarMensajeError("No se puede eliminar este tipo de producto porque tiene tipos hijos asociados. Elimine primero los tipos hijos.");
+                    return;
+                }
+
+                getDao().eliminar(registro);
+                inicializarRegistros();
+                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opEliminar"));
+                limpiarFormulario();
+
+                // Resetear el árbol después de eliminar
+                this.root = null;
+                this.opcionesPadreJerarquicas = null;
+                this.selectedNode = null;
+            } else {
+                enviarMensajeError("No hay registro seleccionado para eliminar");
+            }
+        } catch (Exception e) {
+            // Manejar error de integridad referencial
+            if (e.getMessage().contains("foreign key constraint") ||
+                    e.getMessage().contains("violates foreign key") ||
+                    e.getMessage().contains("is still referenced")) {
+                enviarMensajeError("No se puede eliminar este tipo de producto porque está siendo utilizado por algunos productos. Elimine primero los productos asociados.");
+            } else {
+                enviarMensajeError("Error al eliminar: " + e.getMessage());
+            }
+            Logger.getLogger(TipoProductoFrm.class.getName()).log(Level.SEVERE, "Error en btnEliminarHandler", e);
+        }
+    }
+
+    // EL RESTO DE TU CÓDIGO PERMANECE IGUAL...
     @Override
     protected FacesContext getFacesContext() {
         return FacesContext.getCurrentInstance();
@@ -98,11 +392,8 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
 
     @Override
     protected void configurarNuevoRegistro() {
-        // Resetear la lista de tipos disponibles
         this.tiposProductoDisponibles = null;
     }
-
-    // MÉTODOS NUEVOS PARA MANEJAR LA JERARQUÍA
 
     public List<TipoProducto> getTiposProductoDisponibles() {
         if (tiposProductoDisponibles == null) {
@@ -113,10 +404,8 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
 
     private void cargarTiposProductoDisponibles() {
         try {
-            // Obtener todos los tipos de producto activos
             List<TipoProducto> todos = tPDAO.findAll();
 
-            // Si estamos editando, excluir el registro actual y sus descendientes
             if (this.registro != null && this.registro.getId() != null) {
                 todos = todos.stream()
                         .filter(tp -> !tp.getId().equals(this.registro.getId()))
@@ -132,7 +421,6 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
     }
 
     private boolean esDescendiente(TipoProducto tipo, Long idBuscado) {
-        // Verificar si el tipo es descendiente del idBuscado (para evitar ciclos)
         TipoProducto actual = tipo.getIdTipoProductoPadre();
         while (actual != null) {
             if (actual.getId().equals(idBuscado)) {
@@ -143,7 +431,6 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
         return false;
     }
 
-    // Nuevo método para sincronizar la instancia del padre
     public void sincronizarPadre() {
         if (registro != null && registro.getIdTipoProductoPadre() != null && tiposProductoDisponibles != null) {
             for (TipoProducto tp : tiposProductoDisponibles) {
@@ -161,12 +448,10 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
             this.registro = event.getObject();
             this.estado = ESTADO_CRUD.MODIFICAR;
 
-            // Setear el idTipoProducto en el formulario de características
             if (this.tpcFrm != null) {
                 this.tpcFrm.setIdTipoProducto(this.registro.getId());
             }
 
-            // Sincronizar instancia del padre para que selectOneMenu funcione correctamente
             sincronizarPadre();
         }
     }
@@ -191,7 +476,6 @@ public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
         return tpcFrm;
     }
 
-    // Método adicional para obtener un tipo por su ID dentro de la lista de disponibles
     public TipoProducto obtenerTipoProductoPorId(Long id) {
         if (id == null) return null;
         if (tiposProductoDisponibles != null) {

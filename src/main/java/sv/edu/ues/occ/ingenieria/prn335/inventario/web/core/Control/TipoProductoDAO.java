@@ -27,7 +27,6 @@ public class TipoProductoDAO extends InventarioDefaultDataAccess<TipoProducto> i
         return em;
     }
 
-
     public TipoProducto buscarRegistroPorId(Long id) {
         try {
             if (id != null) {
@@ -63,7 +62,8 @@ public class TipoProductoDAO extends InventarioDefaultDataAccess<TipoProducto> i
 
     public List<TipoProducto> findAll() {
         try {
-            return em.createQuery("SELECT t FROM TipoProducto t WHERE t.activo = true ORDER BY t.nombre", TipoProducto.class)
+            // CORREGIDO: Quitado cualquier filtro por estado activo
+            return em.createQuery("SELECT t FROM TipoProducto t ORDER BY t.nombre", TipoProducto.class)
                     .getResultList();
         } catch (Exception ex) {
             Logger.getLogger(TipoProductoDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);

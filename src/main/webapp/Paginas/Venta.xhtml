@@ -18,7 +18,9 @@
             <!-- Panel de Tabla (se muestra cuando mostrarFormulario es false) -->
             <h:panelGroup id="ventaPnlTabla" rendered="#{ventaFrm.mostrarTabla}">
                 <h:form id="ventaFrmTabla">
-                    <p:dataTable value="#{ventaFrm.modelo}" var="v"
+                    <p:dataTable value="#{ventaFrm.modelo}"
+
+                                 var="v"
                                  paginator="true"
                                  paginatorPosition="bottom"
                                  lazy="true"
@@ -30,6 +32,7 @@
                             <h:outputText value="#{v.id}" />
                         </p:column>
 
+
                         <p:column headerText="Cliente">
                             <h:outputText value="#{v.idCliente.nombre}" />
                         </p:column>
@@ -37,6 +40,13 @@
                         <p:column headerText="Total">
                             <h:outputText value="#{v.total}">
                                 <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <!-- Fecha de venta -->
+                        <p:column headerText="Fecha Venta" width="113">
+                            <h:outputText value="#{v.fecha}">
+                                <f:converter converterId="offsetDateTimeConverter" />
                             </h:outputText>
                         </p:column>
 
@@ -78,6 +88,7 @@
                                 <p:outputLabel for="ventaTxtId" value="ID:"/>
                                 <p:inputText id="ventaTxtId" value="#{ventaFrm.registro.id}" readonly="true" style="width: 100px;"/>
 
+
                                 <p:outputLabel for="ventaCliente" value="Cliente:"/>
                                 <p:autoComplete id="ventaCliente"
                                                 value="#{ventaFrm.clienteSeleccionado}"
@@ -100,6 +111,17 @@
                                                  value="#{ventaFrm.registro.observaciones}"
                                                  rows="4"
                                                  style="width: 400px;"/>
+                                <!-- Fecha (Automática) -->
+
+                                <p:datePicker id="dpFecha"
+                                              value="#{ventaFrm.fechaVenta}"
+                                              showTime="true"
+                                              hourFormat="24"
+                                              timeInput="true"
+                                              timeZone="America/El_Salvador"
+                                              pattern="yyyy-MM-dd'   📅  'HH:mm"
+                                              readonly="true"
+                                              disabled="true"/>
 
                             </h:panelGrid>
                         </p:fieldset>
