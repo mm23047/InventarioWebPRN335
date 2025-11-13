@@ -43,11 +43,23 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
     @Inject
     TipoProductoCaracteristicaDAO tipoProductoCaracteristicaDAO;
 
-    private List<TipoProductoCaracteristica> posibleCaracteristicas = new ArrayList<>();
-    private List<TipoProductoCaracteristica> caracteristicasSeleccionadas = new ArrayList<>();
+    private List<TipoProductoCaracteristica> posibleCaracteristicas;
+    private List<TipoProductoCaracteristica> caracteristicasSeleccionadas;
     private TipoProductoCaracteristica caracteristicaSeleccionadaDisponible;
     private TipoProductoCaracteristica caracteristicaSeleccionadaSeleccionada;
-    private List<TipoProductoCaracteristica> caracteristicasObligatorias = new ArrayList<>();
+    private List<TipoProductoCaracteristica> caracteristicasObligatorias;
+
+    // Mapa para almacenar valores por característica
+    private Double valorCaracteristica;
+    private Map<Long, Double> valoresCaracteristicas;
+
+    public ProductoTipoProductoFrm() {
+        // Inicializar todas las listas en el constructor
+        this.posibleCaracteristicas = new ArrayList<>();
+        this.caracteristicasSeleccionadas = new ArrayList<>();
+        this.caracteristicasObligatorias = new ArrayList<>();
+        this.valoresCaracteristicas = new HashMap<>();
+    }
 
     @Override
     protected FacesContext getFacesContext() {
@@ -206,13 +218,28 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
                         productoTipoProductoCaracteristicaDAO.findByProductoTipoProducto(this.registro.getId());
 
                 this.caracteristicasSeleccionadas = new ArrayList<>();
+                this.valoresCaracteristicas = new HashMap<>(); // Reiniciar valores
 
+                // Cargar características y sus valores desde la base de datos
                 for (ProductoTipoProductoCaracteristica ptpc : existentes) {
                     if (ptpc.getIdTipoProductoCaracteristica() != null) {
                         this.caracteristicasSeleccionadas.add(ptpc.getIdTipoProductoCaracteristica());
+
+                        // Cargar el valor si existe
+                        if (ptpc.getValor() != null && !ptpc.getValor().isEmpty()) {
+                            try {
+                                Double valor = Double.parseDouble(ptpc.getValor());
+                                this.valoresCaracteristicas.put(ptpc.getIdTipoProductoCaracteristica().getId(), valor);
+                            } catch (NumberFormatException e) {
+                                // Si no es un número válido, no cargar valor
+                                Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.WARNING,
+                                        "Valor no numérico para característica: " + ptpc.getValor());
+                            }
+                        }
                     }
                 }
 
+                // Agregar características obligatorias que no estén ya en la lista
                 for (TipoProductoCaracteristica obligatoria : this.caracteristicasObligatorias) {
                     if (!this.caracteristicasSeleccionadas.contains(obligatoria)) {
                         this.caracteristicasSeleccionadas.add(obligatoria);
@@ -220,6 +247,9 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
                 }
 
                 this.posibleCaracteristicas.removeAll(this.caracteristicasSeleccionadas);
+
+                // ✅✅✅ AGREGAR ESTA LÍNEA ✅✅✅
+                seleccionarPrimeraSinValor();
             }
         } catch (Exception ex) {
             Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE,
@@ -270,6 +300,10 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
                 this.posibleCaracteristicas = tipoProductoCaracteristicaDAO.findNoObligatoriasByTipoProductoDirecto(idTipoProducto);
 
                 this.caracteristicasSeleccionadas = new ArrayList<>(this.caracteristicasObligatorias);
+                this.valoresCaracteristicas = new HashMap<>(); // Reiniciar valores
+
+                // ✅✅✅ AGREGAR ESTA LÍNEA ✅✅✅
+                seleccionarPrimeraSinValor();
 
             } else {
                 limpiarListasCaracteristicas();
@@ -318,6 +352,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
                     .anyMatch(obligatoria -> obligatoria.getId().equals(caracteristicaSeleccionadaSeleccionada.getId()));
 
             if (esObligatoria) {
+                enviarMensajeError("No se puede eliminar una característica obligatoria");
                 return;
             }
 
@@ -327,7 +362,10 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
             if (removida) {
                 posibleCaracteristicas.add(caracteristicaSeleccionadaSeleccionada);
+                // Remover también el valor asociado
+                valoresCaracteristicas.remove(caracteristicaSeleccionadaSeleccionada.getId());
                 caracteristicaSeleccionadaSeleccionada = null;
+                valorCaracteristica = null; // Limpiar también el valor actual
                 enviarMensajeExito("Característica eliminada correctamente");
             }
         } catch (Exception ex) {
@@ -336,16 +374,133 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
         }
     }
 
+    public void guardarValorCaracteristica(ActionEvent event) {
+        try {
+            System.out.println("=== INICIANDO GUARDADO DE VALOR ===");
+            System.out.println("Característica seleccionada: " +
+                    (caracteristicaSeleccionadaSeleccionada != null ?
+                            caracteristicaSeleccionadaSeleccionada.getIdCaracteristica().getNombre() : "NULA"));
+            System.out.println("Valor a guardar: " + valorCaracteristica);
+
+            if (caracteristicaSeleccionadaSeleccionada == null) {
+                enviarMensajeError("Por favor, seleccione una característica primero");
+                return;
+            }
+
+            if (valorCaracteristica == null) {
+                enviarMensajeError("Por favor, ingrese un valor numérico");
+                return;
+            }
+
+            // Guardar el valor en el mapa usando el ID de la característica como clave
+            Long idCaracteristica = caracteristicaSeleccionadaSeleccionada.getId();
+            valoresCaracteristicas.put(idCaracteristica, valorCaracteristica);
+
+            System.out.println("Valor guardado en mapa - Clave: " + idCaracteristica + ", Valor: " + valorCaracteristica);
+            System.out.println("Mapa actual: " + valoresCaracteristicas);
+
+            enviarMensajeExito("Valor '" + valorCaracteristica + "' guardado para '" +
+                    caracteristicaSeleccionadaSeleccionada.getIdCaracteristica().getNombre() + "'");
+
+            // ✅✅✅ GUARDAR EL VALOR TEMPORALMENTE Y LIMPIAR INMEDIATAMENTE
+            Double valorGuardado = valorCaracteristica;
+
+            // ✅✅✅ LIMPIAR INMEDIATAMENTE - ESTO ES LO MÁS IMPORTANTE
+            valorCaracteristica = null;
+
+            // ✅✅✅ FORZAR ACTUALIZACIÓN DEL COMPONENTE PRIMERO
+            FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("formId:txtValorCaracteristica");
+
+            // BUSCAR LA SIGUIENTE CARACTERÍSTICA SIN VALOR
+            seleccionarPrimeraSinValor();
+
+            System.out.println("Valor después de limpiar: " + valorCaracteristica);
+            System.out.println("=== VALOR GUARDADO EXITOSAMENTE ===");
+
+        } catch (Exception ex) {
+            System.out.println("=== ERROR AL GUARDAR ===");
+            Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE, "Error al guardar valor de característica", ex);
+            enviarMensajeError("Error al guardar valor: " + ex.getMessage());
+        }
+    }
+
+    // MÉTODO PARA OBTENER LA ETIQUETA CON EL VALOR Y OBLIGATORIEDAD - VERSIÓN MEJORADA
+    public String obtenerEtiquetaCaracteristica(TipoProductoCaracteristica caracteristica) {
+        if (caracteristica == null) {
+            return "";
+        }
+
+        String nombre = caracteristica.getIdCaracteristica().getNombre();
+        Double valor = valoresCaracteristicas.get(caracteristica.getId());
+        boolean esObligatoria = esCaracteristicaObligatoria(caracteristica);
+
+        System.out.println("Generando etiqueta para: " + nombre +
+                ", ID: " + caracteristica.getId() +
+                ", Obligatorio: " + esObligatoria +
+                ", Valor en mapa: " + valor);
+
+        // Construir la etiqueta
+        StringBuilder etiqueta = new StringBuilder(nombre);
+
+        // Agregar "(Obligatorio)" si es obligatoria
+        if (esObligatoria) {
+            etiqueta.append(" (Obligatorio)");
+        }
+
+        // Agregar el valor si existe
+        if (valor != null) {
+            etiqueta.append(" [").append(valor).append("]");
+        }
+
+        return etiqueta.toString();
+    }
+
+    // MÉTODO MODIFICADO: Para cargar el valor cuando se selecciona una característica
+    public void onCaracteristicaSeleccionadaChange() {
+        try {
+            System.out.println("=== CAMBIO DE CARACTERÍSTICA SELECCIONADA ===");
+            System.out.println("Característica seleccionada: " +
+                    (caracteristicaSeleccionadaSeleccionada != null ?
+                            caracteristicaSeleccionadaSeleccionada.getIdCaracteristica().getNombre() : "NULA"));
+
+            if (caracteristicaSeleccionadaSeleccionada != null) {
+                // Cargar el valor existente si hay uno
+                Long idCaracteristica = caracteristicaSeleccionadaSeleccionada.getId();
+                valorCaracteristica = valoresCaracteristicas.get(idCaracteristica);
+                System.out.println("Valor cargado: " + valorCaracteristica + " para ID: " + idCaracteristica);
+            } else {
+                valorCaracteristica = null;
+                System.out.println("No hay característica seleccionada, valor limpiado");
+            }
+        } catch (Exception ex) {
+            System.out.println("ERROR en onCaracteristicaSeleccionadaChange: " + ex.getMessage());
+            Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE,
+                    "Error al cargar valor de característica", ex);
+            valorCaracteristica = null;
+        }
+    }
+
+    // MÉTODO MODIFICADO: Guardar características con sus valores
     private void guardarCaracteristicasSeleccionadas(ProductoTipoProducto registro, UUID idRegistro) {
         try {
+            // Primero eliminar todas las características existentes
             productoTipoProductoCaracteristicaDAO.eliminarPorProductoTipoProducto(idRegistro);
 
+            // Luego guardar todas las características seleccionadas con sus valores
             for (TipoProductoCaracteristica caracteristica : caracteristicasSeleccionadas) {
                 ProductoTipoProductoCaracteristica ptpc = new ProductoTipoProductoCaracteristica();
                 ptpc.setId(UUID.randomUUID());
                 ptpc.setIdProductoTipoProducto(registro);
                 ptpc.setIdTipoProductoCaracteristica(caracteristica);
-                ptpc.setValor("");
+
+                // Obtener el valor del mapa, si existe
+                Double valor = valoresCaracteristicas.get(caracteristica.getId());
+                if (valor != null) {
+                    ptpc.setValor(String.valueOf(valor));
+                } else {
+                    ptpc.setValor("");
+                }
+
                 ptpc.setObservaciones("Modificado desde formulario");
 
                 productoTipoProductoCaracteristicaDAO.crear(ptpc);
@@ -360,6 +515,12 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
     @Override
     public void btnGuardarHandler(ActionEvent actionEvent) {
         try {
+            // Validar antes de guardar
+            if (isHayCaracteristicasSinValor()) {
+                enviarMensajeError("No se puede guardar. Todas las características deben tener un valor asignado.");
+                return;
+            }
+
             ProductoTipoProducto registroAntesDeGuardar = this.registro;
             UUID idRegistroAntesDeGuardar = registroAntesDeGuardar != null ? registroAntesDeGuardar.getId() : null;
 
@@ -379,9 +540,16 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
     @Override
     public void btnModificarHandler(ActionEvent event) {
         try {
+            // Validar antes de modificar
+            if (isHayCaracteristicasSinValor()) {
+                enviarMensajeError("No se puede modificar. Todas las características deben tener un valor asignado.");
+                return;
+            }
+
             List<TipoProductoCaracteristica> backupSeleccionadas = new ArrayList<>(this.caracteristicasSeleccionadas);
             List<TipoProductoCaracteristica> backupObligatorias = new ArrayList<>(this.caracteristicasObligatorias);
             List<TipoProductoCaracteristica> backupDisponibles = new ArrayList<>(this.posibleCaracteristicas);
+            Map<Long, Double> backupValores = new HashMap<>(this.valoresCaracteristicas);
 
             ProductoTipoProducto registroAntesDeModificar = this.registro;
             UUID idRegistroAntesDeModificar = registroAntesDeModificar != null ? registroAntesDeModificar.getId() : null;
@@ -391,6 +559,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
             this.caracteristicasSeleccionadas = new ArrayList<>(backupSeleccionadas);
             this.caracteristicasObligatorias = new ArrayList<>(backupObligatorias);
             this.posibleCaracteristicas = new ArrayList<>(backupDisponibles);
+            this.valoresCaracteristicas = new HashMap<>(backupValores);
 
             if (this.estado == ESTADO_CRUD.NADA && registroAntesDeModificar != null && idRegistroAntesDeModificar != null) {
                 guardarCaracteristicasSeleccionadas(registroAntesDeModificar, idRegistroAntesDeModificar);
@@ -408,6 +577,8 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
         limpiarListasCaracteristicas();
         this.caracteristicaSeleccionadaDisponible = null;
         this.caracteristicaSeleccionadaSeleccionada = null;
+        this.valorCaracteristica = null;
+        this.valoresCaracteristicas = new HashMap<>();
     }
 
     private void limpiarListasCaracteristicas() {
@@ -416,8 +587,74 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
         this.caracteristicasObligatorias = new ArrayList<>();
     }
 
+    // MÉTODO NUEVO AGREGADO: Para verificar si hay características sin valor
+    public boolean isHayCaracteristicasSinValor() {
+        try {
+            System.out.println("=== VALIDANDO CARACTERÍSTICAS SIN VALOR ===");
+            System.out.println("Características seleccionadas: " + (caracteristicasSeleccionadas != null ? caracteristicasSeleccionadas.size() : 0));
+            System.out.println("Valores en mapa: " + (valoresCaracteristicas != null ? valoresCaracteristicas.size() : 0));
+
+            if (caracteristicasSeleccionadas == null || caracteristicasSeleccionadas.isEmpty()) {
+                System.out.println("No hay características seleccionadas - RETORNANDO FALSE");
+                return false; // No hay características seleccionadas, no hay problema
+            }
+
+            // Verificar cada característica
+            for (TipoProductoCaracteristica caracteristica : caracteristicasSeleccionadas) {
+                Long id = caracteristica.getId();
+                Double valor = valoresCaracteristicas.get(id);
+
+                System.out.println("Validando característica: " + caracteristica.getIdCaracteristica().getNombre() +
+                        " - ID: " + id + " - Valor: " + valor);
+
+                if (valor == null) {
+                    System.out.println("ENCONTRADA CARACTERÍSTICA SIN VALOR: " + caracteristica.getIdCaracteristica().getNombre());
+                    return true; // Encontró al menos una característica sin valor
+                }
+            }
+
+            System.out.println("TODAS LAS CARACTERÍSTICAS TIENEN VALOR - RETORNANDO FALSE");
+            return false; // Todas las características tienen valor
+
+        } catch (Exception e) {
+            System.out.println("ERROR en isHayCaracteristicasSinValor: " + e.getMessage());
+            Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE, "Error al verificar características sin valor", e);
+            return true; // En caso de error, mejor prevenir y no permitir guardar
+        }
+    }
+
+    // MÉTODO NUEVO AGREGADO: Para debugging en el XHTML
+    public String getDebugInfo() {
+        StringBuilder debug = new StringBuilder();
+        debug.append("Características Seleccionadas: ").append(caracteristicasSeleccionadas.size()).append(" | ");
+        debug.append("Característica Actual: ");
+        if (caracteristicaSeleccionadaSeleccionada != null) {
+            debug.append(caracteristicaSeleccionadaSeleccionada.getIdCaracteristica().getNombre())
+                    .append(" (ID: ").append(caracteristicaSeleccionadaSeleccionada.getId()).append(")");
+        } else {
+            debug.append("NULA");
+        }
+        debug.append(" | Valor: ").append(valorCaracteristica != null ? valorCaracteristica : "NULO");
+        debug.append(" | Mapa: ").append(valoresCaracteristicas.size()).append(" entradas");
+        debug.append(" | Hay sin valor: ").append(isHayCaracteristicasSinValor());
+        return debug.toString();
+    }
+
+    // GETTERS Y SETTERS CORREGIDOS
+    public Double getValorCaracteristica() {
+        return valorCaracteristica;
+    }
+
+    public void setValorCaracteristica(Double valorCaracteristica) {
+        this.valorCaracteristica = valorCaracteristica;
+    }
+
     public List<TipoProductoCaracteristica> getPosibleCaracteristicas() {
         return posibleCaracteristicas;
+    }
+
+    public void setPosibleCaracteristicas(List<TipoProductoCaracteristica> posibleCaracteristicas) {
+        this.posibleCaracteristicas = posibleCaracteristicas;
     }
 
     public List<TipoProductoCaracteristica> getCaracteristicasSeleccionadas() {
@@ -442,10 +679,23 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
     public void setCaracteristicaSeleccionadaSeleccionada(TipoProductoCaracteristica caracteristicaSeleccionadaSeleccionada) {
         this.caracteristicaSeleccionadaSeleccionada = caracteristicaSeleccionadaSeleccionada;
+        // NO llamar onCaracteristicaSeleccionadaChange aquí - se llamará desde el AJAX
     }
 
     public List<TipoProductoCaracteristica> getCaracteristicasObligatorias() {
         return caracteristicasObligatorias;
+    }
+
+    public void setCaracteristicasObligatorias(List<TipoProductoCaracteristica> caracteristicasObligatorias) {
+        this.caracteristicasObligatorias = caracteristicasObligatorias;
+    }
+
+    public Map<Long, Double> getValoresCaracteristicas() {
+        return valoresCaracteristicas;
+    }
+
+    public void setValoresCaracteristicas(Map<Long, Double> valoresCaracteristicas) {
+        this.valoresCaracteristicas = valoresCaracteristicas;
     }
 
     public boolean esCaracteristicaObligatoria(TipoProductoCaracteristica caracteristica) {
@@ -453,4 +703,70 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
                 caracteristica.getObligatorio() != null &&
                 caracteristica.getObligatorio();
     }
+
+    // MÉTODO TEMPORAL PARA VER OBLIGATORIEDAD
+    public String getDebugObligatorias() {
+        if (caracteristicasSeleccionadas == null) return "Lista nula";
+
+        StringBuilder debug = new StringBuilder();
+        for (TipoProductoCaracteristica car : caracteristicasSeleccionadas) {
+            debug.append(car.getIdCaracteristica().getNombre())
+                    .append(": ")
+                    .append(car.getObligatorio())
+                    .append(" | ");
+        }
+        return debug.toString();
+    }
+
+    // MÉTODO PARA SELECCIONAR AUTOMÁTICAMENTE LA PRIMERA CARACTERÍSTICA SIN VALOR
+    public void seleccionarPrimeraSinValor() {
+        try {
+            System.out.println("=== BUSCANDO PRIMERA CARACTERÍSTICA SIN VALOR ===");
+
+            if (caracteristicasSeleccionadas == null || caracteristicasSeleccionadas.isEmpty()) {
+                System.out.println("No hay características seleccionadas");
+                this.caracteristicaSeleccionadaSeleccionada = null;
+                this.valorCaracteristica = null;
+                return;
+            }
+
+            // Buscar la primera característica que no tenga valor
+            for (TipoProductoCaracteristica caracteristica : caracteristicasSeleccionadas) {
+                Long id = caracteristica.getId();
+                Double valor = valoresCaracteristicas.get(id);
+
+                System.out.println("Revisando: " + caracteristica.getIdCaracteristica().getNombre() +
+                        " - Valor: " + valor);
+
+                if (valor == null) {
+                    // Encontramos una sin valor
+                    this.caracteristicaSeleccionadaSeleccionada = caracteristica;
+                    this.valorCaracteristica = null;
+                    System.out.println("SELECCIONADA: " + caracteristica.getIdCaracteristica().getNombre());
+                    return;
+                }
+            }
+
+            // Si todas tienen valor, seleccionar la primera
+            if (!caracteristicasSeleccionadas.isEmpty()) {
+                this.caracteristicaSeleccionadaSeleccionada = caracteristicasSeleccionadas.get(0);
+                this.valorCaracteristica = valoresCaracteristicas.get(caracteristicasSeleccionadas.get(0).getId());
+                System.out.println("Todas tienen valor, seleccionando la primera: " +
+                        caracteristicaSeleccionadaSeleccionada.getIdCaracteristica().getNombre());
+            } else {
+                this.caracteristicaSeleccionadaSeleccionada = null;
+                this.valorCaracteristica = null;
+                System.out.println("No hay características para seleccionar");
+            }
+
+        } catch (Exception ex) {
+            System.out.println("ERROR en seleccionarPrimeraSinValor: " + ex.getMessage());
+            Logger.getLogger(ProductoTipoProductoFrm.class.getName()).log(Level.SEVERE,
+                    "Error al seleccionar primera característica sin valor", ex);
+            this.caracteristicaSeleccionadaSeleccionada = null;
+            this.valorCaracteristica = null;
+        }
+    }
+
+
 }

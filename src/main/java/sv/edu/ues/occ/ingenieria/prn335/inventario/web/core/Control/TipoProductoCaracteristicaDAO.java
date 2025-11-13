@@ -40,15 +40,6 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return 0L;
     }
 
-
-    /**
-     * NUEVO MÉTODO: Busca características de un tipo de producto con paginación
-     *
-     * @param idTipoProducto el id del tipo de producto
-     * @param first          primer registro
-     * @param max            máximo de registros
-     * @return lista paginada de características
-     */
     public List<TipoProductoCaracteristica> findByTipoProducto(final Long idTipoProducto, int first, int max) {
         if (idTipoProducto != null) {
             try {
@@ -94,11 +85,6 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return 0L;
     }
 
-    /**
-     * Busca características obligatorias de un tipo de producto (sin paginación)
-     * @param idTipoProducto el id del tipo de producto
-     * @return lista de características obligatorias
-     */
     public List<TipoProductoCaracteristica> findObligatoriasByTipoProductoDirecto(final Long idTipoProducto) {
         if (idTipoProducto != null) {
             try {
@@ -115,11 +101,6 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return List.of();
     }
 
-    /**
-     * Busca características NO obligatorias de un tipo de producto
-     * @param idTipoProducto el id del tipo de producto
-     * @return lista de características no obligatorias
-     */
     public List<TipoProductoCaracteristica> findNoObligatoriasByTipoProductoDirecto(final Long idTipoProducto) {
         if (idTipoProducto != null) {
             try {
@@ -136,11 +117,6 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return List.of();
     }
 
-    /**
-     * Verifica si una característica es obligatoria
-     * @param idTipoProductoCaracteristica el id de la relación tipo producto-característica
-     * @return true si es obligatoria, false en caso contrario
-     */
     public boolean esCaracteristicaObligatoria(final Long idTipoProductoCaracteristica) {
         if (idTipoProductoCaracteristica != null) {
             try {
@@ -157,10 +133,10 @@ public class TipoProductoCaracteristicaDAO extends InventarioDefaultDataAccess<T
         return false;
     }
 
+    // MÉTODO NUEVO AGREGADO - Para el converter
     public TipoProductoCaracteristica buscarRegistroPorId(Long id) {
         if (id != null) {
             try {
-                // Usar el método leer heredado de InventarioDefaultDataAccess
                 return this.leer(id);
             } catch (Exception ex) {
                 Logger.getLogger(TipoProductoCaracteristicaDAO.class.getName()).log(Level.SEVERE,

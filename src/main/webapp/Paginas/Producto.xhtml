@@ -1,11 +1,11 @@
-<ui:composition
-        xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="jakarta.faces.html"
-        xmlns:f="jakarta.faces.core"
-        xmlns:p="http://primefaces.org/ui"
-        xmlns:ui="jakarta.faces.facelets"
-        xmlns:ues="jakarta.faces.composite/ues"
-        template="../WEB-INF/templates/default.xhtml">
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:ues="http://xmlns.jcp.org/jsf/composite/ues"
+                template="../WEB-INF/templates/default.xhtml">
 
    <!-- Header -->
    <ui:define name="header">
@@ -126,7 +126,7 @@
                         <p:column headerText="ID">
                            <h:outputText value="#{tp.id}" />
                         </p:column>
-                        <p:column headerText="#{crud['frm.botones.tipos']}" >
+                        <p:column headerText="#{crud['frm.botones.tipos']}">
                            <h:outputText value="#{tp.idTipoProducto.nombre}" />
                         </p:column>
                         <p:column headerText="#{crud['frm.botones.fechaCreacion']}">
@@ -181,7 +181,7 @@
                               <p:outputLabel value="#{crud['frm.botones.caracteristica']}" style="font-weight: bold; display: block; margin-bottom: 8px;"/>
                               <h:panelGrid columns="3" style="width: 100%;">
                                  <h:panelGrid>
-                                    <h:outputLabel value="Características Disponibles" />
+                                    <p:outputLabel for="listDisponibles" value="Características Disponibles" />
                                     <h:selectOneListbox id="listDisponibles"
                                                         style="width: 300px; height: 150px;"
                                                         value="#{productoFrm.ptpFrm.caracteristicaSeleccionadaDisponible}">
@@ -198,31 +198,95 @@
                                                      style="margin-bottom: 5px;"
                                                      icon="pi pi-plus"
                                                      actionListener="#{productoFrm.ptpFrm.agregarCaracteristica}"
-                                                     update="pnlCaracteristicas"
+                                                     update="pnlCaracteristicas btnGuardarTp btnModificarTp btnRemoverTp"
                                                      process="listDisponibles @this"/>
                                     <p:commandButton value="← #{crud['frm.botones.remover']}"
                                                      style="margin-bottom: 5px;"
                                                      icon="pi pi-minus"
                                                      actionListener="#{productoFrm.ptpFrm.eliminarCaracteristica}"
-                                                     update="pnlCaracteristicas"
+                                                     update="pnlCaracteristicas btnGuardarTp btnModificarTp"
                                                      process="listSeleccionadas @this"
-                                                     disabled="#{not empty productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada and
-                                productoFrm.ptpFrm.esCaracteristicaObligatoria(productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada)}"/>
+                                                     disabled="#{not empty productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada and productoFrm.ptpFrm.esCaracteristicaObligatoria(productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada)}"
+                                                     id="btnRemoverTp"/>
                                  </h:panelGrid>
 
                                  <h:panelGrid>
-                                    <h:outputLabel value="#{crud['frm.botones.caracteristicaSeleccionada']}"/>
+                                    <p:outputLabel for="listSeleccionadas" value="#{crud['frm.botones.caracteristicaSeleccionada']}"/>
                                     <h:selectOneListbox id="listSeleccionadas"
                                                         style="width: 300px; height: 150px"
                                                         value="#{productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada}">
                                        <f:selectItems value="#{productoFrm.ptpFrm.caracteristicasSeleccionadas}"
                                                       var="cs"
-                                                      itemLabel="#{cs.idCaracteristica.nombre} #{cs.obligatorio ? '(Obligatoria)' : ''}"
+                                                      itemLabel="#{productoFrm.ptpFrm.obtenerEtiquetaCaracteristica(cs)}"
                                                       itemValue="#{cs}"/>
                                        <f:converter converterId="TipoProductoCaracteristicaConverter" />
+                                       <p:ajax event="change"
+                                               listener="#{productoFrm.ptpFrm.onCaracteristicaSeleccionadaChange}"
+                                               update="seccionValorCaracteristica txtValorCaracteristica btnRemoverTp"
+                                               process="@this"/>
                                     </h:selectOneListbox>
+
+                                    <!-- SECCIÓN DE VALOR -->
+                                    <h:panelGroup id="seccionValorCaracteristica">
+                                       <!-- Mostrar formulario de valor solo cuando hay característica seleccionada -->
+
+                                          <h:panelGrid columns="1" style="width: 100%; margin-top: 15px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+                                             <p:outputLabel for="txtValorCaracteristica"
+                                                            value="Valor para: #{productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada.idCaracteristica.nombre}"
+                                                            style="font-weight: bold; color: #495057; display: block; margin-bottom: 10px;"/>
+
+                                             <h:panelGrid columns="2" style="width: 100%; column-gap: 10px;">
+                                                <p:inputNumber id="txtValorCaracteristica"
+                                                               value="#{productoFrm.ptpFrm.valorCaracteristica}"
+                                                               placeholder="Ingrese valor numérico"
+                                                               decimalPlaces="2"
+                                                               minValue="0"
+                                                               maxValue="999999.99"
+                                                               style="width: 200px;"/>
+
+                                                <p:commandButton value="Guardar Valor"
+                                                                 icon="pi pi-save"
+                                                                 style="background-color: #28a745; border-color: #28a745;"
+                                                                 actionListener="#{productoFrm.ptpFrm.guardarValorCaracteristica}"
+                                                                 update="@form"
+                                                                 process="@this txtValorCaracteristica"/>
+                                             </h:panelGrid>
+                                          </h:panelGrid>
+
+
+                                       <!-- Mensaje cuando no hay característica seleccionada -->
+                                       <h:panelGroup rendered="#{productoFrm.ptpFrm.caracteristicaSeleccionadaSeleccionada == null}">
+                                          <p:outputLabel value="Seleccione una característica para asignar un valor"
+                                                         style="color: #6c757d; font-style: italic; display: block; margin-top: 15px; padding: 15px; text-align: center;"/>
+                                       </h:panelGroup>
+                                    </h:panelGroup>
                                  </h:panelGrid>
                               </h:panelGrid>
+
+                              <!-- SECCIÓN: Mostrar valores para todas las características -->
+                              <h:panelGroup id="pnlValoresActuales"
+                                            rendered="#{not empty productoFrm.ptpFrm.caracteristicasSeleccionadas}"
+                                            style="margin-top: 20px; padding: 15px; border-radius: 5px;">
+                                 <p:outputLabel value="Valores Actuales:" style="font-weight: bold; display: block; margin-bottom: 10px; color: #495057;"/>
+
+                                 <h:panelGrid columns="2" style="width: 100%;" columnClasses="label,value">
+                                    <ui:repeat value="#{productoFrm.ptpFrm.caracteristicasSeleccionadas}" var="caracteristica">
+                                       <p:outputLabel value="#{caracteristica.idCaracteristica.nombre}:"
+                                                      style="font-weight: normal; padding: 5px 0;"/>
+                                       <h:panelGroup style="padding: 5px 0;">
+                                          <p:outputLabel value="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] != null ? productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] : ' Sin valor'}"
+                                                         style="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] != null ? 'color: #28a745; font-weight: bold; padding: 0 8px; margin: 0 4px;' : 'color: #dc3545; font-style: italic; padding: 0 8px; margin: 0 4px;'}"/>
+                                       </h:panelGroup>
+                                    </ui:repeat>
+                                 </h:panelGrid>
+
+
+                                 <!-- VALIDACIÓN: Mostrar advertencia si hay características sin valor -->
+                                 <h:panelGroup rendered="#{productoFrm.ptpFrm.hayCaracteristicasSinValor}">
+                                    <p:outputLabel value="⚠️ Advertencia: Hay características sin valor asignado. Debe asignar valores a todas las características antes de guardar."
+                                                   style="color: #856404; font-weight: bold; display: block; margin-top: 10px;"/>
+                                 </h:panelGroup>
+                              </h:panelGroup>
 
                               <!-- Información de estado -->
                               <p:outputLabel value="#{crud['frm.botones.totalSeleccionadas']}: #{productoFrm.ptpFrm.caracteristicasSeleccionadas.size()}"
@@ -258,26 +322,38 @@
 
                      </h:panelGrid>
 
-                     <!-- Botones de acción -->
-                     <h:panelGrid columns="4" style="margin-top: 20px;">
+                     <!-- BOTONES DE ACCIÓN CON VALIDACIÓN -->
+                     <h:panelGrid columns="3" style="margin-top: 20px;">
                         <p:commandButton value="#{crud['frm.botones.guardar']}"
                                          actionListener="#{productoFrm.ptpFrm.btnGuardarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='CREAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
-                                         process="@form"/>
+                                         process="@form"
+                                         disabled="#{productoFrm.ptpFrm.hayCaracteristicasSinValor}"
+                                         id="btnGuardarTp"/>
 
                         <p:commandButton value="#{crud['frm.botones.modificar']}"
                                          actionListener="#{productoFrm.ptpFrm.btnModificarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
-                                         process="@form"/>
+                                         process="@form"
+                                         disabled="#{productoFrm.ptpFrm.hayCaracteristicasSinValor}"
+                                         id="btnModificarTp"/>
 
                         <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                          actionListener="#{productoFrm.ptpFrm.btnEliminarHandler}"
                                          rendered="#{productoFrm.ptpFrm.estado=='MODIFICAR'}"
                                          update=":tabProducto:pnlTipoProductoTabla :tabProducto:pnlTipoProductoDetalle"
-                                         process="@form"/>
+                                         process="@form"
+                                         id="btnEliminarTp"/>
                      </h:panelGrid>
+
+                     <!-- MENSAJE DE VALIDACIÓN -->
+                     <h:panelGroup rendered="#{productoFrm.ptpFrm.hayCaracteristicasSinValor}"
+                                   style="margin-top: 15px;">
+                        <p:outputLabel value="❌ No se puede guardar. Todas las características deben tener un valor asignado."
+                                       style="color: #721c24; font-weight: bold; display: block;"/>
+                     </h:panelGroup>
                   </h:form>
                </h:panelGroup>
             </p:tab>
@@ -309,13 +385,24 @@
                                   requiredMessage="#{crud['frm.botones.debeSeleccionarUnTipoDeProducto']}"/>
                </h:panelGrid>
 
-               <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
+               <h:panelGrid columns="1" style="text-align: center; margin-top: 15px;">
                   <p:commandButton value="#{crud['frm.botones.seleccionar']}"
                                    actionListener="#{productoFrm.ptpFrm.btnSeleccionarTipoProductoHandler}"
                                    process="@form"
                                    update=":tabProducto:frmDetalleTipoProducto:pnlTipoProducto :tabProducto:frmDetalleTipoProducto:pnlCaracteristicas"
                                    oncomplete="PF('dlgTipoProducto').hide();"/>
                </h:panelGrid>
+            </h:panelGrid>
+         </h:form>
+      </p:dialog>
+
+      <!-- Diálogo de carga -->
+      <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false"
+                showHeader="false" style="background: transparent; border: none; box-shadow: none;">
+         <h:form>
+            <h:panelGrid columns="1" style="text-align: center;">
+               <p:graphicImage name="images/loading.gif" />
+               <h:outputText value="Procesando..." style="color: white; font-size: 14px;"/>
             </h:panelGrid>
          </h:form>
       </p:dialog>
