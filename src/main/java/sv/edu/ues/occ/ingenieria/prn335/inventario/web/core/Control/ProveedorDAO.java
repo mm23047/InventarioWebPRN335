@@ -48,6 +48,17 @@ public class ProveedorDAO extends InventarioDefaultDataAccess<Proveedor> impleme
         return em.find(Proveedor.class, id);
     }
 
+    public Proveedor buscarRegistroPorId(Integer id) {
+        try {
+            if (id != null) {
+                return em.find(Proveedor.class, id);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ProveedorDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return null;
+    }
+
     //metodo para buscar proveedores activos
     public List<Proveedor> findByActivos(int first, int max) {
         try {

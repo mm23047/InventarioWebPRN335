@@ -9,6 +9,9 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Cliente;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
@@ -23,6 +26,17 @@ public class ClienteDAO extends InventarioDefaultDataAccess<Cliente> implements 
     @Override
     public EntityManager getEntityManager() {
         return em;
+    }
+
+    public Cliente buscarPorId(UUID id) {
+        try {
+            if (id != null) {
+                return em.find(Cliente.class, id);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ClienteDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return null;
     }
 
     // -----------------------

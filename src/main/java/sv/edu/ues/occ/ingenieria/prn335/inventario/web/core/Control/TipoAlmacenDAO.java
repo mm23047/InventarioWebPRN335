@@ -7,6 +7,8 @@ import jakarta.persistence.PersistenceContext;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoAlmacen;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
@@ -21,6 +23,17 @@ public class TipoAlmacenDAO extends InventarioDefaultDataAccess<TipoAlmacen> imp
     @Override
     public EntityManager getEntityManager(){
         return em;
+    }
+
+    public TipoAlmacen buscarRegistroPorId(Integer id) {
+        try {
+            if (id != null) {
+                return em.find(TipoAlmacen.class, id);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TipoAlmacenDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return null;
     }
 
 }

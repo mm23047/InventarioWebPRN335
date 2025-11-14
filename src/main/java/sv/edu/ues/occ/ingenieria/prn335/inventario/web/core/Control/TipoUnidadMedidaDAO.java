@@ -7,6 +7,8 @@ import jakarta.persistence.PersistenceContext;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoUnidadMedida;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Stateless
 @LocalBean
@@ -20,5 +22,16 @@ public class TipoUnidadMedidaDAO extends InventarioDefaultDataAccess<TipoUnidadM
     @Override
     public EntityManager getEntityManager(){
         return em;
+    }
+
+    public TipoUnidadMedida buscarRegistroPorId(Integer id) {
+        try {
+            if (id != null) {
+                return em.find(TipoUnidadMedida.class, id);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TipoUnidadMedidaDAO.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return null;
     }
 }
