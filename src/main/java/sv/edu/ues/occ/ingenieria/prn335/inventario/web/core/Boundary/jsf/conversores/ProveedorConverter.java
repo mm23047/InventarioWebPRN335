@@ -5,12 +5,14 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf.CompraFrm;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProveedorDAO;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
 
 @FacesConverter("proveedorConverter")
 public class ProveedorConverter implements Converter<Proveedor> {
-
     @Override
     public Proveedor getAsObject(FacesContext context, UIComponent component, String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -18,14 +20,18 @@ public class ProveedorConverter implements Converter<Proveedor> {
         }
 
         try {
-
-            return null;
-
+            // Crear un objeto Proveedor con solo el ID
+            // PrimeFaces maneja el objeto completo desde el autocomplete
+            Integer id = Integer.valueOf(value);
+            Proveedor proveedor = new Proveedor();
+            proveedor.setId(id);
+            return proveedor;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("ID de proveedor inválido: " + value, e);
         } catch (Exception e) {
-            throw new RuntimeException("Error en converter de proveedor: " + e.getMessage(), e);
+            throw new RuntimeException("Error al convertir proveedor: " + e.getMessage(), e);
         }
     }
-
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Proveedor value) {
@@ -34,5 +40,4 @@ public class ProveedorConverter implements Converter<Proveedor> {
         }
         return value.getId() != null ? value.getId().toString() : "";
     }
-
 }

@@ -7,7 +7,8 @@ import jakarta.validation.constraints.Size;
 @Entity
 @Table(name = "proveedor", schema = "public")
 @NamedQueries({
-        @NamedQuery(name = "Proveedor.findByNombreLike", query = "SELECT p FROM Proveedor p WHERE UPPER(p.nombre) LIKE :nombre AND p.activo = true ORDER BY p.nombre ASC")
+        @NamedQuery(name = "Proveedor.findByNombreLike", query = "SELECT p FROM Proveedor p WHERE UPPER(p.nombre) LIKE :nombre AND p.activo = true ORDER BY p.nombre ASC"),
+        @NamedQuery(name = "Proveedor.findByActivos", query = "SELECT p FROM Proveedor p WHERE p.activo = true ORDER BY p.nombre ASC")
 })
 public class Proveedor {
     @Id

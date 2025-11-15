@@ -10,6 +10,7 @@ import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CompraDetalleDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.CompraDetalle;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
 
@@ -81,6 +82,8 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
                     try {
                         if (idCompra != null) {
                             long count = compraDetalleDAO.countByCompra(idCompra);
+                            Logger.getLogger(CompraDetalleFrm.class.getName()).log(Level.INFO,
+                                    "Contando detalles para compra ID: " + idCompra + ", total: " + count);
                             return (int) Math.min(count, Integer.MAX_VALUE);
                         }
                         return getDao().count();
@@ -94,7 +97,12 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
                 public List<CompraDetalle> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
                     try {
                         if (idCompra != null) {
-                            return compraDetalleDAO.findByCompra(idCompra, first, pageSize);
+                            List<CompraDetalle> detalles = compraDetalleDAO.findByCompra(idCompra, first, pageSize);
+                            Logger.getLogger(CompraDetalleFrm.class.getName()).log(Level.INFO,
+                                    "Cargando detalles para compra ID: " + idCompra +
+                                            ", first: " + first + ", pageSize: " + pageSize +
+                                            ", encontrados: " + detalles.size());
+                            return detalles;
                         }
                         return getDao().findRange(first, pageSize);
                     } catch (Exception e) {
@@ -103,6 +111,11 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
                     }
                 }
             };
+
+            // Forzar un conteo inicial para que el paginador funcione
+            if (idCompra != null) {
+                this.modelo.setRowCount(this.modelo.count(null));
+            }
         } catch (Exception e) {
             enviarMensajeError("Error al inicializar registros: " + e.getMessage());
             Logger.getLogger(CompraDetalleFrm.class.getName()).log(Level.SEVERE, "Error en inicializarRegistros", e);
@@ -135,9 +148,11 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
     @Override
     protected CompraDetalle nuevoRegistro() {
         CompraDetalle detalle = createNewEntity();
-        if (idCompra != null && this.registro != null) {
-            // Configurar la relación con la compra padre
-            detalle.setIdCompra(this.registro.getIdCompra());
+        if (idCompra != null) {
+            // Establecer la relación con la compra padre
+            Compra compra = new Compra();
+            compra.setId(idCompra);
+            detalle.setIdCompra(compra);
         }
         return detalle;
     }
@@ -190,9 +205,12 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
         return idCompra;
     }
 
+    // Asegurar que setIdCompra actualice los registros
     public void setIdCompra(Long idCompra) {
         this.idCompra = idCompra;
         if (idCompra != null) {
+            Logger.getLogger(CompraDetalleFrm.class.getName()).log(Level.INFO,
+                    "Estableciendo ID Compra en detalles: " + idCompra);
             inicializarRegistros();
         }
     }

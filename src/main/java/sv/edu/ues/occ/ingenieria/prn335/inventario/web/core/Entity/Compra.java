@@ -18,7 +18,8 @@ import java.time.OffsetDateTime;
 })
 public class Compra {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "compra_seq_gen", sequenceName = "compra_id_compra_seq", schema = "public", allocationSize = 1 ) // CRÍTICO: debe ser 1
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "compra_seq_gen")
     @Column(name = "id_compra", nullable = false)
     private Long id;
 

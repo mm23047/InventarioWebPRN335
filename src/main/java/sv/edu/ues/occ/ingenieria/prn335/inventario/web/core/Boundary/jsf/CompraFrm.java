@@ -2,6 +2,7 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -115,8 +116,16 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         if (event != null && event.getObject() != null) {
             this.registro = event.getObject();
             this.estado = ESTADO_CRUD.MODIFICAR;
+
             // Configurar el compraDetalleFrm con la compra seleccionada
             this.compraDetalleFrm.setIdCompra(this.registro.getId());
+
+            // Forzar la inicialización de los registros del detalle
+            this.compraDetalleFrm.inicializarRegistros();
+
+            Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
+                    "Compra seleccionada - ID: " + this.registro.getId() +
+                            ", Estado: " + this.estado);
         }
     }
 

@@ -57,14 +57,13 @@
 
                <!-- Monto Total (Cantidad × Precio Unitario) -->
                <p:column headerText="Monto Total" width="120">
-                  <h:outputText value="#{compraFrm.compraDetalleFrm.idCompra eq compra.id ? compraFrm.montoTotal : '0.00'}">
+                  <h:outputText value="#{compraFrm.montoTotal}">
                      <f:convertNumber type="currency" currencySymbol="$" />
                   </h:outputText>
                </p:column>
-
                <p:ajax event="rowSelect"
                        listener="#{compraFrm.seleccionarRegistro}"
-                       update=":pnlCompraTabla :pnlCompraDetalle"/>
+                       update=":pnlCompraTabla :pnlCompraDetalle :tabCompra"/>
             </p:dataTable>
 
             <ues:botones-top formulario="#{compraFrm}"
@@ -95,7 +94,7 @@
                                         value="#{compraFrm.registro.proveedor}"
                                         completeMethod="#{compraFrm.buscarProveedoresPorNombre}"
                                         var="proveedor"
-                                        itemLabel="#{proveedor.nombre} "
+                                        itemLabel="#{proveedor.nombre}"
                                         itemValue="#{proveedor}"
                                         forceSelection="true"
                                         dropdown="true"
@@ -103,7 +102,8 @@
                                         requiredMessage="Seleccione un proveedor"
                                         size="50"
                                         placeholder="Escriba el nombre...">
-                           />
+                           <!-- ESTA LÍNEA ES CRÍTICA -->
+                           <f:converter converterId="proveedorConverter" />
                         </p:autoComplete>
                         <p:message for="autoProveedor" display="icon"/>
                      </h:panelGroup>
@@ -166,7 +166,6 @@
             <!-- Pestaña Productos (Solo visible en MODIFICAR) -->
             <p:tab id="tabProductos" closable="false" title="Productos"
                    disabled="#{compraFrm.estado!='MODIFICAR'}">
-
                <!-- Panel de Tabla de Detalles (Tabla 2) -->
                <h:panelGroup id="pnlCompraDetalleTabla">
                   <h:form id="frmTablaCompraDetalle">
@@ -195,7 +194,7 @@
                         <!-- Cantidad -->
                         <p:column headerText="Cantidad" width="100">
                            <h:outputText value="#{detalle.cantidad}">
-                              <f:convertNumber pattern="0.00" />
+                              <f:convertNumber pattern="0" />
                            </h:outputText>
                         </p:column>
 
@@ -214,13 +213,6 @@
                         <!-- Observaciones -->
                         <p:column headerText="Observaciones" width="200">
                            <h:outputText value="#{detalle.observaciones}" />
-                        </p:column>
-
-                        <!-- Subtotal (Cantidad × Precio) -->
-                        <p:column headerText="Subtotal" width="120">
-                           <h:outputText value="#{detalle.subtotal}">
-                              <f:convertNumber type="currency" currencySymbol="$" />
-                           </h:outputText>
                         </p:column>
 
                         <p:ajax event="rowSelect"
@@ -249,7 +241,7 @@
                   <h:form id="frmDetalleCompra" rendered="#{compraFrm.compraDetalleFrm.estado!='NADA'}">
                      <p:panel header="Detalle de Compra" style="margin-top: 20px;">
 
-                        <h:panelGrid columns="2" style="width: 100%;">
+                        <h:panelGrid columns="1" style="width: 100%;">
 
                            <!-- ID Detalle (Auto-generado) -->
                            <p:outputLabel for="txtDetalleId" value="ID:"/>
@@ -310,15 +302,6 @@
                            <p:inputTextarea id="txtObsDetalle"
                                             value="#{compraFrm.compraDetalleFrm.registro.observaciones}"
                                             rows="3" cols="50"/>
-
-                           <!-- Subtotal Calculado (Solo lectura) -->
-                           <p:outputLabel for="txtSubtotal" value="Subtotal:"/>
-                           <p:inputText id="txtSubtotal"
-                                        value="#{compraFrm.compraDetalleFrm.subtotal}"
-                                        readonly="true"
-                                        disabled="true">
-                              <f:convertNumber type="currency" currencySymbol="$" />
-                           </p:inputText>
 
                         </h:panelGrid>
 
