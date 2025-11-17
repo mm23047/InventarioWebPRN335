@@ -23,27 +23,24 @@ public class ReporteResource implements Serializable {
     @Resource(lookup = "jdbc/pgdb")
     DataSource ds;
 
-
     @GET
     @Path("{nombreReporte}")
     public Response getReporte(@PathParam("nombreReporte") String nombreReporte) {
-        // Buscar el path real del reporte según el nombre solicitado
-        String pathReporte;
-        switch (nombreReporte) {
-            case "tipo_unidad_medida":
-                pathReporte = "/reports/TipoUnidadMedida.jasper";
-                break;
-            default:
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("Reporte '" + nombreReporte + "' no encontrado")
-                        .build();
+        // Validar que el nombre solo contenga caracteres seguros (alfanuméricos, guiones y guiones bajos)
+        if (!nombreReporte.matches("^[a-zA-Z0-9_-]+$")) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Nombre de reporte inválido. Solo se permiten letras, números, guiones y guiones bajos.")
+                    .build();
         }
+
+        // Construir la ruta del reporte dinámicamente
+        String pathReporte = "/reports/" + nombreReporte + ".jasper";
 
         // Validar que el archivo del reporte existe
         InputStream reportStream = this.getClass().getClassLoader().getResourceAsStream(pathReporte);
         if (reportStream == null) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("El archivo del reporte no existe en la ruta: " + pathReporte)
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Reporte '" + nombreReporte + "' no encontrado en la ruta: " + pathReporte)
                     .build();
         }
 
