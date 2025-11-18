@@ -7,10 +7,7 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.primefaces.model.LazyDataModel;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CompraDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CompraDetalleDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProveedorDAO;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.CompraDetalle;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
@@ -30,6 +27,9 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
 
     @Inject
     private FacesContext facesContext;
+
+    @Inject
+    NotificadorKardex notificadorKardex;
 
     @Inject
     private CompraDAO compraDAO;
@@ -193,4 +193,14 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         }
         return List.of();
     }
+
+
+    public void notificarCambioKardex(ActionEvent actionEvent){
+        if(this.registro!=null && this.registro.getId()!=null){
+            this.registro.setEstado("PAGADA"); // Estado de la entidad (String)
+            super.btnModificarHandler(actionEvent);
+            notificadorKardex.notificarCambioKardex("Compra actualizada: ");
+        }
+    }
+
 }

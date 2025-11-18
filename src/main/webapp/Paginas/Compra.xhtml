@@ -130,7 +130,6 @@
                                    readonly="true"
                                    disabled="true"/>
 
-
                      <!-- Observaciones -->
                      <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
                      <p:inputTextarea id="txtObservaciones"
@@ -140,7 +139,7 @@
                   </h:panelGrid>
 
                   <!-- Botones de acción para Compra -->
-                  <h:panelGrid columns="#{compraFrm.estado=='MODIFICAR' ? 1 : 2}" style="margin-top: 20px;">
+                  <h:panelGrid columns="#{compraFrm.estado=='MODIFICAR' ? 3 : 2}" style="margin-top: 20px;">
                      <p:commandButton value="#{crud['frm.botones.guardar']}"
                                       actionListener="#{compraFrm.btnGuardarHandler}"
                                       rendered="#{compraFrm.estado=='CREAR'}"
@@ -159,7 +158,16 @@
                                       update=":pnlCompraTabla :pnlCompraDetalle"
                                       process="@form"/>
 
+                     <!-- Botón Cerrar compra -->
+                     <p:commandButton value="Cerrar compra"
+                                      actionListener="#{compraFrm.notificarCambioKardex}"
+                                      update=":pnlCompraDetalle :pnlCompraTabla"
+                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      process="@form"/>
+
                   </h:panelGrid>
+
+                  <ues:botones-top formulario="#{compraFrm}"/>
                </h:form>
             </p:tab>
 
