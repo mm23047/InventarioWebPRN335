@@ -6,7 +6,9 @@ import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.CompraDetalle;
@@ -18,6 +20,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -201,6 +204,69 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             super.btnModificarHandler(actionEvent);
             notificadorKardex.notificarCambioKardex("Compra actualizada: ");
         }
+    }
+
+    @Override
+    public void inicializarRegistros() {
+        try {
+            this.modelo = new LazyDataModel<Compra>() {
+                @Override
+                public String getRowKey(Compra object) {
+                    return getIdAsText(object);
+                }
+
+                @Override
+                public Compra getRowData(String rowKey) {
+                    return getIdByText(rowKey);
+                }
+
+                @Override
+                public int count(Map<String, FilterMeta> filterBy) {
+                    try {
+                        return getDao().count();
+                    } catch (Exception e) {
+                        Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al contar registros", e);
+                        return 0;
+                    }
+                }
+
+                @Override
+                public List<Compra> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+                    try {
+                        List<Compra> compras = getDao().findRange(first, pageSize);
+
+                        // Pre-calcular montos para cada compra
+                        for (Compra compra : compras) {
+                            if (compra.getId() != null) {
+                                BigDecimal monto = compraDAO.calcularMontoTotal(compra.getId());
+                                compra.setMontoTotal(monto != null ? monto : BigDecimal.ZERO);
+                            } else {
+                                compra.setMontoTotal(BigDecimal.ZERO);
+                            }
+                        }
+
+                        return compras;
+                    } catch (Exception e) {
+                        Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al cargar registros", e);
+                        return List.of();
+                    }
+                }
+            };
+
+            this.modelo.setRowCount(this.modelo.count(null));
+        } catch (Exception e) {
+            enviarMensajeError("Error al inicializar registros: " + e.getMessage());
+            Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error en inicializarRegistros", e);
+        }
+    }
+
+
+    // Método para calcular el monto total de una compra específica
+    public BigDecimal getMontoTotal(Compra compra) {
+        if (compra != null && compra.getId() != null) {
+            return compraDAO.calcularMontoTotal(compra.getId());
+        }
+        return BigDecimal.ZERO;
     }
 
 }

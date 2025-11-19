@@ -57,7 +57,7 @@
 
                <!-- Monto Total (Cantidad × Precio Unitario) -->
                <p:column headerText="Monto Total" width="120">
-                  <h:outputText value="#{compraFrm.montoTotal}">
+                  <h:outputText value="#{compra.montoTotal}">
                      <f:convertNumber type="currency" currencySymbol="$" />
                   </h:outputText>
                </p:column>
@@ -167,7 +167,7 @@
 
                   </h:panelGrid>
 
-                  <ues:botones-top formulario="#{compraFrm}"/>
+
                </h:form>
             </p:tab>
 
@@ -236,11 +236,6 @@
                                       style="margin-top: 10px;"/>
 
                      <!-- Botones Cancelar para Detalle -->
-                     <p:commandButton value="#{crud['frm.botones.cancelar']}"
-                                      actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
-                                      rendered="#{compraFrm.compraDetalleFrm.estado!='NADA'}"
-                                      update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
-                                      style="margin-top: 10px;"/>
                   </h:form>
                </h:panelGroup>
 
@@ -333,10 +328,6 @@
                                             update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
                                             process="@form"/>
 
-                           <p:commandButton value="#{crud['frm.botones.cancelar']}"
-                                            actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
-                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
-                                            process="@this"/>
                         </h:panelGrid>
 
                      </p:panel>

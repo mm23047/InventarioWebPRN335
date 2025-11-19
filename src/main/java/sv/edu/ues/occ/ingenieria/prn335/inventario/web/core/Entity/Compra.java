@@ -2,6 +2,8 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -80,5 +82,16 @@ public class Compra {
 
     public Integer getIdProveedor() {
         return proveedor != null ? proveedor.getId() : null;
+    }
+
+    @Transient
+    private BigDecimal montoTotal;
+
+    public BigDecimal getMontoTotal() {
+        return montoTotal;
+    }
+
+    public void setMontoTotal(BigDecimal montoTotal) {
+        this.montoTotal = montoTotal;
     }
 }
