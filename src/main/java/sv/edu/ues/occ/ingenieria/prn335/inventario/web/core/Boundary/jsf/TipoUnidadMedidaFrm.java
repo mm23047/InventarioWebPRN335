@@ -4,22 +4,23 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.faces.application.Application;
+import jakarta.faces.event.ActionEvent;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoUnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoUnidadMedida;
 
-import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class TipoUnidadMedidaFrm extends DefaultFrm <TipoUnidadMedida> {
+public class TipoUnidadMedidaFrm extends DefaultFrm<TipoUnidadMedida> {
 
     @Inject
     TipoUnidadMedidaDAO tipoUnidadMedidaDAO;
 
-    @Inject
+    // Cambiar de @Inject a creación programática
     protected UnidadMedidaFrm umFrm;
 
     public TipoUnidadMedidaFrm() {
@@ -28,7 +29,7 @@ public class TipoUnidadMedidaFrm extends DefaultFrm <TipoUnidadMedida> {
 
     @Override
     protected String getIdAsText(TipoUnidadMedida r) {
-        if(r != null && r.getId() != null){
+        if (r != null && r.getId() != null) {
             return r.getId().toString();
         }
         return null;
@@ -85,8 +86,37 @@ public class TipoUnidadMedidaFrm extends DefaultFrm <TipoUnidadMedida> {
         if (event != null && event.getObject() != null) {
             this.registro = event.getObject();
             this.estado = ESTADO_CRUD.MODIFICAR;
+
+            // REINICIALIZAR UnidadMedidaFrm con el registro actual
+            inicializarUnidadMedidaFrm();
         }
     }
+
+    @Override
+    public void btnNuevoHandler(ActionEvent evt) {
+        super.btnNuevoHandler(evt);
+
+        // REINICIALIZAR UnidadMedidaFrm para nuevo registro
+        inicializarUnidadMedidaFrm();
+    }
+
+    private void inicializarUnidadMedidaFrm() {
+        try {
+            // Obtener instancia del contexto
+            FacesContext context = FacesContext.getCurrentInstance();
+            Application application = context.getApplication();
+            umFrm = application.evaluateExpressionGet(context, "#{unidadMedidaFrm}", UnidadMedidaFrm.class);
+
+            // Configurar el tipo de unidad de medida actual
+            if (umFrm != null) {
+                umFrm.setTipoUnidadMedidaActual(this.registro); // Esto ya llama a reiniciarEstado internamente
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TipoUnidadMedidaFrm.class.getName()).log(Level.WARNING,
+                    "Error al inicializar UnidadMedidaFrm", ex);
+        }
+    }
+
 
     @Override
     protected Object getEntityId(TipoUnidadMedida entity) {
@@ -101,11 +131,13 @@ public class TipoUnidadMedidaFrm extends DefaultFrm <TipoUnidadMedida> {
     @Override
     protected void configurarNuevoRegistro() {
         // Configuración específica para TipoUnidadMedida si es necesaria
-        // Por ejemplo, establecer valores por defecto adicionales
     }
 
-    public UnidadMedidaFrm getumFrm() {
+    public UnidadMedidaFrm getUmFrm() {
+        // Asegurarse de que umFrm esté inicializado cuando se solicite
+        if (umFrm == null) {
+            inicializarUnidadMedidaFrm();
+        }
         return umFrm;
     }
-
 }

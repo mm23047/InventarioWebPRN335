@@ -31,6 +31,9 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
 
     List<TipoUnidadMedida> listaTipoUnidadMedida;
 
+    // Campo para almacenar el TipoUnidadMedida actual (padre)
+    private TipoUnidadMedida tipoUnidadMedidaActual;
+
     @Override
     protected InventarioDAOInterface<UnidadMedida> getDao() {
         return unidadMedidaDAO;
@@ -40,7 +43,11 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     protected UnidadMedida createNewEntity() {
         UnidadMedida unidadMedida = new UnidadMedida();
         unidadMedida.setActivo(true);
-        if(this.listaTipoUnidadMedida != null && !this.listaTipoUnidadMedida.isEmpty()){
+
+        // Asignar el tipo actual si existe
+        if (this.tipoUnidadMedidaActual != null) {
+            unidadMedida.setIdTipoUnidadMedida(this.tipoUnidadMedidaActual);
+        } else if (this.listaTipoUnidadMedida != null && !this.listaTipoUnidadMedida.isEmpty()) {
             unidadMedida.setIdTipoUnidadMedida(this.listaTipoUnidadMedida.getFirst());
         }
         return unidadMedida;
@@ -48,6 +55,54 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
 
     public UnidadMedidaFrm() {
         this.nombreBean = "Unidad de Medida";
+    }
+
+    @Override
+    public void inicializarRegistros() {
+        try {
+            this.modelo = new LazyDataModel<UnidadMedida>() {
+                @Override
+                public String getRowKey(UnidadMedida object) {
+                    return getIdAsText(object);
+                }
+
+                @Override
+                public UnidadMedida getRowData(String rowKey) {
+                    return getIdByText(rowKey);
+                }
+
+                @Override
+                public int count(java.util.Map<String, org.primefaces.model.FilterMeta> map) {
+                    try {
+                        // Si hay un tipo actual, contar solo las unidades de ese tipo
+                        if (tipoUnidadMedidaActual != null && tipoUnidadMedidaActual.getId() != null) {
+                            return unidadMedidaDAO.countByTipoUnidadMedida(tipoUnidadMedidaActual.getId());
+                        }
+                        return 0; // Sin tipo seleccionado, retornar 0
+                    } catch (Exception e) {
+                        Logger.getLogger(UnidadMedidaFrm.class.getName()).log(Level.SEVERE, "Error al contar", e);
+                        return 0;
+                    }
+                }
+
+                @Override
+                public List<UnidadMedida> load(int first, int max, java.util.Map<String, org.primefaces.model.SortMeta> sortMap,
+                                               java.util.Map<String, org.primefaces.model.FilterMeta> filterMap) {
+                    try {
+                        // Si hay un tipo actual, cargar solo las unidades de ese tipo
+                        if (tipoUnidadMedidaActual != null && tipoUnidadMedidaActual.getId() != null) {
+                            return unidadMedidaDAO.findByTipoUnidadMedida(tipoUnidadMedidaActual.getId(), first, max);
+                        }
+                        return java.util.Collections.emptyList(); // Sin tipo seleccionado, retornar lista vacía
+                    } catch (Exception e) {
+                        Logger.getLogger(UnidadMedidaFrm.class.getName()).log(Level.SEVERE, "Error al cargar", e);
+                        return java.util.Collections.emptyList();
+                    }
+                }
+            };
+        } catch (Exception e) {
+            Logger.getLogger(UnidadMedidaFrm.class.getName()).log(Level.SEVERE, "Error en inicializar", e);
+        }
     }
 
     @Override
@@ -152,5 +207,26 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
 
     public void setListaTipoUnidadMedida(List<TipoUnidadMedida> listaTipoUnidadMedida) {
         this.listaTipoUnidadMedida = listaTipoUnidadMedida;
+    }
+
+    /**
+     * Establece el TipoUnidadMedida actual para filtrar las unidades de medida
+     */
+    public void setTipoUnidadMedidaActual(TipoUnidadMedida tipo) {
+        this.tipoUnidadMedidaActual = tipo;
+        reiniciarEstado();
+    }
+
+    public TipoUnidadMedida getTipoUnidadMedidaActual() {
+        return tipoUnidadMedidaActual;
+    }
+
+    /**
+     * Reinicia el estado del formulario y recarga los datos
+     */
+    public void reiniciarEstado() {
+        this.estado = ESTADO_CRUD.NADA;
+        this.registro = null;
+        inicializarRegistros(); // Recargar el modelo con el filtro actualizado
     }
 }
