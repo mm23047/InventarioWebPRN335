@@ -48,7 +48,7 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
         if (this.tipoUnidadMedidaActual != null) {
             unidadMedida.setIdTipoUnidadMedida(this.tipoUnidadMedidaActual);
         } else if (this.listaTipoUnidadMedida != null && !this.listaTipoUnidadMedida.isEmpty()) {
-            unidadMedida.setIdTipoUnidadMedida(this.listaTipoUnidadMedida.getFirst());
+            unidadMedida.setIdTipoUnidadMedida(this.listaTipoUnidadMedida.get(0));
         }
         return unidadMedida;
     }
@@ -86,8 +86,9 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
                 }
 
                 @Override
-                public List<UnidadMedida> load(int first, int max, java.util.Map<String, org.primefaces.model.SortMeta> sortMap,
-                                               java.util.Map<String, org.primefaces.model.FilterMeta> filterMap) {
+                public List<UnidadMedida> load(int first, int max,
+                        java.util.Map<String, org.primefaces.model.SortMeta> sortMap,
+                        java.util.Map<String, org.primefaces.model.FilterMeta> filterMap) {
                     try {
                         // Si hay un tipo actual, cargar solo las unidades de ese tipo
                         if (tipoUnidadMedidaActual != null && tipoUnidadMedidaActual.getId() != null) {
@@ -113,7 +114,8 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
                     "Lista de tipos de unidad de medida cargada: {0} elementos",
                     listaTipoUnidadMedida != null ? listaTipoUnidadMedida.size() : 0);
         } catch (Exception e) {
-            Logger.getLogger(UnidadMedidaFrm.class.getName()).log(Level.SEVERE, "Error al cargar tipos de unidad de medida", e);
+            Logger.getLogger(UnidadMedidaFrm.class.getName()).log(Level.SEVERE,
+                    "Error al cargar tipos de unidad de medida", e);
             listaTipoUnidadMedida = List.of();
         }
     }
@@ -128,7 +130,8 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
 
     @Override
     protected UnidadMedida getIdByText(String id) {
-        if (id != null && this.modelo != null && this.modelo.getWrappedData() != null && !this.modelo.getWrappedData().isEmpty()) {
+        if (id != null && this.modelo != null && this.modelo.getWrappedData() != null
+                && !this.modelo.getWrappedData().isEmpty()) {
             try {
                 Integer buscado = Integer.valueOf(id);
                 return this.modelo.getWrappedData().stream()
@@ -191,13 +194,13 @@ public class UnidadMedidaFrm extends DefaultFrm<UnidadMedida> implements Seriali
     }
 
     public void setIdTipoUnidadMedidaSeleccionado(Integer idTipoUnidadMedida) {
-        if (idTipoUnidadMedida != null && this.registro != null && this.listaTipoUnidadMedida != null && !this.listaTipoUnidadMedida.isEmpty()) {
+        if (idTipoUnidadMedida != null && this.registro != null && this.listaTipoUnidadMedida != null
+                && !this.listaTipoUnidadMedida.isEmpty()) {
             this.registro.setIdTipoUnidadMedida(
                     this.listaTipoUnidadMedida.stream()
                             .filter(ta -> ta.getId().equals(idTipoUnidadMedida))
                             .findFirst()
-                            .orElse(null)
-            );
+                            .orElse(null));
         }
     }
 
