@@ -281,9 +281,9 @@
                                  </h:panelGrid>
 
 
-                                 <!-- VALIDACIÓN: Mostrar advertencia si hay características sin valor -->
+                                 <!-- VALIDACION: Mostrar advertencia si hay caracteristicas sin valor -->
                                  <h:panelGroup rendered="#{productoFrm.ptpFrm.hayCaracteristicasSinValor}">
-                                    <p:outputLabel value="⚠️ Advertencia: Hay características sin valor asignado. Debe asignar valores a todas las características antes de guardar."
+                                    <p:outputLabel value="Advertencia: Hay caracteristicas sin valor asignado. Debe asignar valores a todas las caracteristicas antes de guardar."
                                                    style="color: #856404; font-weight: bold; display: block; margin-top: 10px;"/>
                                  </h:panelGroup>
                               </h:panelGroup>
@@ -348,10 +348,10 @@
                                          id="btnEliminarTp"/>
                      </h:panelGrid>
 
-                     <!-- MENSAJE DE VALIDACIÓN -->
+                     <!-- MENSAJE DE VALIDACION -->
                      <h:panelGroup rendered="#{productoFrm.ptpFrm.hayCaracteristicasSinValor}"
                                    style="margin-top: 15px;">
-                        <p:outputLabel value="❌ No se puede guardar. Todas las características deben tener un valor asignado."
+                        <p:outputLabel value="No se puede guardar. Todas las caracteristicas deben tener un valor asignado."
                                        style="color: #721c24; font-weight: bold; display: block;"/>
                      </h:panelGroup>
                   </h:form>

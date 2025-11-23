@@ -245,12 +245,12 @@
                  const contextPath = '#{request.contextPath}'; // /InventarioWebapprn335-1.0-SNAPSHOT
                  const wsUrl = protocol + '//' + host + contextPath + '/websocket/ventas';
                  
-                 console.log('[DespachoBodega] 🔌 Conectando WebSocket a:', wsUrl);
+                 console.log('[DespachoBodega] Conectando WebSocket a:', wsUrl);
                  
                  ws = new WebSocket(wsUrl);
                  
                  ws.onopen = function(event) {
-                     console.log('[DespachoBodega]  WebSocket conectado exitosamente');
+                     console.log('[DespachoBodega] WebSocket conectado exitosamente');
                      reconnectAttempts = 0; // Reset contador de reintentos
                      
                      // Opcional: Enviar mensaje de prueba al servidor
@@ -258,43 +258,43 @@
                  };
                  
                  ws.onmessage = function(event) {
-                     console.log('[DespachoBodega] 📩 Mensaje WebSocket recibido:', event.data);
+                     console.log('[DespachoBodega] Mensaje WebSocket recibido:', event.data);
                      
                      if (event.data === 'refresh') {
-                         console.log('[DespachoBodega] 🔄 Actualizando tabla automáticamente...');
+                         console.log('[DespachoBodega] Actualizando tabla automaticamente...');
                          
                          // Llamar al remote command de PrimeFaces para actualizar la tabla
                          if (typeof refrescarTablaVentas !== 'undefined') {
                              refrescarTablaVentas();
                          } else {
-                             console.error('[DespachoBodega] ❌ Función refrescarTablaVentas no está definida');
+                             console.error('[DespachoBodega] Funcion refrescarTablaVentas no esta definida');
                          }
                      } else if (event.data === 'pong') {
-                         console.log('[DespachoBodega] 🏓 Pong recibido del servidor');
+                         console.log('[DespachoBodega] Pong recibido del servidor');
                      } else {
-                         console.log('[DespachoBodega] ℹ️ Mensaje desconocido:', event.data);
+                         console.log('[DespachoBodega] Mensaje desconocido:', event.data);
                      }
                  };
                  
                  ws.onclose = function(event) {
-                     console.log('[DespachoBodega] ⚠️ WebSocket desconectado. Código:', event.code, 'Razón:', event.reason);
+                     console.log('[DespachoBodega] WebSocket desconectado. Codigo:', event.code, 'Razon:', event.reason);
                      
                      // Intentar reconectar automáticamente
                      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                          reconnectAttempts++;
-                         console.log('[DespachoBodega] 🔄 Reintentando conexión (' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ') en ' + (RECONNECT_DELAY/1000) + 's...');
+                         console.log('[DespachoBodega] Reintentando conexion (' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ') en ' + (RECONNECT_DELAY/1000) + 's...');
                          setTimeout(conectarWebSocket, RECONNECT_DELAY);
                      } else {
-                         console.error('[DespachoBodega] ❌ Máximo de reintentos alcanzado. No se pudo reconectar al WebSocket.');
+                         console.error('[DespachoBodega] Maximo de reintentos alcanzado. No se pudo reconectar al WebSocket.');
                      }
                  };
                  
                  ws.onerror = function(error) {
-                     console.error('[DespachoBodega] ❌ Error en WebSocket:', error);
+                     console.error('[DespachoBodega] Error en WebSocket:', error);
                  };
                  
              } catch (error) {
-                 console.error('[DespachoBodega] ❌ Error al crear WebSocket:', error);
+                 console.error('[DespachoBodega] Error al crear WebSocket:', error);
              }
          }
          
@@ -303,10 +303,10 @@
           */
          function enviarPing() {
              if (ws && ws.readyState === WebSocket.OPEN) {
-                 console.log('[DespachoBodega] 🏓 Enviando ping al servidor...');
+                 console.log('[DespachoBodega] Enviando ping al servidor...');
                  ws.send('ping');
              } else {
-                 console.warn('[DespachoBodega] ⚠️ WebSocket no está conectado. Estado:', ws ? ws.readyState : 'null');
+                 console.warn('[DespachoBodega] WebSocket no esta conectado. Estado:', ws ? ws.readyState : 'null');
              }
          }
          
@@ -318,9 +318,9 @@
              
              const states = {
                  [WebSocket.CONNECTING]: 'Conectando...',
-                 [WebSocket.OPEN]: 'Conectado ✅',
+                 [WebSocket.OPEN]: 'Conectado',
                  [WebSocket.CLOSING]: 'Cerrando...',
-                 [WebSocket.CLOSED]: 'Desconectado ❌'
+                 [WebSocket.CLOSED]: 'Desconectado'
              };
              
              return states[ws.readyState] || 'Estado desconocido';
@@ -332,14 +332,14 @@
          
          // Conectar automáticamente al cargar la página
          window.addEventListener('load', function() {
-             console.log('[DespachoBodega] 🚀 Página cargada. Iniciando WebSocket...');
+             console.log('[DespachoBodega] Pagina cargada. Iniciando WebSocket...');
              conectarWebSocket();
          });
          
          // Cerrar limpiamente al salir de la página
          window.addEventListener('beforeunload', function() {
              if (ws && ws.readyState === WebSocket.OPEN) {
-                 console.log('[DespachoBodega] 👋 Cerrando WebSocket...');
+                 console.log('[DespachoBodega] Cerrando WebSocket...');
                  ws.close(1000, 'Usuario salió de la página'); // 1000 = cierre normal
              }
          });
@@ -357,9 +357,9 @@
              }
          };
          
-         console.log('[DespachoBodega] ℹ️ Funciones de debug disponibles en: window.despachoBodegaWS');
-         console.log('[DespachoBodega] ℹ️ Usa despachoBodegaWS.status() para ver el estado');
-         console.log('[DespachoBodega] ℹ️ Usa despachoBodegaWS.ping() para enviar ping');
+         console.log('[DespachoBodega] Funciones de debug disponibles en: window.despachoBodegaWS');
+         console.log('[DespachoBodega] Usa despachoBodegaWS.status() para ver el estado');
+         console.log('[DespachoBodega] Usa despachoBodegaWS.ping() para enviar ping');
       </h:outputScript>
    </ui:define>
 

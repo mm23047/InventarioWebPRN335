@@ -248,7 +248,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
 
                 this.posibleCaracteristicas.removeAll(this.caracteristicasSeleccionadas);
 
-                // ✅✅✅ AGREGAR ESTA LÍNEA ✅✅✅
+                // Seleccionar primera caracteristica sin valor
                 seleccionarPrimeraSinValor();
             }
         } catch (Exception ex) {
