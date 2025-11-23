@@ -11,6 +11,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "venta", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "Venta.findByEstado", query = "SELECT v FROM Venta v WHERE v.estado = :estado ORDER BY v.fecha DESC"),
+        @NamedQuery(name = "Venta.findByCliente", query = "SELECT v FROM Venta v WHERE v.idCliente.id = :idCliente ORDER BY v.fecha DESC"),
+        @NamedQuery(name = "Venta.findByFechaRange", query = "SELECT v FROM Venta v WHERE v.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY v.fecha DESC")
+})
 public class Venta {
 
     @Id
@@ -23,6 +28,10 @@ public class Venta {
 
     @Column(name = "fecha")
     private OffsetDateTime fecha;
+
+    @Size(max = 10)
+    @Column(name = "estado", length = 10)
+    private String estado;
 
     @Lob
     @Column(name = "observaciones")
@@ -59,6 +68,14 @@ public class Venta {
         this.fecha = fecha;
     }
 
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
     public String getObservaciones() {
         return observaciones;
     }
@@ -68,12 +85,7 @@ public class Venta {
     }
 
     public BigDecimal getTotal() {
-        if (detalles != null && !detalles.isEmpty()) {
-            return detalles.stream()
-                    .map(d -> d.getPrecio().multiply(d.getCantidad()))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
-        return BigDecimal.ZERO;
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     public void setTotal(BigDecimal total) {

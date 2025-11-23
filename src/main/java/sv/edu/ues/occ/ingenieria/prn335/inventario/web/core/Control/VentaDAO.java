@@ -64,13 +64,15 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> implements Seri
                                 "LEFT JOIN FETCH v.idCliente " +
                                 "LEFT JOIN FETCH v.detalles d " +
                                 "LEFT JOIN FETCH d.idProducto " +
-                                "WHERE v.id = :id", Venta.class);
+                                "WHERE v.id = :id",
+                        Venta.class);
                 query.setParameter("id", id);
                 return query.getSingleResult();
             }
         } catch (Exception ex) {
             // Si no encuentra resultados, retorna null (es normal)
-            Logger.getLogger(VentaDAO.class.getName()).log(Level.FINE, "No se encontró venta completa con id: " + id, ex);
+            Logger.getLogger(VentaDAO.class.getName()).log(Level.FINE, "No se encontró venta completa con id: " + id,
+                    ex);
             return null;
         }
         return null;
@@ -87,27 +89,74 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> implements Seri
         }
     }
 
-    // --- MÉTODO SIMPLE: Calcular manualmente ---
+    // --- Calcular total general de todas las ventas ---
     public BigDecimal getSumaTotalVentas() {
         try {
-            System.out.println("=== DEBUG VentaDAO: Método manual ===");
-
             List<Venta> todasVentas = findAll();
-            System.out.println("=== DEBUG VentaDAO: Total ventas encontradas: " + todasVentas.size() + " ===");
-
             BigDecimal suma = BigDecimal.ZERO;
+
             for (Venta venta : todasVentas) {
-                if (venta.getTotal() != null) {
-                    suma = suma.add(venta.getTotal());
+                if (venta.getId() != null) {
+                    BigDecimal total = calcularTotalVenta(venta.getId());
+                    suma = suma.add(total);
                 }
             }
 
-            System.out.println("=== DEBUG VentaDAO: Suma manual: " + suma + " ===");
             return suma;
-
         } catch (Exception e) {
-            System.out.println("=== DEBUG VentaDAO: ERROR en método manual - " + e.getMessage() + " ===");
-            e.printStackTrace();
+            Logger.getLogger(VentaDAO.class.getName()).log(Level.SEVERE, "Error al calcular total general", e);
+            return BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * Busca ventas por estado
+     */
+    public List<Venta> findByEstado(String estado, int first, int max) {
+        try {
+            TypedQuery<Venta> query = em.createNamedQuery("Venta.findByEstado", Venta.class);
+            query.setParameter("estado", estado);
+            query.setFirstResult(first);
+            query.setMaxResults(max);
+            return query.getResultList();
+        } catch (Exception e) {
+            Logger.getLogger(VentaDAO.class.getName()).log(Level.SEVERE, "Error al buscar ventas por estado: " + estado,
+                    e);
+            return List.of();
+        }
+    }
+
+    /**
+     * Busca ventas por cliente
+     */
+    public List<Venta> findByCliente(UUID idCliente, int first, int max) {
+        try {
+            TypedQuery<Venta> query = em.createNamedQuery("Venta.findByCliente", Venta.class);
+            query.setParameter("idCliente", idCliente);
+            query.setFirstResult(first);
+            query.setMaxResults(max);
+            return query.getResultList();
+        } catch (Exception e) {
+            Logger.getLogger(VentaDAO.class.getName()).log(Level.SEVERE,
+                    "Error al buscar ventas por cliente: " + idCliente, e);
+            return List.of();
+        }
+    }
+
+    /**
+     * Calcula el total de una venta usando VentaDetalle
+     */
+    public BigDecimal calcularTotalVenta(UUID idVenta) {
+        try {
+            TypedQuery<BigDecimal> query = em.createQuery(
+                    "SELECT SUM(d.cantidad * d.precio) FROM VentaDetalle d WHERE d.idVenta.id = :idVenta AND d.estado != 'CANCELADO'",
+                    BigDecimal.class);
+            query.setParameter("idVenta", idVenta);
+            BigDecimal resultado = query.getSingleResult();
+            return resultado != null ? resultado : BigDecimal.ZERO;
+        } catch (Exception e) {
+            Logger.getLogger(VentaDAO.class.getName()).log(Level.SEVERE,
+                    "Error al calcular total de venta: " + idVenta, e);
             return BigDecimal.ZERO;
         }
     }

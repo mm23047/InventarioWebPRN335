@@ -6,227 +6,344 @@
                 xmlns:ues="jakarta.faces.composite/ues"
                 template="../WEB-INF/templates/default.xhtml">
 
-    <!-- Header -->
-    <ui:define name="header">
-        <h1>#{ventaFrm.nombreBean}</h1>
-    </ui:define>
+   <!-- Header -->
+   <ui:define name="header">
+      <h1 class="titulo-formulario">#{ventaFrm.nombreBean}</h1>
+   </ui:define>
 
-    <!-- Contenido con paneles separados -->
-    <ui:define name="contenido-tabla">
-        <h:panelGroup id="ventaPnlPrincipal">
+   <!-- Tabla de registros -->
+   <ui:define name="contenido-tabla">
+      <h:panelGroup id="pnlVentaTabla">
+         <h:form id="frmVentaTop">
+            <p:dataTable id="tblVentas"
+                         value="#{ventaFrm.modelo}"
+                         var="venta"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         lazy="true"
+                         selection="#{ventaFrm.registro}"
+                         selectionMode="single"
+                         rowKey="#{venta.id}"
+                         rows="#{ventaFrm.registrosPorPagina}"
+                         rendered="#{ventaFrm.estado=='NADA'}">
 
-            <!-- Panel de Tabla (se muestra cuando mostrarFormulario es false) -->
-            <h:panelGroup id="ventaPnlTabla" rendered="#{ventaFrm.mostrarTabla}">
-                <h:form id="ventaFrmTabla">
-                    <p:dataTable value="#{ventaFrm.modelo}"
+               <!-- ID Venta -->
+               <p:column headerText="ID" width="250">
+                  <h:outputText value="#{venta.id}" />
+               </p:column>
 
-                                 var="v"
-                                 paginator="true"
-                                 paginatorPosition="bottom"
-                                 lazy="true"
-                                 selection="#{ventaFrm.registro}"
-                                 selectionMode="single"
-                                 rows="#{ventaFrm.registrosPorPagina}">
+               <!-- Cliente -->
+               <p:column headerText="Cliente" width="200">
+                  <h:outputText value="#{venta.idCliente.nombre}" />
+               </p:column>
 
-                        <p:column headerText="ID">
-                            <h:outputText value="#{v.id}" />
+               <!-- Estado -->
+               <p:column headerText="Estado" width="120">
+                  <h:outputText value="#{venta.estado}" />
+               </p:column>
+
+               <!-- Total -->
+               <p:column headerText="Total" width="120">
+                  <h:outputText value="#{venta.total}">
+                     <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                  </h:outputText>
+               </p:column>
+
+               <!-- Fecha de Venta -->
+               <p:column headerText="Fecha Venta" width="150">
+                  <h:outputText value="#{venta.fecha}">
+                     <f:converter converterId="offsetDateTimeConverter" />
+                  </h:outputText>
+               </p:column>
+
+               <!-- Observaciones -->
+               <p:column headerText="Observaciones" width="200">
+                  <h:outputText value="#{venta.observaciones}" />
+               </p:column>
+
+               <p:ajax event="rowSelect"
+                       listener="#{ventaFrm.seleccionarRegistro}"
+                       update=":pnlVentaTabla :pnlVentaDetalle :tabVenta"/>
+            </p:dataTable>
+
+            <!-- Total General de Ventas -->
+            <h:panelGroup style="display: block; text-align: right; margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">
+               <h:outputText value="TOTAL GENERAL DE VENTAS: "
+                             style="font-weight: bold; font-size: 16px; color: #2c3e50; margin-right: 10px;"/>
+               <h:outputText value="#{ventaFrm.totalGeneralVentas}"
+                             style="font-weight: bold; font-size: 18px; color: #27ae60;">
+                  <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+               </h:outputText>
+            </h:panelGroup>
+
+            <ues:botones-top formulario="#{ventaFrm}"
+                             actualizar=":pnlVentaTabla :pnlVentaDetalle"/>
+         </h:form>
+      </h:panelGroup>
+   </ui:define>
+
+   <!-- Detalle (Formulario con pestañas) -->
+   <ui:define name="contenido-detalle">
+      <h:panelGroup id="pnlVentaDetalle">
+         <p:tabView id="tabVenta" cache="false" dynamic="true"
+                    rendered="#{ventaFrm.estado!='NADA'}">
+
+            <!-- Pestaña Generalidades -->
+            <p:tab id="tabGeneral" closable="false" title="Generalidades">
+               <h:form id="frmVentaCrear">
+                  <h:panelGrid columns="1">
+
+                     <!-- ID (Auto-generado) -->
+                     <p:outputLabel for="txtVentaId" value="ID:"/>
+                     <p:inputText id="txtVentaId" value="#{ventaFrm.registro.id}"
+                                  readonly="true" disabled="true" size="35"/>
+
+                     <!-- Cliente (Relación con Clientes) -->
+                     <h:panelGroup>
+                        <p:outputLabel for="autoCliente" value="Cliente:"/>
+                        <p:autoComplete id="autoCliente"
+                                        value="#{ventaFrm.clienteSeleccionado}"
+                                        completeMethod="#{ventaFrm.completarClientes}"
+                                        var="cliente"
+                                        itemLabel="#{cliente.nombre}"
+                                        itemValue="#{cliente}"
+                                        forceSelection="true"
+                                        dropdown="true"
+                                        required="true"
+                                        requiredMessage="Seleccione un cliente"
+                                        size="50"
+                                        placeholder="Escriba el nombre...">
+                           <f:converter converterId="clienteConverter" />
+                           <p:ajax event="itemSelect"
+                                   listener="#{ventaFrm.seleccionarCliente}"
+                                   update="@form"/>
+                        </p:autoComplete>
+                        <p:message for="autoCliente" display="icon"/>
+                     </h:panelGroup>
+
+                     <!-- Estado (Dropdown con opciones) -->
+                     <p:outputLabel for="selEstado" value="Estado:"/>
+                     <p:selectOneMenu id="selEstado" value="#{ventaFrm.registro.estado}"
+                                      required="true" requiredMessage="Seleccione un estado">
+                        <f:selectItems value="#{ventaFrm.estadosVenta}"
+                                       var="estado"
+                                       itemLabel="#{estado}"
+                                       itemValue="#{estado}"/>
+                     </p:selectOneMenu>
+
+                     <!-- Fecha (Automática) -->
+                     <p:outputLabel for="dpFecha" value="Fecha Venta:"/>
+                     <p:datePicker id="dpFecha"
+                                   value="#{ventaFrm.fechaVenta}"
+                                   showTime="true"
+                                   hourFormat="24"
+                                   timeInput="true"
+                                   timeZone="America/El_Salvador"
+                                   pattern="yyyy-MM-dd'T'HH:mm"
+                                   readonly="true"
+                                   disabled="true"/>
+
+                     <!-- Observaciones -->
+                     <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                     <p:inputTextarea id="txtObservaciones"
+                                      value="#{ventaFrm.registro.observaciones}"
+                                      rows="4" cols="50"/>
+
+                  </h:panelGrid>
+
+                  <!-- Botones de acción para Venta -->
+                  <h:panelGrid columns="#{ventaFrm.estado=='MODIFICAR' ? 2 : 1}" style="margin-top: 20px;">
+                     <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                      actionListener="#{ventaFrm.btnGuardarHandler}"
+                                      rendered="#{ventaFrm.estado=='CREAR'}"
+                                      update=":pnlVentaTabla :pnlVentaDetalle"
+                                      process="@form"/>
+
+                     <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                      actionListener="#{ventaFrm.btnModificarHandler}"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                      update=":pnlVentaTabla :pnlVentaDetalle"
+                                      process="@form"/>
+
+                     <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                      actionListener="#{ventaFrm.btnEliminarHandler}"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                      update=":pnlVentaTabla :pnlVentaDetalle"
+                                      process="@form"/>
+                  </h:panelGrid>
+
+               </h:form>
+            </p:tab>
+
+            <!-- Pestaña Productos (Detalles de Venta) -->
+            <p:tab id="tabProductos" closable="false" title="Productos"
+                   disabled="#{ventaFrm.estado!='MODIFICAR'}">
+               <!-- Panel de Tabla de Detalles (Tabla 2) -->
+               <h:panelGroup id="pnlVentaDetalleTabla">
+                  <h:form id="frmTablaVentaDetalle">
+                     <p:dataTable id="tblVentaDetalles"
+                                  value="#{ventaFrm.ventaDetalleFrm.modelo}"
+                                  var="detalle"
+                                  paginator="true"
+                                  paginatorPosition="bottom"
+                                  lazy="true"
+                                  selection="#{ventaFrm.ventaDetalleFrm.registro}"
+                                  selectionMode="single"
+                                  rowKey="#{detalle.id}"
+                                  rows="#{ventaFrm.ventaDetalleFrm.registrosPorPagina}"
+                                  rendered="#{ventaFrm.ventaDetalleFrm.estado=='NADA'}">
+
+                        <!-- ID Detalle -->
+                        <p:column headerText="ID" width="80">
+                           <h:outputText value="#{detalle.id}" />
                         </p:column>
 
-
-                        <p:column headerText="Cliente">
-                            <h:outputText value="#{v.idCliente.nombre}" />
+                        <!-- Producto -->
+                        <p:column headerText="Producto" width="200">
+                           <h:outputText value="#{detalle.idProducto.nombreProducto}" />
                         </p:column>
 
-                        <p:column headerText="Total">
-                            <h:outputText value="#{v.total}">
-                                <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
-                            </h:outputText>
+                        <!-- Cantidad -->
+                        <p:column headerText="Cantidad" width="100">
+                           <h:outputText value="#{detalle.cantidad}">
+                              <f:convertNumber pattern="0" />
+                           </h:outputText>
                         </p:column>
 
-                        <!-- Fecha de venta -->
-                        <p:column headerText="Fecha Venta" width="113">
-                            <h:outputText value="#{v.fecha}">
-                                <f:converter converterId="offsetDateTimeConverter" />
-                            </h:outputText>
+                        <!-- Precio Unitario -->
+                        <p:column headerText="Precio Unitario" width="120">
+                           <h:outputText value="#{detalle.precio}">
+                              <f:convertNumber type="currency" currencySymbol="$" />
+                           </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Observaciones">
-                            <h:outputText value="#{v.observaciones}" />
+                        <!-- Estado -->
+                        <p:column headerText="Estado" width="120">
+                           <h:outputText value="#{detalle.estado}" />
+                        </p:column>
+
+                        <!-- Observaciones -->
+                        <p:column headerText="Observaciones" width="200">
+                           <h:outputText value="#{detalle.observaciones}" />
                         </p:column>
 
                         <p:ajax event="rowSelect"
-                                listener="#{ventaFrm.seleccionarRegistro}"
-                                update="ventaPnlPrincipal"/>
-                    </p:dataTable>
+                                listener="#{ventaFrm.ventaDetalleFrm.seleccionarRegistro}"
+                                update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario"/>
+                     </p:dataTable>
 
-                    <!-- SECCIÓN NUEVA: Total General de Ventas -->
-                    <h:panelGroup style="display: block; text-align: right; margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">
-                        <h:outputText value="TOTAL GENERAL DE VENTAS: "
-                                      style="font-weight: bold; font-size: 16px; color: #2c3e50; margin-right: 10px;"/>
-                        <h:outputText value="#{ventaFrm.totalGeneralVentas}"
-                                      style="font-weight: bold; font-size: 18px; color: #27ae60;">
-                            <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
-                        </h:outputText>
-                    </h:panelGroup>
+                     <!-- Botón Nuevo Detalle de Venta -->
+                     <p:commandButton value="Nuevo Detalle de Venta"
+                                      actionListener="#{ventaFrm.ventaDetalleFrm.btnNuevoHandler}"
+                                      rendered="#{ventaFrm.ventaDetalleFrm.estado=='NADA'}"
+                                      update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario"
+                                      style="margin-top: 10px;"/>
 
-                    <ues:botones-top formulario="#{ventaFrm}"
-                                     actualizar="ventaPnlPrincipal"/>
-                </h:form>
-            </h:panelGroup>
+                  </h:form>
+               </h:panelGroup>
 
-            <!-- Panel de Formulario (se muestra cuando mostrarFormulario es true) -->
-            <h:panelGroup id="ventaPnlFormulario" rendered="#{ventaFrm.mostrarFormulario}">
-                <h:form id="ventaFrmEdicion">
+               <!-- Panel de Formulario de Detalle -->
+               <h:panelGroup id="pnlVentaDetalleFormulario">
+                  <h:form id="frmDetalleVenta" rendered="#{ventaFrm.ventaDetalleFrm.estado!='NADA'}">
+                     <p:panel header="Detalle de Venta" style="margin-top: 20px;">
 
-                    <!-- Título dinámico según si es nuevo o modificación -->
-                    <p:panel header="#{ventaFrm.esNuevo ? 'Nueva Venta' : 'Modificar Venta'}" style="margin-bottom: 20px;">
+                        <h:panelGrid columns="1" style="width: 100%;">
 
-                        <!-- Sección General -->
-                        <p:fieldset legend="Información General" style="margin-bottom: 20px;">
-                            <h:panelGrid columns="2" columnClasses="label,value" style="width: 100%;">
+                           <!-- ID Detalle (Auto-generado) -->
+                           <p:outputLabel for="txtDetalleId" value="ID:"/>
+                           <p:inputText id="txtDetalleId" value="#{ventaFrm.ventaDetalleFrm.registro.id}"
+                                        readonly="true" disabled="true" size="35"/>
 
-                                <p:outputLabel for="ventaTxtId" value="ID:"/>
-                                <p:inputText id="ventaTxtId" value="#{ventaFrm.registro.id}" readonly="true" style="width: 100px;"/>
+                           <!-- Producto (Autocomplete) -->
+                           <p:outputLabel for="autoProducto" value="Producto:"/>
+                           <p:autoComplete id="autoProducto"
+                                           value="#{ventaFrm.ventaDetalleFrm.registro.idProducto}"
+                                           completeMethod="#{ventaFrm.ventaDetalleFrm.buscarProductosPorNombre}"
+                                           var="producto"
+                                           itemLabel="#{producto.nombreProducto} #{producto.referenciaExterna}"
+                                           itemValue="#{producto}"
+                                           forceSelection="true"
+                                           dropdown="true"
+                                           required="true"
+                                           requiredMessage="Seleccione un producto"
+                                           size="50">
+                              <f:converter converterId="productoConverter" />
+                              <p:ajax event="itemSelect"
+                                      listener="#{ventaFrm.ventaDetalleFrm.cargarPrecioPorProducto}"
+                                      update="numPrecio"/>
+                           </p:autoComplete>
 
+                           <!-- Cantidad (Manual) -->
+                           <p:outputLabel for="numCantidad" value="Cantidad:"/>
+                           <p:inputNumber id="numCantidad"
+                                          value="#{ventaFrm.ventaDetalleFrm.registro.cantidad}"
+                                          decimalPlaces="2"
+                                          minValue="0.01"
+                                          maxValue="999999.99"
+                                          required="true"
+                                          requiredMessage="Ingrese la cantidad"
+                                          style="width: 120px;"/>
 
-                                <p:outputLabel for="ventaCliente" value="Cliente:"/>
-                                <p:autoComplete id="ventaCliente"
-                                                value="#{ventaFrm.clienteSeleccionado}"
-                                                completeMethod="#{ventaFrm.completarClientes}"
-                                                var="c"
-                                                itemLabel="#{c.nombre}"
-                                                itemValue="#{c}"
-                                                converter="clienteConverter"
-                                                forceSelection="true"
-                                                size="50"
-                                                style="width: 300px;">
+                           <!-- Precio Unitario (Manual) -->
+                           <p:outputLabel for="numPrecio" value="Precio Unitario:"/>
+                           <p:inputNumber id="numPrecio"
+                                          value="#{ventaFrm.ventaDetalleFrm.registro.precio}"
+                                          decimalPlaces="2"
+                                          minValue="0"
+                                          maxValue="999999.99"
+                                          required="true"
+                                          requiredMessage="Ingrese el precio unitario"
+                                          style="width: 120px;"/>
 
-                                    <p:ajax event="itemSelect"
-                                            listener="#{ventaFrm.seleccionarCliente}"
-                                            update="@form"/>
-                                </p:autoComplete>
+                           <!-- Estado (Dropdown) -->
+                           <p:outputLabel for="selEstadoDetalle" value="Estado:"/>
+                           <p:selectOneMenu id="selEstadoDetalle"
+                                            value="#{ventaFrm.ventaDetalleFrm.registro.estado}"
+                                            required="true" requiredMessage="Seleccione un estado">
+                              <f:selectItems value="#{ventaFrm.ventaDetalleFrm.estadosDetalle}"
+                                             var="estado"
+                                             itemLabel="#{estado}"
+                                             itemValue="#{estado}"/>
+                           </p:selectOneMenu>
 
-                                <p:outputLabel for="ventaObservaciones" value="Observaciones:"/>
-                                <p:inputTextarea id="ventaObservaciones"
-                                                 value="#{ventaFrm.registro.observaciones}"
-                                                 rows="4"
-                                                 style="width: 400px;"/>
-                                <!-- Fecha (Automática) -->
+                           <!-- Observaciones -->
+                           <p:outputLabel for="txtObsDetalle" value="Observaciones:"/>
+                           <p:inputTextarea id="txtObsDetalle"
+                                            value="#{ventaFrm.ventaDetalleFrm.registro.observaciones}"
+                                            rows="3" cols="50"/>
 
-                                <p:datePicker id="dpFecha"
-                                              value="#{ventaFrm.fechaVenta}"
-                                              showTime="true"
-                                              hourFormat="24"
-                                              timeInput="true"
-                                              timeZone="America/El_Salvador"
-                                              pattern="yyyy-MM-dd'   📅  'HH:mm"
-                                              readonly="true"
-                                              disabled="true"/>
-
-                            </h:panelGrid>
-                        </p:fieldset>
-
-                        <!-- Sección Detalles de Venta -->
-                        <p:fieldset legend="Detalles de la Venta">
-                            <h:panelGrid columns="4" style="margin-bottom: 15px;">
-
-                                <p:outputLabel for="productoSel" value="Producto:"/>
-                                <p:autoComplete id="productoSel"
-                                                value="#{ventaFrm.productoSeleccionado}"
-                                                completeMethod="#{ventaFrm.completarProductos}"
-                                                var="p"
-                                                itemLabel="#{p.nombreProducto}"
-                                                itemValue="#{p}"
-                                                converter="productoConverter"
-                                                forceSelection="true"
-                                                style="width: 250px;">
-
-                                    <p:ajax event="itemSelect"
-                                            listener="#{ventaFrm.seleccionarProducto}"
-                                            update="@form"/>
-                                </p:autoComplete>
-
-                                <p:outputLabel for="cantidadSel" value="Cantidad:"/>
-                                <p:inputText id="cantidadSel"
-                                             value="#{ventaFrm.cantidadSeleccionada}"
-                                             style="width: 100px;">
-                                    <!-- CAMBIO: Enteros nomas, sin decimales -->
-                                    <f:convertNumber integerOnly="true" maxFractionDigits="0"/>
-                                </p:inputText>
-
-                                <h:panelGroup/>
-                                <p:commandButton value="Agregar Producto"
-                                                 actionListener="#{ventaFrm.agregarDetalle}"
-                                                 update="tablaDetalles totalVenta"
-                                                 process="@form"
-                                                 icon="pi pi-plus"
-                                                 style="margin-left: 10px;"/>
-
-                            </h:panelGrid>
-
-                            <!-- Tabla de detalles -->
-                            <p:dataTable id="tablaDetalles"
-                                         value="#{ventaFrm.detalles}"
-                                         var="d"
-                                         editable="true"
-                                         style="margin-top: 10px;"
-                                         emptyMessage="No hay productos agregados">
-                                <p:column headerText="Producto" style="width: 40%;">
-                                    <h:outputText value="#{d.idProducto.nombreProducto}" />
-                                </p:column>
-                                <p:column headerText="Cantidad" style="width: 15%;">
-                                    <h:outputText value="#{d.cantidad}">
-                                        <!-- CAMBIO: Enteros nomas en la tabla también -->
-                                        <f:convertNumber integerOnly="true" maxFractionDigits="0"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="Precio Unitario" style="width: 20%;">
-                                    <h:outputText value="#{d.precio}">
-                                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="Subtotal" style="width: 15%;">
-                                    <h:outputText value="#{d.cantidad * d.precio}">
-                                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="Acciones" style="width: 10%;">
-                                    <p:commandButton icon="pi pi-trash"
-                                                     actionListener="#{ventaFrm.eliminarDetalle(d)}"
-                                                     update="tablaDetalles totalVenta"
-                                                     styleClass="ui-button-danger"/>
-                                </p:column>
-                            </p:dataTable>
-
-                            <!-- Total -->
-                            <h:panelGroup style="display: block; text-align: right; margin-top: 15px;">
-                                <h:outputText id="totalVenta"
-                                              value="Total: #{ventaFrm.totalVenta}"
-                                              style="font-weight: bold; font-size: 16px; color: #2E86AB;">
-                                    <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
-                                </h:outputText>
-                            </h:panelGroup>
-                        </p:fieldset>
-
-                        <!-- Botones de acción -->
-                        <h:panelGrid columns="2" style="margin-top: 20px;">
-                            <p:commandButton value="Guardar"
-                                             actionListener="#{ventaFrm.btnGuardarHandler}"
-                                             update="ventaPnlPrincipal"
-                                             icon="pi pi-check"
-                                             style="margin-right: 10px;"/>
-                            <p:commandButton value="Cancelar"
-                                             actionListener="#{ventaFrm.btnCancelarHandler}"
-                                             update="ventaPnlPrincipal"
-                                             icon="pi pi-times"
-                                             immediate="true"
-                                             styleClass="ui-button-secondary"/>
                         </h:panelGrid>
 
-                    </p:panel>
-                </h:form>
-            </h:panelGroup>
+                        <!-- Botones de acción para Detalle -->
+                        <h:panelGrid columns="4" style="margin-top: 20px; text-align: center;">
+                           <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                            actionListener="#{ventaFrm.ventaDetalleFrm.btnGuardarHandler}"
+                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='CREAR'}"
+                                            update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
+                                            process="@form"/>
 
-        </h:panelGroup>
-    </ui:define>
+                           <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                            actionListener="#{ventaFrm.ventaDetalleFrm.btnModificarHandler}"
+                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR'}"
+                                            update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
+                                            process="@form"/>
+
+                           <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                            actionListener="#{ventaFrm.ventaDetalleFrm.btnEliminarHandler}"
+                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR'}"
+                                            update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
+                                            process="@form"/>
+
+                        </h:panelGrid>
+
+                     </p:panel>
+                  </h:form>
+               </h:panelGroup>
+
+            </p:tab>
+
+         </p:tabView>
+      </h:panelGroup>
+   </ui:define>
+
 </ui:composition>
