@@ -23,7 +23,7 @@ public class TipoAlmacenResource extends AbstractResource<TipoAlmacen> {
 
     @GET
     @Path("{id}")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response findById(@PathParam("id") Integer id) {
         if (id != null) {
             try {
@@ -31,9 +31,11 @@ public class TipoAlmacenResource extends AbstractResource<TipoAlmacen> {
                 if (resp != null) {
                     return Response.ok(resp).build();
                 }
-                return Response.status(Response.Status.NOT_FOUND).header("Not-found-id", "Record with id " + id + " not found").build();
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-found-id", "Record with id " + id + " not found").build();
             } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception", "Cannot access db").build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .header("Server-exception", "Cannot access db").build();
             }
         }
         return Response.status(422).header("Missing-parameter", "id").build();
@@ -49,27 +51,54 @@ public class TipoAlmacenResource extends AbstractResource<TipoAlmacen> {
                     tipoAlmacenDAO.eliminar(resp);
                     return Response.noContent().build();
                 }
-                return Response.status(Response.Status.NOT_FOUND).header("Not-found-id", "Record with id " + id + " not found").build();
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-found-id", "Record with id " + id + " not found").build();
             } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception", "Cannot access db").build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .header("Server-exception", "Cannot access db").build();
             }
         }
         return Response.status(422).header("Missing-parameter", "id").build();
     }
 
     @POST
-    @Produces({MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
     public Response create(TipoAlmacen entity, @Context UriInfo uriInfo) {
         if (entity != null && entity.getId() == null) {
             try {
                 tipoAlmacenDAO.crear(entity);
-                return Response.created(uriInfo.getAbsolutePathBuilder().path(String.valueOf(entity.getId())).build()).build();
+                return Response.created(uriInfo.getAbsolutePathBuilder().path(String.valueOf(entity.getId())).build())
+                        .build();
             } catch (Exception ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception", "Cannot access db").build();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .header("Server-exception", "Cannot access db").build();
             }
         }
-        return Response.status(422).header("Missing-parameter", "entity must not be null and entity.id be null").build();
+        return Response.status(422).header("Missing-parameter", "entity must not be null and entity.id be null")
+                .build();
+    }
+
+    @PUT
+    @Path("{id}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public Response update(@PathParam("id") Integer id, TipoAlmacen entity) {
+        if (id != null && entity != null) {
+            try {
+                TipoAlmacen existing = tipoAlmacenDAO.buscarRegistroPorId(id);
+                if (existing != null) {
+                    entity.setId(id);
+                    tipoAlmacenDAO.actualizar(entity);
+                    return Response.ok(entity).build();
+                }
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("Not-found-id", "Record with id " + id + " not found").build();
+            } catch (Exception ex) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .header("Server-exception", "Cannot access db").build();
+            }
+        }
+        return Response.status(422).header("Missing-parameter", "id and entity must not be null").build();
     }
 }
-
