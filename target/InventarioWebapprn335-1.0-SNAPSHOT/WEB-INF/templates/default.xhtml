@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ues="jakarta.faces.composite/ues">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Sistema de Inventarios</title>
+    <h:outputStylesheet library="estilos" name="crud.css"/>
+</h:head>
+
+<h:body>
+    <main>
+
+        <header>
+            <ui:insert name="header">
+                <h1>Sistema de Inventarios</h1>
+            </ui:insert>
+        </header>
+
+
+        <nav>
+            <ui:include src="menu.xhtml"></ui:include>
+        </nav>
+
+
+        <article>
+            <h:panelGroup id="pnlTabla">
+                <p:growl showSummary="true" showDetail="true" keepAlive="3600" sticky="false"/>
+                <ui:insert name="contenido-tabla"></ui:insert>
+            </h:panelGroup>
+
+            <h:panelGroup id="pnlDetalle">
+                <ui:insert name="contenido-detalle"></ui:insert>
+            </h:panelGroup>
+        </article>
+
+        <!-- Extras opcionales -->
+        <ui:insert name="extras"></ui:insert>
+
+
+        <footer>
+            2025 Mi Aplicación
+        </footer>
+    </main>
+</h:body>
+</html>

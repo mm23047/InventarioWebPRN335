@@ -13,6 +13,7 @@ import java.util.UUID;
 @Table(name = "venta", schema = "public")
 @NamedQueries({
         @NamedQuery(name = "Venta.findByEstado", query = "SELECT v FROM Venta v WHERE v.estado = :estado ORDER BY v.fecha DESC"),
+        @NamedQuery(name = "Venta.countByEstado", query = "SELECT COUNT(v) FROM Venta v WHERE v.estado = :estado"),
         @NamedQuery(name = "Venta.findByCliente", query = "SELECT v FROM Venta v WHERE v.idCliente.id = :idCliente ORDER BY v.fecha DESC"),
         @NamedQuery(name = "Venta.findByFechaRange", query = "SELECT v FROM Venta v WHERE v.fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY v.fecha DESC")
 })

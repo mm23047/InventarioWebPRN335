@@ -1,0 +1,366 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="../WEB-INF/templates/default.xhtml">
+
+   <!-- Header -->
+   <ui:define name="header">
+      <h1 class="titulo-formulario">#{despachoBodegaFrm.nombreBean}</h1>
+   </ui:define>
+
+   <!-- Tabla de registros -->
+   <ui:define name="contenido-tabla">
+      <h:panelGroup id="pnlDespachoBodegaTabla">
+         <h:form id="frmDespachoBodegaTop">
+            <p:dataTable id="tblVentasAprobadas"
+                         value="#{despachoBodegaFrm.modelo}"
+                         var="venta"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         lazy="true"
+                         selection="#{despachoBodegaFrm.registro}"
+                         selectionMode="single"
+                         rowKey="#{venta.id}"
+                         rows="#{despachoBodegaFrm.registrosPorPagina}"
+                         widgetVar="wvVentasAprobadas"
+                         rendered="#{despachoBodegaFrm.estado=='NADA'}">
+
+               <!-- ID Venta -->
+               <p:column headerText="ID" width="250">
+                  <h:outputText value="#{venta.id}" />
+               </p:column>
+
+               <!-- Cliente -->
+               <p:column headerText="Cliente" width="200">
+                  <h:outputText value="#{venta.idCliente.nombre}" />
+               </p:column>
+
+               <!-- Estado -->
+               <p:column headerText="Estado" width="120">
+                  <h:outputText value="#{venta.estado}" 
+                                style="font-weight: bold; color: #27ae60;"/>
+               </p:column>
+
+               <!-- Total -->
+               <p:column headerText="Total" width="120">
+                  <h:outputText value="#{venta.total}">
+                     <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                  </h:outputText>
+               </p:column>
+
+               <!-- Fecha de Venta -->
+               <p:column headerText="Fecha Venta" width="150">
+                  <h:outputText value="#{venta.fecha}">
+                     <f:converter converterId="offsetDateTimeConverter" />
+                  </h:outputText>
+               </p:column>
+
+               <!-- Observaciones -->
+               <p:column headerText="Observaciones" width="200">
+                  <h:outputText value="#{venta.observaciones}" />
+               </p:column>
+
+               <p:ajax event="rowSelect"
+                       listener="#{despachoBodegaFrm.seleccionarRegistro}"
+                       update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle :tabDespachoBodega"/>
+            </p:dataTable>
+
+            <!-- Remote Command para actualización automática vía WebSocket -->
+            <p:remoteCommand name="refrescarTablaVentas"
+                             actionListener="#{despachoBodegaFrm.actualizarTablaAutomaticamente}"
+                             update="tblVentasAprobadas"
+                             process="@none"
+                             global="false"
+                             async="true"
+                             onstart="console.log('[DespachoBodega] Iniciando actualización...');"
+                             oncomplete="console.log('[DespachoBodega] Tabla actualizada correctamente');"/>
+
+         </h:form>
+      </h:panelGroup>
+   </ui:define>
+
+   <!-- Detalle (Formulario con pestañas) -->
+   <ui:define name="contenido-detalle">
+      <h:panelGroup id="pnlDespachoBodegaDetalle">
+         <p:tabView id="tabDespachoBodega" cache="false" dynamic="true"
+                    rendered="#{despachoBodegaFrm.estado!='NADA'}">
+
+            <!-- Pestaña Información de Venta -->
+            <p:tab id="tabInfo" closable="false" title="Información de Venta">
+               <h:form id="frmDespachoBodegaInfo">
+                  <h:panelGrid columns="2" style="width: 100%;">
+
+                     <!-- ID (Solo lectura) -->
+                     <p:outputLabel for="txtVentaId" value="ID Venta:"/>
+                     <p:inputText id="txtVentaId" value="#{despachoBodegaFrm.registro.id}"
+                                  readonly="true" disabled="true" size="35"/>
+
+                     <!-- Cliente (Solo lectura) -->
+                     <p:outputLabel for="txtCliente" value="Cliente:"/>
+                     <p:inputText id="txtCliente" value="#{despachoBodegaFrm.registro.idCliente.nombre}"
+                                  readonly="true" disabled="true" size="50"/>
+
+                     <!-- Estado (Solo lectura) -->
+                     <p:outputLabel for="txtEstado" value="Estado:"/>
+                     <p:inputText id="txtEstado" value="#{despachoBodegaFrm.registro.estado}"
+                                  readonly="true" disabled="true" 
+                                  style="font-weight: bold; color: #27ae60;"/>
+
+                     <!-- Fecha (Solo lectura) -->
+                     <p:outputLabel for="dpFecha" value="Fecha Venta:"/>
+                     <p:datePicker id="dpFecha"
+                                   value="#{despachoBodegaFrm.fechaVenta}"
+                                   showTime="true"
+                                   hourFormat="24"
+                                   timeZone="America/El_Salvador"
+                                   pattern="yyyy-MM-dd'T'HH:mm"
+                                   readonly="true"
+                                   disabled="true"/>
+
+                     <!-- Total (Solo lectura) -->
+                     <p:outputLabel for="txtTotal" value="Total Venta:"/>
+                     <p:inputText id="txtTotal" value="#{despachoBodegaFrm.totalVenta}"
+                                  readonly="true" disabled="true"
+                                  style="font-weight: bold; font-size: 14px;">
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                     </p:inputText>
+
+                     <!-- Observaciones (Solo lectura) -->
+                     <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                     <p:inputTextarea id="txtObservaciones"
+                                      value="#{despachoBodegaFrm.registro.observaciones}"
+                                      rows="4" cols="50"
+                                      readonly="true" disabled="true"/>
+
+                  </h:panelGrid>
+
+                  <!-- Botón para marcar como ENTREGADO -->
+                  <h:panelGrid columns="1" style="margin-top: 20px;">
+                     <p:commandButton value="Marcar como ENTREGADO"
+                                      actionListener="#{despachoBodegaFrm.marcarComoEntregado}"
+                                      update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
+                                      icon="pi pi-check"
+                                      styleClass="ui-button-success"
+                                      style="width: 250px;"/>
+                  </h:panelGrid>
+
+               </h:form>
+            </p:tab>
+
+            <!-- Pestaña Productos (Detalles de Venta) - SOLO LECTURA -->
+            <p:tab id="tabProductos" closable="false" title="Productos a Despachar">
+               <h:panelGroup id="pnlDespachoBodegaDetalleTabla">
+                  <h:form id="frmTablaDetalleDespacho">
+                     <p:dataTable id="tblDetallesDespacho"
+                                  value="#{despachoBodegaFrm.ventaDetalleFrm.modelo}"
+                                  var="detalle"
+                                  paginator="true"
+                                  paginatorPosition="bottom"
+                                  lazy="true"
+                                  rowKey="#{detalle.id}"
+                                  rows="#{despachoBodegaFrm.ventaDetalleFrm.registrosPorPagina}">
+
+                        <!-- ID Detalle -->
+                        <p:column headerText="ID" width="80">
+                           <h:outputText value="#{detalle.id}" />
+                        </p:column>
+
+                        <!-- Producto -->
+                        <p:column headerText="Producto" width="250">
+                           <h:outputText value="#{detalle.idProducto.nombreProducto}" 
+                                         style="font-weight: bold;"/>
+                        </p:column>
+
+                        <!-- Referencia -->
+                        <p:column headerText="Referencia" width="120">
+                           <h:outputText value="#{detalle.idProducto.referenciaExterna}" />
+                        </p:column>
+
+                        <!-- Cantidad -->
+                        <p:column headerText="Cantidad" width="100">
+                           <h:outputText value="#{detalle.cantidad}" 
+                                         style="font-weight: bold; color: #2980b9;">
+                              <f:convertNumber pattern="0.##" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Precio Unitario -->
+                        <p:column headerText="Precio Unitario" width="120">
+                           <h:outputText value="#{detalle.precio}">
+                              <f:convertNumber type="currency" currencySymbol="$" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Subtotal -->
+                        <p:column headerText="Subtotal" width="120">
+                           <h:outputText value="#{detalle.cantidad * detalle.precio}"
+                                         style="font-weight: bold;">
+                              <f:convertNumber type="currency" currencySymbol="$" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Estado -->
+                        <p:column headerText="Estado" width="100">
+                           <h:outputText value="#{detalle.estado}" />
+                        </p:column>
+
+                        <!-- Observaciones -->
+                        <p:column headerText="Observaciones" width="200">
+                           <h:outputText value="#{detalle.observaciones}" />
+                        </p:column>
+
+                     </p:dataTable>
+
+                  </h:form>
+               </h:panelGroup>
+
+            </p:tab>
+
+         </p:tabView>
+      </h:panelGroup>
+   </ui:define>
+
+   <!-- WebSocket JavaScript Puro para actualización automática en tiempo real -->
+   <ui:define name="extras">
+      <h:outputScript>
+         // ========================================
+         // WebSocket JavaScript Puro (sin JSF <f:websocket>)
+         // ========================================
+         
+         let ws = null;
+         let reconnectAttempts = 0;
+         const MAX_RECONNECT_ATTEMPTS = 10;
+         const RECONNECT_DELAY = 3000; // 3 segundos
+         
+         /**
+          * Conectar al WebSocket del servidor
+          */
+         function conectarWebSocket() {
+             try {
+                 // Determinar protocolo (ws o wss según HTTP/HTTPS)
+                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                 const host = window.location.host; // localhost:9080 o dominio en producción
+                 const contextPath = '#{request.contextPath}'; // /InventarioWebapprn335-1.0-SNAPSHOT
+                 const wsUrl = protocol + '//' + host + contextPath + '/websocket/ventas';
+                 
+                 console.log('[DespachoBodega] 🔌 Conectando WebSocket a:', wsUrl);
+                 
+                 ws = new WebSocket(wsUrl);
+                 
+                 ws.onopen = function(event) {
+                     console.log('[DespachoBodega] ✅ WebSocket conectado exitosamente');
+                     reconnectAttempts = 0; // Reset contador de reintentos
+                     
+                     // Opcional: Enviar mensaje de prueba al servidor
+                     // ws.send('Cliente DespachoBodega conectado');
+                 };
+                 
+                 ws.onmessage = function(event) {
+                     console.log('[DespachoBodega] 📩 Mensaje WebSocket recibido:', event.data);
+                     
+                     if (event.data === 'refresh') {
+                         console.log('[DespachoBodega] 🔄 Actualizando tabla automáticamente...');
+                         
+                         // Llamar al remote command de PrimeFaces para actualizar la tabla
+                         if (typeof refrescarTablaVentas !== 'undefined') {
+                             refrescarTablaVentas();
+                         } else {
+                             console.error('[DespachoBodega] ❌ Función refrescarTablaVentas no está definida');
+                         }
+                     } else if (event.data === 'pong') {
+                         console.log('[DespachoBodega] 🏓 Pong recibido del servidor');
+                     } else {
+                         console.log('[DespachoBodega] ℹ️ Mensaje desconocido:', event.data);
+                     }
+                 };
+                 
+                 ws.onclose = function(event) {
+                     console.log('[DespachoBodega] ⚠️ WebSocket desconectado. Código:', event.code, 'Razón:', event.reason);
+                     
+                     // Intentar reconectar automáticamente
+                     if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                         reconnectAttempts++;
+                         console.log('[DespachoBodega] 🔄 Reintentando conexión (' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ') en ' + (RECONNECT_DELAY/1000) + 's...');
+                         setTimeout(conectarWebSocket, RECONNECT_DELAY);
+                     } else {
+                         console.error('[DespachoBodega] ❌ Máximo de reintentos alcanzado. No se pudo reconectar al WebSocket.');
+                     }
+                 };
+                 
+                 ws.onerror = function(error) {
+                     console.error('[DespachoBodega] ❌ Error en WebSocket:', error);
+                 };
+                 
+             } catch (error) {
+                 console.error('[DespachoBodega] ❌ Error al crear WebSocket:', error);
+             }
+         }
+         
+         /**
+          * Enviar ping al servidor (opcional - para testing)
+          */
+         function enviarPing() {
+             if (ws && ws.readyState === WebSocket.OPEN) {
+                 console.log('[DespachoBodega] 🏓 Enviando ping al servidor...');
+                 ws.send('ping');
+             } else {
+                 console.warn('[DespachoBodega] ⚠️ WebSocket no está conectado. Estado:', ws ? ws.readyState : 'null');
+             }
+         }
+         
+         /**
+          * Obtener estado de la conexión WebSocket
+          */
+         function getWebSocketStatus() {
+             if (!ws) return 'No inicializado';
+             
+             const states = {
+                 [WebSocket.CONNECTING]: 'Conectando...',
+                 [WebSocket.OPEN]: 'Conectado ✅',
+                 [WebSocket.CLOSING]: 'Cerrando...',
+                 [WebSocket.CLOSED]: 'Desconectado ❌'
+             };
+             
+             return states[ws.readyState] || 'Estado desconocido';
+         }
+         
+         // ========================================
+         // Inicialización y Cleanup
+         // ========================================
+         
+         // Conectar automáticamente al cargar la página
+         window.addEventListener('load', function() {
+             console.log('[DespachoBodega] 🚀 Página cargada. Iniciando WebSocket...');
+             conectarWebSocket();
+         });
+         
+         // Cerrar limpiamente al salir de la página
+         window.addEventListener('beforeunload', function() {
+             if (ws && ws.readyState === WebSocket.OPEN) {
+                 console.log('[DespachoBodega] 👋 Cerrando WebSocket...');
+                 ws.close(1000, 'Usuario salió de la página'); // 1000 = cierre normal
+             }
+         });
+         
+         // Exponer funciones globales para debugging en la consola del navegador
+         window.despachoBodegaWS = {
+             status: getWebSocketStatus,
+             ping: enviarPing,
+             reconnect: conectarWebSocket,
+             close: function() {
+                 if (ws) {
+                     ws.close();
+                     console.log('[DespachoBodega] WebSocket cerrado manualmente');
+                 }
+             }
+         };
+         
+         console.log('[DespachoBodega] ℹ️ Funciones de debug disponibles en: window.despachoBodegaWS');
+         console.log('[DespachoBodega] ℹ️ Usa despachoBodegaWS.status() para ver el estado');
+         console.log('[DespachoBodega] ℹ️ Usa despachoBodegaWS.ping() para enviar ping');
+      </h:outputScript>
+   </ui:define>
+
+</ui:composition>

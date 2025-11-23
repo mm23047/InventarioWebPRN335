@@ -1,0 +1,107 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:ues="jakarta.faces.composite/ues"
+        template="../WEB-INF/templates/default.xhtml">
+
+    <!-- Header -->
+    <ui:define name="header">
+        <h1>#{crud['frm.botones.caracteristica']}</h1>
+    </ui:define>
+
+    <!-- Tabla de registros -->
+    <ui:define name="contenido-tabla">
+        <h:panelGrid>
+            <h:form id="frmTop">
+                <p:dataTable value="#{caracteristicaFrm.modelo}" var="r"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             lazy="true"
+                             selection="#{caracteristicaFrm.registro}"
+                             selectionMode="single"
+                             rows="#{caracteristicaFrm.registrosPorPagina}"
+                             rendered="#{caracteristicaFrm.estado=='NADA'}">
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{r.id}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.nombre']}">
+                        <h:outputText value="#{r.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.caracteristica']}">
+                        <h:outputText value="#{r.idTipoUnidadMedida.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.estado']}">
+                        <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.descripcion']}">
+                        <h:outputText value="#{r.descripcion}" />
+                    </p:column>
+
+                    <p:ajax event="rowSelect"
+                            listener="#{caracteristicaFrm.seleccionarRegistro}"
+                            update=":pnlTabla :pnlDetalle"/>
+                </p:dataTable>
+
+                <ues:botones-top formulario="#{caracteristicaFrm}" />
+            </h:form>
+        </h:panelGrid>
+    </ui:define>
+
+    <!-- Detalle (formulario de edición/creación) -->
+    <ui:define name="contenido-detalle">
+        <h:form id="frmCrear" rendered="#{caracteristicaFrm.estado!='NADA'}">
+            <h:panelGrid columns="2">
+
+                <p:outputLabel for="txtId" value="ID:"/>
+                <p:inputText id="txtId" value="#{caracteristicaFrm.registro.id}" readonly="true" disabled="true"/>
+
+                <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
+                <p:inputText id="txtNombre" value="#{caracteristicaFrm.registro.nombre}"
+                             required="true"
+                             validator="#{caracteristicaFrm.validarnombre}"/>
+
+                <p:outputLabel for="ddlTipoUnidadMedida" value="#{crud['frm.botones.caracteristica']}:"/>
+                <p:selectOneMenu id="ddlTipoUnidadMedida" value="#{caracteristicaFrm.idTipoUnidadMedidaSeleccionado}">
+                    <f:selectItems value="#{caracteristicaFrm.listaTipoUnidadMedida}"
+                                   var="tipo"
+                                   itemLabel="#{tipo.nombre}"
+                                   itemValue="#{tipo.id}" />
+                </p:selectOneMenu>
+
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.estado']}:"/>
+                <p:selectBooleanCheckbox id="chkActivo" value="#{caracteristicaFrm.registro.activo}"/>
+
+                <p:outputLabel for="txtDescripcion" value="#{crud['frm.botones.descripcion']}:"/>
+                <p:inputTextarea id="txtDescripcion"
+                                 value="#{caracteristicaFrm.registro.descripcion}"
+                                 rows="4" cols="50"/>
+            </h:panelGrid>
+
+            <h:panelGrid columns="#{caracteristicaFrm.estado=='MODIFICAR' ? 1 : 2}">
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                 actionListener="#{caracteristicaFrm.btnGuardarHandler}"
+                                 rendered="#{caracteristicaFrm.estado=='CREAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                 actionListener="#{caracteristicaFrm.btnModificarHandler}"
+                                 rendered="#{caracteristicaFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                 actionListener="#{caracteristicaFrm.btnEliminarHandler}"
+                                 rendered="#{caracteristicaFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

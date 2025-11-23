@@ -1,0 +1,271 @@
+/* ====== Estilos generales ====== */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+}
+
+/* ====== Encabezado ====== */
+header {
+    background-color: #4a6b8a;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+/* ====== Navegación ====== */
+nav {
+    background-color: #7691ab;
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+nav .ui-menu {
+    width: 100%;
+}
+
+/* ====== Menú Compacto Horizontal ====== */
+.menu-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0.5rem 1rem;
+    background-color: #7691ab;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    flex-wrap: nowrap;
+    min-height: 50px;
+}
+
+.language-form {
+    margin: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.language-selector {
+    width: 140px !important;
+    background: white !important;
+    height: 35px !important;
+}
+
+/* Ajustes específicos para el selector de idioma */
+.language-selector .ui-selectonemenu-trigger {
+    height: 35px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
+
+.language-selector .ui-selectonemenu-label {
+    line-height: 35px !important;
+    height: 35px !important;
+    padding: 0 8px !important;
+}
+
+.compact-menubar {
+    border: none !important;
+    background: none !important;
+    flex-grow: 1;
+    height: 40px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+
+.compact-menuitem {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.compact-menuitem > a {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    color: white !important;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    text-decoration: none !important;
+    display: inline-block !important;
+    height: 35px !important;
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1 !important;
+}
+
+.compact-menuitem > a:hover {
+    background-color: #4a6b8a !important;
+}
+
+.compact-submenu .ui-menuitem-link {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Ajustes para los iconos del menú */
+.compact-menubar .ui-menuitem-icon {
+    margin-right: 5px !important;
+}
+
+/* ====== Contenido ====== */
+article {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-grow: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* ====== DataTable PrimeFaces ====== */
+.ui-datatable {
+    width: 100% !important;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.ui-datatable-tablewrapper {
+    width: 100% !important;
+    overflow-x: auto;
+}
+
+.ui-datatable table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.ui-datatable th, .ui-datatable td {
+    text-align: center !important;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.ui-datatable th {
+    background-color: #7691ab;
+    color: white;
+    font-weight: 600;
+}
+
+/* ====== Botones ====== */
+button, .ui-button {
+    background-color: #4a6b8a !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, .ui-button:hover {
+    background-color: #3b556f !important;
+}
+
+/* ====== Mensajes Growl ====== */
+.ui-growl {
+    z-index: 9999;
+}
+
+/* ====== Pie de página ====== */
+footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 2rem;
+}
+
+/* ====== Responsivo ====== */
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+
+    th, td {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    header h1 {
+        font-size: 1.4rem;
+    }
+
+    article {
+        padding: 0.5rem;
+    }
+
+    /* Menú Responsivo */
+    .menu-container {
+        flex-direction: column;
+        gap: 10px;
+        padding: 0.8rem;
+        min-height: auto;
+    }
+
+    .language-form {
+        height: auto;
+        width: 100%;
+    }
+
+    .language-selector {
+        width: 100% !important;
+        height: 40px !important;
+    }
+
+    .language-selector .ui-selectonemenu-label {
+        line-height: 40px !important;
+        height: 40px !important;
+    }
+
+    .compact-menubar {
+        width: 100%;
+        justify-content: center;
+        height: auto;
+        flex-wrap: wrap;
+    }
+
+    .compact-menuitem > a {
+        padding: 6px 10px !important;
+        font-size: 13px !important;
+        height: 32px !important;
+        margin: 2px;
+    }
+}
+
+/* Centrar contenido del menú y selector de idioma */
+nav h\:panelGrid {
+    width: 100%;
+    text-align: center;
+}
+
+nav form,
+nav .ui-selectonemenu,
+nav .ui-menu {
+    margin: 0 auto;
+    display: inline-block;
+}

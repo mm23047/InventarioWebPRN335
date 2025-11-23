@@ -1,0 +1,352 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:ues="jakarta.faces.composite/ues"
+        template="../WEB-INF/templates/default.xhtml">
+
+   <!-- Header -->
+   <ui:define name="header">
+      <h1 class="titulo-formulario">#{compraFrm.nombreBean}</h1>
+   </ui:define>
+
+   <!-- Tabla de registros (Tabla 1) -->
+   <ui:define name="contenido-tabla">
+      <h:panelGroup id="pnlCompraTabla">
+         <h:form id="frmCompraTop">
+            <p:dataTable id="tblCompras"
+                         value="#{compraFrm.modelo}"
+                         var="compra"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         lazy="true"
+                         selection="#{compraFrm.registro}"
+                         selectionMode="single"
+                         rowKey="#{compra.id}"
+                         rows="#{compraFrm.registrosPorPagina}"
+                         rendered="#{compraFrm.estado=='NADA'}">
+
+               <!-- ID Compra -->
+               <p:column headerText="ID" width="80">
+                  <h:outputText value="#{compra.id}" />
+               </p:column>
+
+               <!-- Proveedor -->
+               <p:column headerText="Proveedor" width="200">
+                  <h:outputText value="#{compra.proveedor.nombre}" />
+               </p:column>
+
+               <!-- Estado -->
+               <p:column headerText="Estado" width="120">
+                  <h:outputText value="#{compra.estado}" />
+               </p:column>
+
+               <!-- Fecha de Compra -->
+               <p:column headerText="Fecha Compra" width="150">
+                  <h:outputText value="#{compra.fecha}">
+                     <f:converter converterId="offsetDateTimeConverter" />
+                  </h:outputText>
+               </p:column>
+
+               <!-- Observaciones -->
+               <p:column headerText="Observaciones" width="200">
+                  <h:outputText value="#{compra.observaciones}" />
+               </p:column>
+
+               <!-- Monto Total (Cantidad × Precio Unitario) -->
+               <p:column headerText="Monto Total" width="120">
+                  <h:outputText value="#{compraFrm.montoTotal}">
+                     <f:convertNumber type="currency" currencySymbol="$" />
+                  </h:outputText>
+               </p:column>
+               <p:ajax event="rowSelect"
+                       listener="#{compraFrm.seleccionarRegistro}"
+                       update=":pnlCompraTabla :pnlCompraDetalle :tabCompra"/>
+            </p:dataTable>
+
+            <ues:botones-top formulario="#{compraFrm}"
+                             actualizar=":pnlCompraTabla :pnlCompraDetalle"/>
+         </h:form>
+      </h:panelGroup>
+   </ui:define>
+
+   <!-- Detalle (Formulario con pestañas) -->
+   <ui:define name="contenido-detalle">
+      <h:panelGroup id="pnlCompraDetalle">
+         <p:tabView id="tabCompra" cache="false" dynamic="true"
+                    rendered="#{compraFrm.estado!='NADA'}">
+
+            <!-- Pestaña Generalidades -->
+            <p:tab id="tabGeneral" closable="false" title="Generalidades">
+               <h:form id="frmCompraCrear">
+                  <h:panelGrid columns="1" >
+
+                     <!-- ID (Auto-generado) -->
+                     <p:outputLabel for="txtCompraId" value="ID:"/>
+                     <p:inputText id="txtCompraId" value="#{compraFrm.registro.id}"
+                                  readonly="true" disabled="true" size="20"/>
+
+                     <!-- Proveedor (Relación con Proveedores) -->
+                     <h:panelGroup>
+                        <p:autoComplete id="autoProveedor"
+                                        value="#{compraFrm.registro.proveedor}"
+                                        completeMethod="#{compraFrm.buscarProveedoresPorNombre}"
+                                        var="proveedor"
+                                        itemLabel="#{proveedor.nombre}"
+                                        itemValue="#{proveedor}"
+                                        forceSelection="true"
+                                        dropdown="true"
+                                        required="true"
+                                        requiredMessage="Seleccione un proveedor"
+                                        size="50"
+                                        placeholder="Escriba el nombre...">
+                           <!-- ESTA LÍNEA ES CRÍTICA -->
+                           <f:converter converterId="proveedorConverter" />
+                        </p:autoComplete>
+                        <p:message for="autoProveedor" display="icon"/>
+                     </h:panelGroup>
+
+                     <!-- Estado (Dropdown con opciones) -->
+                     <p:outputLabel for="selEstado" value="Estado:"/>
+                     <p:selectOneMenu id="selEstado" value="#{compraFrm.registro.estado}"
+                                      required="true" requiredMessage="Seleccione un estado">
+                        <f:selectItems value="#{compraFrm.estadosCompra}"
+                                       var="estado"
+                                       itemLabel="#{estado}"
+                                       itemValue="#{estado}"/>
+                     </p:selectOneMenu>
+
+                     <!-- Fecha (Automática) -->
+                     <p:outputLabel for="dpFecha" value="Fecha Compra:"/>
+                     <p:datePicker id="dpFecha"
+                                   value="#{compraFrm.fechaCompra}"
+                                   showTime="true"
+                                   hourFormat="24"
+                                   timeInput="true"
+                                   timeZone="America/El_Salvador"
+                                   pattern="yyyy-MM-dd'T'HH:mm"
+                                   readonly="true"
+                                   disabled="true"/>
+
+                     <!-- Observaciones -->
+                     <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                     <p:inputTextarea id="txtObservaciones"
+                                      value="#{compraFrm.registro.observaciones}"
+                                      rows="4" cols="50"/>
+
+                  </h:panelGrid>
+
+                  <!-- Botones de acción para Compra -->
+                  <h:panelGrid columns="#{compraFrm.estado=='MODIFICAR' ? 3 : 2}" style="margin-top: 20px;">
+                     <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                      actionListener="#{compraFrm.btnGuardarHandler}"
+                                      rendered="#{compraFrm.estado=='CREAR'}"
+                                      update=":pnlCompraTabla :pnlCompraDetalle"
+                                      process="@form"/>
+
+                     <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                      actionListener="#{compraFrm.btnModificarHandler}"
+                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      update=":pnlCompraTabla :pnlCompraDetalle"
+                                      process="@form"/>
+
+                     <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                      actionListener="#{compraFrm.btnEliminarHandler}"
+                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      update=":pnlCompraTabla :pnlCompraDetalle"
+                                      process="@form"/>
+
+                     <!-- Botón Cerrar compra -->
+                     <p:commandButton value="Cerrar compra"
+                                      actionListener="#{compraFrm.notificarCambioKardex}"
+                                      update=":pnlCompraDetalle :pnlCompraTabla"
+                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      process="@form"/>
+
+                  </h:panelGrid>
+
+                  <ues:botones-top formulario="#{compraFrm}"/>
+               </h:form>
+            </p:tab>
+
+            <!-- Pestaña Productos (Solo visible en MODIFICAR) -->
+            <p:tab id="tabProductos" closable="false" title="Productos"
+                   disabled="#{compraFrm.estado!='MODIFICAR'}">
+               <!-- Panel de Tabla de Detalles (Tabla 2) -->
+               <h:panelGroup id="pnlCompraDetalleTabla">
+                  <h:form id="frmTablaCompraDetalle">
+                     <p:dataTable id="tblCompraDetalles"
+                                  value="#{compraFrm.compraDetalleFrm.modelo}"
+                                  var="detalle"
+                                  paginator="true"
+                                  paginatorPosition="bottom"
+                                  lazy="true"
+                                  selection="#{compraFrm.compraDetalleFrm.registro}"
+                                  selectionMode="single"
+                                  rowKey="#{detalle.id}"
+                                  rows="#{compraFrm.compraDetalleFrm.registrosPorPagina}"
+                                  rendered="#{compraFrm.compraDetalleFrm.estado=='NADA'}">
+
+                        <!-- ID Detalle -->
+                        <p:column headerText="ID" width="80">
+                           <h:outputText value="#{detalle.id}" />
+                        </p:column>
+
+                        <!-- Producto -->
+                        <p:column headerText="Producto" width="200">
+                           <h:outputText value="#{detalle.idProducto.nombreProducto}" />
+                        </p:column>
+
+                        <!-- Cantidad -->
+                        <p:column headerText="Cantidad" width="100">
+                           <h:outputText value="#{detalle.cantidad}">
+                              <f:convertNumber pattern="0" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Precio Unitario -->
+                        <p:column headerText="Precio Unitario" width="120">
+                           <h:outputText value="#{detalle.precio}">
+                              <f:convertNumber type="currency" currencySymbol="$" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Estado -->
+                        <p:column headerText="Estado" width="120">
+                           <h:outputText value="#{detalle.estado}" />
+                        </p:column>
+
+                        <!-- Observaciones -->
+                        <p:column headerText="Observaciones" width="200">
+                           <h:outputText value="#{detalle.observaciones}" />
+                        </p:column>
+
+                        <p:ajax event="rowSelect"
+                                listener="#{compraFrm.compraDetalleFrm.seleccionarRegistro}"
+                                update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"/>
+                     </p:dataTable>
+
+                     <!-- Botón Nuevo Detalle de Compra -->
+                     <p:commandButton value="Nuevo Detalle de Compra"
+                                      actionListener="#{compraFrm.compraDetalleFrm.btnNuevoHandler}"
+                                      rendered="#{compraFrm.compraDetalleFrm.estado=='NADA'}"
+                                      update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
+                                      style="margin-top: 10px;"/>
+
+                     <!-- Botones Cancelar para Detalle -->
+                     <p:commandButton value="#{crud['frm.botones.cancelar']}"
+                                      actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
+                                      rendered="#{compraFrm.compraDetalleFrm.estado!='NADA'}"
+                                      update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
+                                      style="margin-top: 10px;"/>
+                  </h:form>
+               </h:panelGroup>
+
+               <!-- Panel de Formulario de Detalle -->
+               <h:panelGroup id="pnlCompraDetalleFormulario">
+                  <h:form id="frmDetalleCompra" rendered="#{compraFrm.compraDetalleFrm.estado!='NADA'}">
+                     <p:panel header="Detalle de Compra" style="margin-top: 20px;">
+
+                        <h:panelGrid columns="1" style="width: 100%;">
+
+                           <!-- ID Detalle (Auto-generado) -->
+                           <p:outputLabel for="txtDetalleId" value="ID:"/>
+                           <p:inputText id="txtDetalleId" value="#{compraFrm.compraDetalleFrm.registro.id}"
+                                        readonly="true" disabled="true" size="35"/>
+
+                           <!-- Producto (Autocomplete) -->
+                           <p:outputLabel for="autoProducto" value="Producto:"/>
+                           <p:autoComplete id="autoProducto"
+                                           value="#{compraFrm.compraDetalleFrm.registro.idProducto}"
+                                           completeMethod="#{compraFrm.compraDetalleFrm.buscarProductosPorNombre}"
+                                           var="producto"
+                                           itemLabel="#{producto.nombreProducto} #{producto.referenciaExterna}"
+                                           itemValue="#{producto}"
+                                           forceSelection="true"
+                                           dropdown="true"
+                                           required="true"
+                                           requiredMessage="Seleccione un producto"
+                                           size="50">
+                              <f:converter converterId="productoConverter" />
+                           </p:autoComplete>
+
+                           <!-- Cantidad (Manual) -->
+                           <p:outputLabel for="numCantidad" value="Cantidad:"/>
+                           <p:inputNumber id="numCantidad"
+                                          value="#{compraFrm.compraDetalleFrm.registro.cantidad}"
+                                          decimalPlaces="2"
+                                          minValue="0.01"
+                                          maxValue="999999.99"
+                                          required="true"
+                                          requiredMessage="Ingrese la cantidad"
+                                          style="width: 120px;"/>
+
+                           <!-- Precio Unitario (Manual) -->
+                           <p:outputLabel for="numPrecio" value="Precio Unitario:"/>
+                           <p:inputNumber id="numPrecio"
+                                          value="#{compraFrm.compraDetalleFrm.registro.precio}"
+                                          decimalPlaces="2"
+                                          minValue="0"
+                                          maxValue="999999.99"
+                                          required="true"
+                                          requiredMessage="Ingrese el precio unitario"
+                                          style="width: 120px;"/>
+
+                           <!-- Estado (Dropdown) -->
+                           <p:outputLabel for="selEstadoDetalle" value="Estado:"/>
+                           <p:selectOneMenu id="selEstadoDetalle"
+                                            value="#{compraFrm.compraDetalleFrm.registro.estado}"
+                                            required="true" requiredMessage="Seleccione un estado">
+                              <f:selectItems value="#{compraFrm.compraDetalleFrm.estadosDetalle}"
+                                             var="estado"
+                                             itemLabel="#{estado}"
+                                             itemValue="#{estado}"/>
+                           </p:selectOneMenu>
+
+                           <!-- Observaciones -->
+                           <p:outputLabel for="txtObsDetalle" value="Observaciones:"/>
+                           <p:inputTextarea id="txtObsDetalle"
+                                            value="#{compraFrm.compraDetalleFrm.registro.observaciones}"
+                                            rows="3" cols="50"/>
+
+                        </h:panelGrid>
+
+                        <!-- Botones de acción para Detalle -->
+                        <h:panelGrid columns="4" style="margin-top: 20px; text-align: center;">
+                           <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                            actionListener="#{compraFrm.compraDetalleFrm.btnGuardarHandler}"
+                                            rendered="#{compraFrm.compraDetalleFrm.estado=='CREAR'}"
+                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
+                                            process="@form"/>
+
+                           <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                            actionListener="#{compraFrm.compraDetalleFrm.btnModificarHandler}"
+                                            rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR'}"
+                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
+                                            process="@form"/>
+
+                           <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                            actionListener="#{compraFrm.compraDetalleFrm.btnEliminarHandler}"
+                                            rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR'}"
+                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
+                                            process="@form"/>
+
+                           <p:commandButton value="#{crud['frm.botones.cancelar']}"
+                                            actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
+                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
+                                            process="@this"/>
+                        </h:panelGrid>
+
+                     </p:panel>
+                  </h:form>
+               </h:panelGroup>
+
+            </p:tab>
+
+         </p:tabView>
+      </h:panelGroup>
+   </ui:define>
+
+</ui:composition>
