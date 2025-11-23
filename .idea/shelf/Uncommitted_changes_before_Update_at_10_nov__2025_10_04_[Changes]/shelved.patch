@@ -1,0 +1,207 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"21326914-e5fc-4517-aee1-fde55bfaa8d5\" name=\"Changes\" comment=\"\" />\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"jsf\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"wip-venta\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;mm23047&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/mm23047/InventarioWebPRN335.git&quot;,\r\n    &quot;accountId&quot;: &quot;a7d319e3-30e5-40b3-ac77-79601e854772&quot;\r\n  }\r\n}</component>\r\n  <component name=\"KubernetesApiPersistence\">{}</component>\r\n  <component name=\"KubernetesApiProvider\">{\r\n  &quot;isMigrated&quot;: true\r\n}</component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHomeTypeForPersistence\" value=\"WRAPPER\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"341nQSEN18rB6JBj7ggiyL3h1eP\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;Maven.InventarioWebapprn335 [clean].executor&quot;: &quot;Run&quot;,\r\n    &quot;Maven.InventarioWebapprn335 [package].executor&quot;: &quot;Run&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;main&quot;,\r\n    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/MINED/IdeaProjects/InventarioWebapprn335/src/main/webapp/WEB-INF/templates&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  },\r\n  &quot;keyToStringList&quot;: {\r\n    &quot;DatabaseDriversLRU&quot;: [\r\n      &quot;postgresql&quot;\r\n    ]\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\MINED\\IdeaProjects\\InventarioWebapprn335\\src\\main\\webapp\\WEB-INF\\templates\" />\r\n      <recent name=\"C:\\Users\\MINED\\IdeaProjects\\InventarioWebapprn335\\src\\main\\webapp\\resources\" />\r\n      <recent name=\"C:\\Users\\MINED\\IdeaProjects\\InventarioWebapprn335\\src\\main\\webapp\" />\r\n      <recent name=\"C:\\Users\\MINED\\IdeaProjects\\InventarioWebapprn335\\src\\main\\webapp\\WEB-INF\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\MINED\\IdeaProjects\\InventarioWebapprn335\\src\\main\\webapp\\resources\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19416.15\" />\r\n        <option value=\"bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19416.15\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"21326914-e5fc-4517-aee1-fde55bfaa8d5\" name=\"Changes\" comment=\"\" />\r\n      <created>1760389935016</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1760389935016</updated>\r\n      <workItem from=\"1760389936458\" duration=\"37000\" />\r\n      <workItem from=\"1760462018553\" duration=\"14843000\" />\r\n      <workItem from=\"1761679996794\" duration=\"5164000\" />\r\n      <workItem from=\"1761712979630\" duration=\"3976000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 2f5ca61320d4c6de655f9477b4247f361572ed51)
++++ b/.idea/workspace.xml	(date 1762790507375)
+@@ -4,7 +4,14 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="21326914-e5fc-4517-aee1-fde55bfaa8d5" name="Changes" comment="" />
++    <list default="true" id="21326914-e5fc-4517-aee1-fde55bfaa8d5" name="Changes" comment="">
++      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/RestConfig.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/TipoProductoResource.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_nov__2025_05_02__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_nov__2025_05_02__Changes_.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_nov__2025_05_02__Changes_1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_nov__2025_05_02__Changes_1.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_nov__2025_05_08__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_9_nov__2025_05_08__Changes_.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -58,29 +65,29 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;Maven.InventarioWebapprn335 [clean].executor&quot;: &quot;Run&quot;,
+-    &quot;Maven.InventarioWebapprn335 [package].executor&quot;: &quot;Run&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;C:/Users/MINED/IdeaProjects/InventarioWebapprn335/src/main/webapp/WEB-INF/templates&quot;,
+-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "Maven.InventarioWebapprn335 [clean].executor": "Run",
++    "Maven.InventarioWebapprn335 [package].executor": "Run",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
++    "git-widget-placeholder": "Merging main",
++    "ignore.virus.scanning.warn.message": "true",
++    "kotlin-language-version-configured": "true",
++    "last_opened_file_path": "C:/Users/MINED/IdeaProjects/InventarioWebapprn335/src/main/webapp/WEB-INF/templates",
++    "node.js.detected.package.eslint": "true",
++    "node.js.detected.package.tslint": "true",
++    "node.js.selected.package.eslint": "(autodetect)",
++    "node.js.selected.package.tslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm",
++    "vue.rearranger.settings.migration": "true"
+   },
+-  &quot;keyToStringList&quot;: {
+-    &quot;DatabaseDriversLRU&quot;: [
+-      &quot;postgresql&quot;
++  "keyToStringList": {
++    "DatabaseDriversLRU": [
++      "postgresql"
+     ]
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
+     <key name="CopyFile.RECENT_KEYS">
+       <recent name="C:\Users\MINED\IdeaProjects\InventarioWebapprn335\src\main\webapp\WEB-INF\templates" />
+@@ -95,8 +102,8 @@
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19416.15" />
+-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19416.15" />
++        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19072.14" />
++        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19072.14" />
+       </set>
+     </attachedChunks>
+   </component>
+@@ -112,6 +119,7 @@
+       <workItem from="1760462018553" duration="14843000" />
+       <workItem from="1761679996794" duration="5164000" />
+       <workItem from="1761712979630" duration="3976000" />
++      <workItem from="1762788751379" duration="1581000" />
+     </task>
+     <servers />
+   </component>
+Index: src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/TipoProductoResource.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/TipoProductoResource.java b/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/TipoProductoResource.java
+new file mode 100644
+--- /dev/null	(date 1762789813225)
++++ b/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/TipoProductoResource.java	(date 1762789813225)
+@@ -0,0 +1,81 @@
++package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.rest.server;
++
++import jakarta.inject.Inject;
++import jakarta.validation.constraints.Max;
++import jakarta.validation.constraints.Min;
++import jakarta.ws.rs.*;
++import jakarta.ws.rs.core.MediaType;
++import jakarta.ws.rs.core.Response;
++import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoProductoDAO;
++import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoProducto;
++
++
++@Path("tipo_producto")
++public class TipoProductoResource {
++
++    @Inject
++    TipoProductoDAO tipoProductoDAO;
++
++    @GET
++    @Produces({MediaType.APPLICATION_JSON})
++    public Response findRange(
++            @Min(0)
++            @DefaultValue("0")
++            @QueryParam("first")
++            int first,
++            @Max(100)
++            @DefaultValue("50")
++            @QueryParam("max")
++            int max) {
++        if (first >= 0 && max > 0 && max <= 100) {
++            try {
++                int total = tipoProductoDAO.count();
++                return  Response.ok(tipoProductoDAO.findRange(first,max)).header("Total-records", total).build();
++            } catch (Exception e) {
++                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception","Cannot access db").build();
++            }
++        }
++         return Response.status(422).header("Missing-parameter", "first:" + first + ", max:" + max).build();
++    }
++
++    @GET
++    @Path("{id}")
++    @Produces({MediaType.APPLICATION_JSON})
++
++    public Response findById(@PathParam("id") Long id) {
++        if(id != null){
++            try {
++             TipoProducto resp = tipoProductoDAO.buscarRegistroPorId(id);
++             if(resp != null){
++                 return Response.ok(resp).build();
++             }
++                return Response.status(Response.Status.NOT_FOUND).header("Not-found-id", "Record with id "+id+" not found").build();
++            } catch (Exception ex) {
++                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception","Cannot access db").build();
++            }
++
++        }
++        return Response.status(422).header("Missing-parameter", "id").build();
++    }
++
++    @GET
++    @Path("{id}")
++
++    public Response delete(@PathParam("id") Long id){
++        if(id != null){
++            try {
++                TipoProducto resp = tipoProductoDAO.buscarRegistroPorId(id);
++                if(resp != null){
++                    tipoProductoDAO.eliminar(resp);
++                    return Response.noContent().build();
++                }
++                return Response.status(Response.Status.NOT_FOUND).header("Not-found-id", "Record with id "+id+" not found").build();
++            } catch (Exception ex) {
++                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Server-exception","Cannot access db").build();
++            }
++
++        }
++        return Response.status(422).header("Missing-parameter", "id").build();
++    }
++
++}
+\ No newline at end of file
+Index: src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/RestConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/RestConfig.java b/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/RestConfig.java
+new file mode 100644
+--- /dev/null	(date 1762789813223)
++++ b/src/main/java/sv/edu/ues/occ/ingenieria/prn335/inventario/web/core/Boundary/rest/server/RestConfig.java	(date 1762789813223)
+@@ -0,0 +1,10 @@
++package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.rest.server;
++
++import jakarta.ws.rs.ApplicationPath;
++import jakarta.ws.rs.core.Application;
++
++
++@ApplicationPath("/resources/v1")
++public class RestConfig  extends Application {
++
++}

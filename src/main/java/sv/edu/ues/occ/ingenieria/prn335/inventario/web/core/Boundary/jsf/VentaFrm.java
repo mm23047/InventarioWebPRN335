@@ -35,11 +35,19 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     @Inject
     private VentaDetalleFrm ventaDetalleFrm;
 
+    @Inject
+    NotificadorKardex notificadorKardex;
+
     private Cliente clienteSeleccionado;
     private List<String> estadosVenta;
 
     public VentaFrm() {
         this.nombreBean = "Venta";
+    }
+
+    @Override
+    public void inicializarListas() {
+        this.estadosVenta = Arrays.asList("CREADO", "PENDIENTE", "APROBADO", "ENTREGADO", "CANCELADO");
     }
 
     @Override
@@ -331,9 +339,6 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     }
 
     public List<String> getEstadosVenta() {
-        if (estadosVenta == null) {
-            estadosVenta = Arrays.asList("CREADO", "PENDIENTE", "APROBADO", "ENTREGADO", "CANCELADO");
-        }
         return estadosVenta;
     }
 
@@ -343,5 +348,13 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     public VentaDetalleFrm getVentaDetalleFrm() {
         return ventaDetalleFrm;
+    }
+
+    public void notificarCambioKardex(jakarta.faces.event.ActionEvent actionEvent) {
+        if (this.registro != null && this.registro.getId() != null) {
+            this.registro.setEstado("APROBADO");
+            super.btnModificarHandler(actionEvent);
+            notificadorKardex.notificarCambioKardex("Venta actualizada: ");
+        }
     }
 }

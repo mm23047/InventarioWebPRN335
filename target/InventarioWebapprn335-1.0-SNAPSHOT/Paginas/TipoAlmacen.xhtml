@@ -1,0 +1,93 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:ues="jakarta.faces.composite/ues"
+        template="../WEB-INF/templates/default.xhtml">
+
+    <!-- Header -->
+    <ui:define name="header">
+        <h1>#{tipoAlmacenFrm.nombreBean}</h1>
+    </ui:define>
+
+    <!-- Tabla de registros -->
+    <ui:define name="contenido-tabla">
+        <h:panelGrid>
+            <h:form id="frmTop">
+                <p:dataTable value="#{tipoAlmacenFrm.modelo}" var="r"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             lazy="true"
+                             selection="#{tipoAlmacenFrm.registro}"
+                             selectionMode="single"
+                             rows="#{tipoAlmacenFrm.registrosPorPagina}"
+                             rendered="#{tipoAlmacenFrm.estado=='NADA'}">
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{r.id}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.nombre']}">
+                        <h:outputText value="#{r.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.estado']}">
+                        <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.observaciones']}">
+                        <h:outputText value="#{r.obsevaciones}" />
+                    </p:column>
+
+                    <p:ajax event="rowSelect"
+                            listener="#{tipoAlmacenFrm.seleccionarRegistro}"
+                            update=":pnlTabla :pnlDetalle"/>
+                </p:dataTable>
+
+                <ues:botones-top formulario="#{tipoAlmacenFrm}" />
+            </h:form>
+        </h:panelGrid>
+    </ui:define>
+
+    <!-- Detalle (formulario de edición/creación) -->
+    <ui:define name="contenido-detalle">
+        <h:form id="frmCrear" rendered="#{tipoAlmacenFrm.estado!='NADA'}">
+            <h:panelGrid columns="2">
+
+                <p:outputLabel for="txtId" value="ID:"/>
+                <p:inputText id="txtId" value="#{tipoAlmacenFrm.registro.id}" readonly="true" disabled="true"/>
+
+                <p:outputLabel for="txtNombre" value="#{crud['frm.botones.nombre']}:"/>
+                <p:inputText id="txtNombre" value="#{tipoAlmacenFrm.registro.nombre}" size="75"/>
+
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
+                <p:selectBooleanCheckbox id="chkActivo" value="#{tipoAlmacenFrm.registro.activo}"/>
+
+                <p:outputLabel for="txtObservaciones" value="#{crud['frm.botones.observaciones']}:"/>
+                <p:inputTextarea id="txtObservaciones"
+                                 value="#{tipoAlmacenFrm.registro.obsevaciones}"
+                                 rows="4" cols="50"/>
+            </h:panelGrid>
+
+            <h:panelGrid columns="#{tipoAlmacenFrm.estado=='MODIFICAR' ? 1 : 2}">
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                 actionListener="#{tipoAlmacenFrm.btnGuardarHandler}"
+                                 rendered="#{tipoAlmacenFrm.estado=='CREAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                 actionListener="#{tipoAlmacenFrm.btnModificarHandler}"
+                                 rendered="#{tipoAlmacenFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                 actionListener="#{tipoAlmacenFrm.btnEliminarHandler}"
+                                 rendered="#{tipoAlmacenFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: wolf
+-->
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.facelets"
+      xmlns:c="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>
+        <f:insert name="titulo">
+            Titulo de la pagina
+        </f:insert>
+    </title>
+    <h:outputStylesheet library="estilos" name="crud.css"/>
+</h:head>
+
+<h:body>
+    <div class="ui-g">
+        <p:growl/>
+        <div class="ui-g-12 ui-md-2">
+            <h:form id="frmMenuPrincipal">
+                <p:menu model="#{frmMenu.model}" appendTo="body" toggleable="true" />
+            </h:form>
+        </div>
+        <div class="ui-g-12 ui-md-10 ui-g-nopad">
+            <div class="ui-g-12" id="sesion">
+                <p:toolbar>
+                    <p:toolbarGroup align="right">
+                        <h:form id="frmIdioma">
+                            <p:selectOneMenu value="#{sesionDeUsuario.idiomaSeleccionado}"
+                                             valueChangeListener="#{sesionDeUsuario.cambiarIdioma}">
+
+                                <c:selectItem noSelectionOption="true" itemValue="#{null}" itemLabel="Idioma"/>
+                                <c:selectItems value="#{sesionDeUsuario.idiomas.entrySet()}"
+                                               var="idioma"
+                                               itemLabel="#{idioma.key}"
+                                               itemValue="#{idioma.key}"/>
+                                <c:ajax execute="@form" render="@all"/>
+
+                            </p:selectOneMenu>
+                            <p:commandButton type="button" icon="pi pi-globe" styleClass="mr-2"/>
+                        </h:form>
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </div>
+            <div class="ui-g-12">
+                <h1>
+                    <f:insert name="titulo">
+                        Titulo de la pagina
+                    </f:insert>
+                </h1>
+            </div>
+            <div class="ui-g-12 ui-g-nopad">
+                <div class="ui-g">
+                    <f:insert name="cuerpo">
+                        <p:outputLabel for="dpFechaCreacion" value="Fecha de creación"/>
+                        <p:datePicker id="dpFechaCreacion"
+                                      value="#{frmTipoProductoCaracteristica.registro.fechaCreacion}"
+                                      showTime="true"
+                                      hourFormat="24"
+                                      timeInput="true"
+                                      timeZone="America/El_Salvador"
+                                      pattern="yyyy-MM-dd'T'HH:mm"
+                                      converter="offsetDateTimeConverter"
+                                      required="true"
+                                      requiredMessage="La fecha es obligatoria"
+                                      touchUI="false" />
+                    </f:insert>
+                </div>
+            </div>
+            <div class="footer">
+                Todos los derechos resrvados por la Universidad de El Salvador @2024
+            </div>
+        </div>
+    </div>
+    <f:insert name="extras">
+    </f:insert>
+</h:body>
+</html>

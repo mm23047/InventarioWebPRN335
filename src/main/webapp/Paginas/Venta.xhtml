@@ -152,7 +152,7 @@
                   </h:panelGrid>
 
                   <!-- Botones de acción para Venta -->
-                  <h:panelGrid columns="#{ventaFrm.estado=='MODIFICAR' ? 2 : 1}" style="margin-top: 20px;">
+                  <h:panelGrid columns="#{ventaFrm.estado=='MODIFICAR' ? 3 : 2}" style="margin-top: 20px;">
                      <p:commandButton value="#{crud['frm.botones.guardar']}"
                                       actionListener="#{ventaFrm.btnGuardarHandler}"
                                       rendered="#{ventaFrm.estado=='CREAR'}"
@@ -170,6 +170,14 @@
                                       rendered="#{ventaFrm.estado=='MODIFICAR'}"
                                       update=":pnlVentaTabla :pnlVentaDetalle"
                                       process="@form"/>
+
+                     <!-- Botón Cerrar venta -->
+                     <p:commandButton value="Cerrar venta"
+                                      actionListener="#{ventaFrm.notificarCambioKardex}"
+                                      update=":pnlVentaDetalle :pnlVentaTabla"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                      process="@form"/>
+
                   </h:panelGrid>
 
                </h:form>

@@ -150,7 +150,7 @@
                 <artifactId>liberty-maven-plugin</artifactId>
                 <version>3.10</version>
                 <configuration>
-                    <installDirectory>C:\Users\MINED\Downloads\openliberty-jakartaee10-25.0.0.8\wlp</installDirectory>
+                    <installDirectory>C:\Users\melya\Downloads\openliberty-jakartaee10-25.0.0.8\wlp</installDirectory>
                     <serverName>prn335-2025</serverName>
                 </configuration>
             </plugin>

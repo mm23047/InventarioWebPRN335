@@ -127,6 +127,20 @@ public class VentaDAO extends InventarioDefaultDataAccess<Venta> implements Seri
     }
 
     /**
+     * Cuenta ventas por estado
+     */
+    public int countByEstado(String estado) {
+        try {
+            TypedQuery<Long> query = em.createNamedQuery("Venta.countByEstado", Long.class);
+            query.setParameter("estado", estado);
+            return query.getSingleResult().intValue();
+        } catch (Exception e) {
+            Logger.getLogger(VentaDAO.class.getName()).log(Level.SEVERE, "Error al contar ventas por estado: " + estado, e);
+            return 0;
+        }
+    }
+
+    /**
      * Busca ventas por cliente
      */
     public List<Venta> findByCliente(UUID idCliente, int first, int max) {

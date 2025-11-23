@@ -1,0 +1,121 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:ues="jakarta.faces.composite/ues"
+        template="../WEB-INF/templates/default.xhtml">
+
+    <!-- Header -->
+    <ui:define name="header">
+        <h1>#{crud['frm.botones.unidadMedida']}</h1>
+    </ui:define>
+
+    <!-- Tabla de registros -->
+    <ui:define name="contenido-tabla">
+        <h:panelGrid>
+            <h:form id="frmTop">
+                <p:dataTable value="#{unidadMedidaFrm.modelo}" var="r"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             lazy="true"
+                             selection="#{unidadMedidaFrm.registro}"
+                             selectionMode="single"
+                             rows="#{unidadMedidaFrm.registrosPorPagina}"
+                             rendered="#{unidadMedidaFrm.estado=='NADA'}">
+
+                    <p:column headerText="ID">
+                        <h:outputText value="#{r.id}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.tipoUnidadMedida']}">
+                        <h:outputText value="#{r.idTipoUnidadMedida.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.equivalencia']}">
+                        <h:outputText value="#{r.equivalencia}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.expresionRegular']}">
+                        <h:outputText value="#{r.expresionRegular}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.estado']}">
+                        <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}" />
+                    </p:column>
+
+                    <p:column headerText="#{crud['frm.botones.comentarios']}">
+                        <h:outputText value="#{r.comentarios}" />
+                    </p:column>
+
+                    <p:ajax event="rowSelect"
+                            listener="#{unidadMedidaFrm.seleccionarRegistro}"
+                            update=":pnlTabla :pnlDetalle"/>
+                </p:dataTable>
+
+                <ues:botones-top formulario="#{unidadMedidaFrm}" />
+            </h:form>
+        </h:panelGrid>
+    </ui:define>
+
+    <!-- Detalle (formulario de edición/creación) -->
+    <ui:define name="contenido-detalle">
+        <h:form id="frmCrear" rendered="#{unidadMedidaFrm.estado!='NADA'}">
+            <h:panelGrid columns="2">
+
+                <p:outputLabel for="txtId" value="ID:"/>
+                <p:inputText id="txtId" value="#{unidadMedidaFrm.registro.id}" readonly="true" disabled="true"/>
+
+                <p:outputLabel for="lstTipo" value="#{crud['frm.botones.tipoUnidadMedida']}:"/>
+                <p:selectOneMenu id="lstTipo" value="#{unidadMedidaFrm.idTipoUnidadMedidaSeleccionado}">
+                    <f:selectItems value="#{unidadMedidaFrm.listaTipoUnidadMedida}"
+                                   var="tipo"
+                                   itemValue="#{tipo.id}"
+                                   itemLabel="#{tipo.nombre}"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel for="txtEquivalencia" value="#{crud['frm.botones.equivalencia']}:"/>
+                <p:inputNumber id="txtEquivalencia"
+                               value="#{unidadMedidaFrm.registro.equivalencia}"
+                               decimalPlaces="2"
+                               minValue="0"
+                               maxValue="999999.99"/>
+
+                <p:outputLabel for="txtExpresionRegular" value="#{crud['frm.botones.expresionRegular']}:"/>
+                <p:inputText id="txtExpresionRegular"
+                             value="#{unidadMedidaFrm.registro.expresionRegular}"
+                             maxlength="255"/>
+
+                <p:outputLabel for="chkActivo" value="#{crud['frm.botones.activo']}:"/>
+                <p:selectBooleanCheckbox id="chkActivo" value="#{unidadMedidaFrm.registro.activo}"/>
+
+                <p:outputLabel for="txtComentarios" value="#{crud['frm.botones.comentarios']}:"/>
+                <p:inputTextarea id="txtComentarios"
+                                 value="#{unidadMedidaFrm.registro.comentarios}"
+                                 rows="4"
+                                 cols="50"
+                                 maxlength="255"/>
+
+            </h:panelGrid>
+
+            <h:panelGrid columns="#{unidadMedidaFrm.estado=='MODIFICAR' ? 1 : 2}">
+                <p:commandButton value="#{crud['frm.botones.guardar']}"
+                                 actionListener="#{unidadMedidaFrm.btnGuardarHandler}"
+                                 rendered="#{unidadMedidaFrm.estado=='CREAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="#{crud['frm.botones.modificar']}"
+                                 actionListener="#{unidadMedidaFrm.btnModificarHandler}"
+                                 rendered="#{unidadMedidaFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+
+                <p:commandButton value="#{crud['frm.botones.eliminar']}"
+                                 actionListener="#{unidadMedidaFrm.btnEliminarHandler}"
+                                 rendered="#{unidadMedidaFrm.estado=='MODIFICAR'}"
+                                 update=":pnlTabla :pnlDetalle"/>
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

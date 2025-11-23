@@ -1,0 +1,36 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:cc="jakarta.faces.composite"
+        xmlns:h="jakarta.faces.html"
+        xmlns:p="http://primefaces.org/ui">
+
+    <cc:interface>
+        <cc:attribute name="formulario" required="true"
+                      type="sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf.DefaultFrm"
+                      shortDescription="Backing Bean para el formulario"/>
+        <cc:attribute name="actualizar" required="false"
+                      default=":pnlTabla :pnlDetalle"
+                      type="java.lang.String"
+                      shortDescription="Componentes a actualizar luego de accionar los botones"/>
+    </cc:interface>
+
+    <cc:implementation>
+        <h:panelGrid>
+            <p:commandButton id="btnNuevo"
+                             value="#{crud['frm.botones.nuevo']} #{cc.attrs.formulario.nombreBean}"
+                             rendered="#{cc.attrs.formulario.estado=='NADA'}"
+                             actionListener="#{cc.attrs.formulario.btnNuevoHandler}"
+                             update="#{cc.attrs.actualizar}"/>
+
+            <p:commandButton id="btnCancelar"
+                             value="#{crud['frm.botones.cancelar']} #{cc.attrs.formulario.nombreBean}"
+                             rendered="#{cc.attrs.formulario.estado!='NADA'}"
+                             actionListener="#{cc.attrs.formulario.btnCancelarHandler}"
+                             update="#{cc.attrs.actualizar}"/>
+
+               <p:messages showSummary="true" showDetail="true" closable="true"/>
+        </h:panelGrid>
+    </cc:implementation>
+
+</ui:composition>
