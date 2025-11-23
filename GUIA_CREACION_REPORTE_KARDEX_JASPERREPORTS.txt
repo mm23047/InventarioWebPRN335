@@ -1,0 +1,471 @@
+================================================================================
+GUÍA: CREAR REPORTE KARDEX EN JASPERSOFT STUDIO
+================================================================================
+
+VERSIÓN: JasperReports 7.0.3
+PROYECTO: InventarioWebPRN335
+FECHA: Noviembre 2025
+
+================================================================================
+1. CONFIGURACIÓN INICIAL
+================================================================================
+
+1.1 Abrir Jaspersoft Studio
+    - Descargar desde: https://community.jaspersoft.com/project/jaspersoft-studio
+    - Versión recomendada: 6.20.x o superior
+
+1.2 Crear Nuevo Reporte
+    - File → New → Jasper Report
+    - Template: Blank A4 Landscape (842 x 595)
+    - Nombre: kardex.jrxml
+    - Ubicación: src/main/resources/reports/
+
+================================================================================
+2. CONFIGURAR DATASOURCE (CONEXIÓN A BASE DE DATOS)
+================================================================================
+
+2.1 Crear Conexión PostgreSQL
+    - Window → Show View → Repository Explorer
+    - Data Adapters → Create Data Adapter
+    - Database JDBC Connection
+    - Configurar:
+      * Name: PostgreSQL_Inventario
+      * JDBC Driver: org.postgresql.Driver
+      * JDBC URL: jdbc:postgresql://localhost:5432/inventariodb
+      * Username: postgres
+      * Password: [tu contraseña]
+    - Test Connection → Finish
+
+2.2 Asignar DataSource al Reporte
+    - Click derecho en reporte → Properties
+    - Language: Java
+    - Data Adapter: PostgreSQL_Inventario
+
+================================================================================
+3. DEFINIR PARÁMETROS DEL REPORTE
+================================================================================
+
+3.1 Crear Parámetros (Parameters en Outline View)
+    - Click derecho en Parameters → Create Parameter
+
+    Parámetro 1:
+    * Name: idProducto
+    * Class: java.lang.String
+    * Description: UUID del producto a filtrar
+
+    Parámetro 2:
+    * Name: fechaInicio
+    * Class: java.sql.Timestamp
+    * Description: Fecha inicial del rango
+
+    Parámetro 3:
+    * Name: fechaFin
+    * Class: java.sql.Timestamp
+    * Description: Fecha final del rango
+
+================================================================================
+4. CREAR CONSULTA SQL (QUERY)
+================================================================================
+
+4.1 Abrir Dataset and Query Dialog
+    - Click derecho en reporte → Dataset and Query
+    - Seleccionar Language: sql
+    - Pegar siguiente consulta:
+
+----------------------------
+SELECT 
+    k.id_kardex,
+    k.fecha,
+    k.tipo_movimiento,
+    k.cantidad,
+    k.precio,
+    k.cantidad_actual,
+    k.precio_actual,
+    k.referencia_externa,
+    k.observaciones,
+    p.nombre_producto,
+    p.referencia_externa AS producto_referencia,
+    a.nombre AS almacen_nombre,
+    CASE 
+        WHEN k.tipo_movimiento = 'ENTRADA' THEN k.cantidad
+        ELSE 0
+    END AS cantidad_entrada,
+    CASE 
+        WHEN k.tipo_movimiento = 'SALIDA' THEN k.cantidad
+        ELSE 0
+    END AS cantidad_salida,
+    (k.cantidad_actual * k.precio_actual) AS valor_total
+FROM kardex k
+INNER JOIN producto p ON k.id_producto = p.id_producto
+LEFT JOIN almacen a ON k.id_almacen = a.id_almacen
+WHERE k.id_producto = CAST($P{idProducto} AS uuid)
+  AND k.fecha >= $P{fechaInicio}
+  AND k.fecha <= $P{fechaFin}
+ORDER BY k.fecha ASC
+----------------------------
+
+4.2 Verificar Campos (Fields)
+    - Click "Read Fields" para auto-detectar columnas
+    - Verificar que se crearon todos los fields
+
+================================================================================
+5. DISEÑO DEL REPORTE - ESTRUCTURA DE BANDAS
+================================================================================
+
+5.1 Configuración de Página
+    - Page Format: A4 Landscape (842 x 595)
+    - Margins: 20px (todos los lados)
+    - Column Width: 802px
+
+5.2 Bandas del Reporte:
+
+    ┌─────────────────────────────────────────────┐
+    │ TITLE BAND (Height: 60px)                   │
+    │ - Título del reporte                        │
+    │ - Información del producto                  │
+    │ - Rango de fechas                           │
+    └─────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────┐
+    │ PAGE HEADER (Height: 0px - No usar)         │
+    └─────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────┐
+    │ COLUMN HEADER (Height: 30px)                │
+    │ - Encabezados de columnas                   │
+    └─────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────┐
+    │ DETAIL BAND (Height: 20px)                  │
+    │ - Datos de cada movimiento kardex           │
+    └─────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────┐
+    │ COLUMN FOOTER (Height: 0px - No usar)       │
+    └─────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────┐
+    │ PAGE FOOTER (Height: 20px)                  │
+    │ - Número de página                          │
+    │ - Fecha de generación                       │
+    └─────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────┐
+    │ SUMMARY BAND (Height: 40px)                 │
+    │ - Total de movimientos                      │
+    │ - Saldo final                               │
+    │ - Valor total                               │
+    └─────────────────────────────────────────────┘
+
+================================================================================
+6. TITLE BAND - DISEÑO
+================================================================================
+
+6.1 Título Principal
+    - Agregar Static Text
+    - Texto: "REPORTE KARDEX DE INVENTARIO"
+    - Posición: x=0, y=5, width=802, height=20
+    - Font: Arial, Bold, 16pt
+    - Alignment: Center
+    - Border: None
+
+6.2 Información del Producto
+    - Agregar Text Field (usando Fields)
+    - Expression: "Producto: " + $F{nombre_producto} + " (" + $F{producto_referencia} + ")"
+    - Posición: x=0, y=30, width=400, height=15
+    - Font: Arial, Bold, 10pt
+
+6.3 Rango de Fechas
+    - Agregar Text Field (usando Parameters)
+    - Expression: "Período: " + new SimpleDateFormat("dd/MM/yyyy").format($P{fechaInicio}) + " - " + new SimpleDateFormat("dd/MM/yyyy").format($P{fechaFin})
+    - Posición: x=402, y=30, width=400, height=15
+    - Font: Arial, 10pt
+    - Alignment: Right
+
+================================================================================
+7. COLUMN HEADER - ENCABEZADOS DE COLUMNAS
+================================================================================
+
+Diseño de columnas (Total width: 802px):
+
+┌──────────┬────────────┬───────┬───────┬────────┬────────┬─────────┬──────────┐
+│ Fecha    │ Tipo Mov.  │ Ref.  │ Alm.  │ Entr.  │ Salid. │ P.Unit. │ Saldo    │
+│ 80px     │ 70px       │ 60px  │ 60px  │ 60px   │ 60px   │ 70px    │ 70px     │
+├──────────┼────────────┼───────┼───────┼────────┼────────┼─────────┼──────────┤
+│ P.Prom.  │ Valor Tot. │ Observaciones                                        │
+│ 70px     │ 80px       │ 222px                                                │
+└──────────┴────────────┴──────────────────────────────────────────────────────┘
+
+Para cada columna:
+- Agregar Static Text
+- Font: Arial, Bold, 9pt
+- Alignment: Center
+- Border: Box, 1px
+- Background: #E0E0E0 (gris claro)
+
+Columnas:
+1. Fecha (x=0, width=80)
+2. Tipo Movimiento (x=80, width=70)
+3. Referencia (x=150, width=60)
+4. Almacén (x=210, width=60)
+5. Entrada (x=270, width=60)
+6. Salida (x=330, width=60)
+7. P. Unitario (x=390, width=70)
+8. Saldo Cant. (x=460, width=70)
+9. P. Promedio (x=530, width=70)
+10. Valor Total (x=600, width=80)
+11. Observaciones (x=680, width=122)
+
+================================================================================
+8. DETAIL BAND - DATOS DE MOVIMIENTOS
+================================================================================
+
+Para cada columna del DETAIL, agregar Text Field con Expression:
+
+1. Fecha:
+   - Expression: new SimpleDateFormat("dd/MM/yyyy HH:mm").format($F{fecha})
+   - Pattern: (ninguno)
+   - x=0, width=80, height=20
+
+2. Tipo Movimiento:
+   - Expression: $F{tipo_movimiento}
+   - x=80, width=70
+
+3. Referencia:
+   - Expression: $F{referencia_externa}
+   - x=150, width=60
+
+4. Almacén:
+   - Expression: $F{almacen_nombre}
+   - x=210, width=60
+
+5. Entrada:
+   - Expression: $F{cantidad_entrada}
+   - Pattern: #,##0.00
+   - x=270, width=60
+   - Alignment: Right
+
+6. Salida:
+   - Expression: $F{cantidad_salida}
+   - Pattern: #,##0.00
+   - x=330, width=60
+   - Alignment: Right
+
+7. Precio Unitario:
+   - Expression: $F{precio}
+   - Pattern: $#,##0.00
+   - x=390, width=70
+   - Alignment: Right
+
+8. Saldo Cantidad:
+   - Expression: $F{cantidad_actual}
+   - Pattern: #,##0.00
+   - x=460, width=70
+   - Alignment: Right
+
+9. Precio Promedio:
+   - Expression: $F{precio_actual}
+   - Pattern: $#,##0.00
+   - x=530, width=70
+   - Alignment: Right
+
+10. Valor Total:
+    - Expression: $F{valor_total}
+    - Pattern: $#,##0.00
+    - x=600, width=80
+    - Alignment: Right
+
+11. Observaciones:
+    - Expression: $F{observaciones}
+    - x=680, width=122
+    - Text Adjustment: Stretch Height
+
+IMPORTANTE: Todos los campos deben tener:
+- Font: Arial, 8pt
+- Border: Box, 0.5px
+- Padding: 2px
+
+================================================================================
+9. VARIABLES PARA CÁLCULOS (SUMMARY)
+================================================================================
+
+9.1 Crear Variables (Variables en Outline View)
+
+Variable 1: totalMovimientos
+- Calculation: Count
+- Reset Type: Report
+- Variable Class: java.lang.Integer
+- Variable Expression: $F{id_kardex}
+
+Variable 2: saldoFinal
+- Calculation: Highest
+- Reset Type: Report
+- Variable Class: java.math.BigDecimal
+- Variable Expression: $F{cantidad_actual}
+
+Variable 3: valorTotalFinal
+- Calculation: Highest
+- Reset Type: Report
+- Variable Class: java.math.BigDecimal
+- Variable Expression: $F{valor_total}
+
+================================================================================
+10. SUMMARY BAND - PIE DEL REPORTE
+================================================================================
+
+10.1 Total de Movimientos
+    - Static Text: "Total de Movimientos:"
+    - Posición: x=0, y=10, width=150
+    - Text Field: $V{totalMovimientos}
+    - Posición: x=150, y=10, width=100
+
+10.2 Saldo Final
+    - Static Text: "Saldo Final:"
+    - Posición: x=300, y=10, width=100
+    - Text Field: $V{saldoFinal}
+    - Pattern: #,##0.00
+    - Posición: x=400, y=10, width=100
+
+10.3 Valor Total Inventario
+    - Static Text: "Valor Total:"
+    - Posición: x=550, y=10, width=100
+    - Text Field: $V{valorTotalFinal}
+    - Pattern: $#,##0.00
+    - Posición: x=650, y=10, width=152
+    - Font: Bold
+    - Background: #FFFF99 (amarillo claro)
+
+================================================================================
+11. PAGE FOOTER
+================================================================================
+
+11.1 Número de Página
+    - Expression: "Página " + $V{PAGE_NUMBER} + " de "
+    - Posición: x=350, y=0, width=100
+    - Alignment: Right
+    - Evaluation Time: Now
+
+    - Expression: $V{PAGE_NUMBER}
+    - Posición: x=450, y=0, width=50
+    - Evaluation Time: Report
+
+11.2 Fecha de Generación
+    - Expression: "Generado: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date())
+    - Posición: x=0, y=0, width=200
+    - Font: Arial, 8pt, Italic
+
+================================================================================
+12. COMPILAR Y PROBAR
+================================================================================
+
+12.1 Compilar el Reporte
+    - Click en Preview tab
+    - Llenar parámetros de prueba:
+      * idProducto: [UUID de un producto existente]
+      * fechaInicio: [timestamp inicial]
+      * fechaFin: [timestamp final]
+    - Click "Run Report"
+
+12.2 Exportar a .jasper
+    - Build → Compile Report
+    - Esto genera kardex.jasper en el mismo directorio
+
+12.3 Copiar archivos al proyecto
+    - Copiar kardex.jrxml a: src/main/resources/reports/
+    - Copiar kardex.jasper a: src/main/resources/reports/
+
+================================================================================
+13. INTEGRACIÓN CON LA APLICACIÓN
+================================================================================
+
+13.1 Verificar archivos en classpath
+    - Después de mvn clean install
+    - Verificar en: target/classes/reports/kardex.jasper
+
+13.2 Endpoint REST
+    - URL: /resources/v1/reporte/kardex
+    - Parámetros: ?idProducto=UUID&fechaInicio=millis&fechaFin=millis
+
+13.3 Probar desde la aplicación
+    - Ir a Productos
+    - Click en botón "Reportes"
+    - Seleccionar producto
+    - Seleccionar rango de fechas
+    - Click "Generar PDF"
+
+================================================================================
+14. TROUBLESHOOTING
+================================================================================
+
+Error: "Report not found"
+Solución: Verificar que kardex.jasper existe en src/main/resources/reports/
+
+Error: "net.sf.jasperreports.engine.JRException: Error compiling report"
+Solución: Verificar sintaxis SQL y que todos los fields están correctamente definidos
+
+Error: "Cannot cast parameter"
+Solución: Verificar que el tipo de datos de parámetros coincide (String para UUID, Timestamp para fechas)
+
+Error: "No data found"
+Solución: Verificar que existen registros en la tabla kardex para el producto y rango de fechas seleccionado
+
+================================================================================
+15. MEJORAS OPCIONALES
+================================================================================
+
+15.1 Colores Alternados en Filas
+    - En Detail Band → Propiedades
+    - Print When Expression: new Boolean($V{REPORT_COUNT}.intValue() % 2 == 0)
+    - Background Color: #F5F5F5
+
+15.2 Conditional Formatting
+    - Para Tipo Movimiento:
+      * Si es "ENTRADA" → Color verde (#00FF00)
+      * Si es "SALIDA" → Color rojo (#FF0000)
+    - Text Field → Properties → Style → Conditional Styles
+
+15.3 Gráfico de Movimientos (Chart)
+    - Agregar en Summary Band
+    - Chart Type: Line Chart
+    - Dataset: Same as Report
+    - Category: fecha
+    - Series: cantidad_actual
+
+================================================================================
+16. COMANDOS MAVEN ÚTILES
+================================================================================
+
+Compilar reportes automáticamente (opcional):
+- Plugin: net.sf.jasperreports:jasperreports-plugin
+- Agregar en pom.xml:
+
+<plugin>
+    <groupId>com.alexnederlof</groupId>
+    <artifactId>jasperreports-plugin</artifactId>
+    <version>2.8</version>
+    <executions>
+        <execution>
+            <phase>process-resources</phase>
+            <goals>
+                <goal>jasper</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <sourceDirectory>src/main/resources/reports</sourceDirectory>
+        <outputDirectory>target/classes/reports</outputDirectory>
+    </configuration>
+</plugin>
+
+================================================================================
+NOTAS FINALES
+================================================================================
+
+- Siempre compilar después de modificar el .jrxml
+- Reiniciar servidor después de actualizar el .jasper
+- Hacer backup de reportes antes de modificaciones mayores
+- Usar versionamiento para los archivos .jrxml
+
+================================================================================
+FIN DE LA GUÍA
+================================================================================

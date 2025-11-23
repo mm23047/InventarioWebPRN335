@@ -55,6 +55,12 @@
 
             <ues:botones-top formulario="#{productoFrm}"
                              actualizar=":pnlProductoTabla :pnlProductoDetalle"/>
+            
+            <p:commandButton value="Reportes" 
+                             icon="pi pi-file-pdf" 
+                             onclick="PF('dlgReportes').show(); return false;"
+                             styleClass="ui-button-info"
+                             style="margin-top: 10px;"/>
          </h:form>
       </h:panelGroup>
    </ui:define>
@@ -84,7 +90,7 @@
                      <p:selectBooleanCheckbox id="chkProductoActivo" value="#{productoFrm.registro.activo}"/>
                   </h:panelGrid>
 
-                  <h:panelGrid columns="#{productoFrm.estado=='MODIFICAR' ? 1 : 2}">
+                  <h:panelGrid columns="2">
                      <p:commandButton value="#{crud['frm.botones.guardar']}"
                                       actionListener="#{productoFrm.btnGuardarHandler}"
                                       rendered="#{productoFrm.estado=='CREAR'}"
@@ -274,8 +280,12 @@
                                        <p:outputLabel value="#{caracteristica.idCaracteristica.nombre}:"
                                                       style="font-weight: normal; padding: 5px 0;"/>
                                        <h:panelGroup style="padding: 5px 0;">
-                                          <p:outputLabel value="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] != null ? productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] : ' Sin valor'}"
-                                                         style="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] != null ? 'color: #28a745; font-weight: bold; padding: 0 8px; margin: 0 4px;' : 'color: #dc3545; font-style: italic; padding: 0 8px; margin: 0 4px;'}"/>
+                                          <h:outputText value="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id]}"
+                                                        rendered="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] != null}"
+                                                        style="color: #28a745; font-weight: bold; padding: 0 8px; margin: 0 4px;"/>
+                                          <h:outputText value="Sin valor"
+                                                        rendered="#{productoFrm.ptpFrm.valoresCaracteristicas[caracteristica.id] == null}"
+                                                        style="color: #dc3545; font-style: italic; padding: 0 8px; margin: 0 4px;"/>
                                        </h:panelGroup>
                                     </ui:repeat>
                                  </h:panelGrid>
@@ -393,6 +403,62 @@
                                    oncomplete="PF('dlgTipoProducto').hide();"/>
                </h:panelGrid>
             </h:panelGrid>
+         </h:form>
+      </p:dialog>
+
+      <!-- Diálogo de Reportes Kardex -->
+      <p:dialog header="Generar Reporte Kardex" widgetVar="dlgReportes" modal="true" 
+                width="500" resizable="false">
+         <h:form id="frmDialogReportes">
+            <h:panelGrid columns="2" style="margin: 20px 0;">
+               <p:outputLabel for="cmbProductoReporte" value="Producto:"/>
+               <p:autoComplete id="cmbProductoReporte" 
+                               value="#{productoFrm.productoSeleccionadoReporte}"
+                               completeMethod="#{productoFrm.buscarProductosActivos}"
+                               var="p"
+                               itemLabel="#{p.nombreProducto}"
+                               itemValue="#{p}"
+                               converter="productoConverter"
+                               forceSelection="true"
+                               dropdown="true"
+                               minQueryLength="0"
+                               required="true"
+                               size="40">
+                  <p:column>
+                     <h:outputText value="#{p.nombreProducto}" />
+                  </p:column>
+               </p:autoComplete>
+               
+               <p:outputLabel for="calFechaInicioReporte" value="Fecha Inicio:"/>
+               <p:calendar id="calFechaInicioReporte" 
+                           value="#{productoFrm.fechaInicioReporte}"
+                           pattern="dd/MM/yyyy" 
+                           showOn="button" 
+                           required="true"/>
+               
+               <p:outputLabel for="calFechaFinReporte" value="Fecha Fin:"/>
+               <p:calendar id="calFechaFinReporte" 
+                           value="#{productoFrm.fechaFinReporte}"
+                           pattern="dd/MM/yyyy" 
+                           showOn="button" 
+                           required="true"/>
+            </h:panelGrid>
+            
+            <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
+               <h:commandButton value="Generar PDF"
+                                disabled="#{!productoFrm.reporteKardexValido}"
+                                onclick="window.open('#{productoFrm.urlReporteKardex}', '_blank'); return false;"
+                                styleClass="ui-button ui-button-success"
+                                style="background-color: #28a745; border-color: #28a745; color: white; padding: 8px 16px;">
+                  <span class="pi pi-file-pdf" style="margin-right: 5px;"></span>
+               </h:commandButton>
+               
+               <p:commandButton value="Cancelar" 
+                                onclick="PF('dlgReportes').hide(); return false;"
+                                styleClass="ui-button-secondary"/>
+            </h:panelGrid>
+            
+            <p:messages showDetail="true" closable="true"/>
          </h:form>
       </p:dialog>
 

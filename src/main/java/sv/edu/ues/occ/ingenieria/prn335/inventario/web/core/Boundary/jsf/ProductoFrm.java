@@ -1,5 +1,7 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -8,6 +10,11 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDA
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,8 +29,18 @@ public class ProductoFrm extends DefaultFrm<Producto> {
     @Inject
     protected ProductoTipoProductoFrm ptpFrm;
 
+    // Propiedades para reporte Kardex (independiente del CRUD)
+    private Producto productoSeleccionadoReporte;
+    private Date fechaInicioReporte;
+    private Date fechaFinReporte;
+
     public ProductoFrm() {
         this.nombreBean = "Producto";
+        // Inicializar fechas por defecto (último mes)
+        LocalDate hoy = LocalDate.now();
+        LocalDate inicioMes = hoy.withDayOfMonth(1);
+        this.fechaInicioReporte = Date.from(inicioMes.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.fechaFinReporte = Date.from(hoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     @Override
@@ -112,5 +129,85 @@ public class ProductoFrm extends DefaultFrm<Producto> {
         return ptpFrm;
     }
 
+    // Método para autocompletar productos activos
+    public List<Producto> buscarProductosActivos(String query) {
+        try {
+            if (query == null || query.trim().isEmpty()) {
+                // Si no hay query, devolver los primeros 10 productos activos
+                return productoDAO.findRange(0, 10);
+            }
+            // Buscar productos por nombre que coincidan con el query
+            return productoDAO.findByNombreLike(query.toUpperCase() + "%", 0, 10);
+        } catch (Exception e) {
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.SEVERE, "Error buscando productos", e);
+            return List.of();
+        }
+    }
+
+    // Método para obtener URL del reporte Kardex (ahora usa productoSeleccionadoReporte)
+    public String getUrlReporteKardex() {
+        if (productoSeleccionadoReporte == null || productoSeleccionadoReporte.getId() == null) {
+            return "#";
+        }
+        
+        if (fechaInicioReporte == null || fechaFinReporte == null) {
+            return "#";
+        }
+        
+        FacesContext context = getFacesContext();
+        ExternalContext externalContext = context.getExternalContext();
+        String contextPath = externalContext.getRequestContextPath();
+        
+        return String.format("%s/resources/v1/reporte/kardex?idProducto=%s&fechaInicio=%d&fechaFin=%d",
+            contextPath,
+            productoSeleccionadoReporte.getId().toString(),
+            fechaInicioReporte.getTime(),
+            fechaFinReporte.getTime()
+        );
+    }
+    
+    // Método para validar antes de generar reporte
+    public boolean isReporteKardexValido() {
+        if (productoSeleccionadoReporte == null || productoSeleccionadoReporte.getId() == null) {
+            return false;
+        }
+        
+        if (fechaInicioReporte == null || fechaFinReporte == null) {
+            return false;
+        }
+        
+        if (fechaInicioReporte.after(fechaFinReporte)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Getters y Setters
+    public Producto getProductoSeleccionadoReporte() {
+        return productoSeleccionadoReporte;
+    }
+
+    public void setProductoSeleccionadoReporte(Producto productoSeleccionadoReporte) {
+        this.productoSeleccionadoReporte = productoSeleccionadoReporte;
+    }
+
+    // Getters y Setters para las fechas del reporte
+    public Date getFechaInicioReporte() {
+        return fechaInicioReporte;
+    }
+
+    public void setFechaInicioReporte(Date fechaInicioReporte) {
+        this.fechaInicioReporte = fechaInicioReporte;
+    }
+
+    public Date getFechaFinReporte() {
+        return fechaFinReporte;
+    }
+
+    public void setFechaFinReporte(Date fechaFinReporte) {
+        this.fechaFinReporte = fechaFinReporte;
+    }
 
 }
+
