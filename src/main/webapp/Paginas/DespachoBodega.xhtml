@@ -1,0 +1,246 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="../WEB-INF/templates/default.xhtml">
+
+   <!-- Header -->
+   <ui:define name="header">
+      <h1 class="titulo-formulario">#{despachoBodegaFrm.nombreBean}</h1>
+   </ui:define>
+
+   <!-- Tabla de registros -->
+   <ui:define name="contenido-tabla">
+      <h:panelGroup id="pnlDespachoBodegaTabla">
+         <h:form id="frmDespachoBodegaTop">
+            <p:dataTable id="tblVentasAprobadas"
+                         value="#{despachoBodegaFrm.modelo}"
+                         var="venta"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         lazy="true"
+                         selection="#{despachoBodegaFrm.registro}"
+                         selectionMode="single"
+                         rowKey="#{venta.id}"
+                         rows="#{despachoBodegaFrm.registrosPorPagina}"
+                         widgetVar="wvVentasAprobadas"
+                         rendered="#{despachoBodegaFrm.estado=='NADA'}">
+
+               <!-- ID Venta -->
+               <p:column headerText="ID" width="250">
+                  <h:outputText value="#{venta.id}" />
+               </p:column>
+
+               <!-- Cliente -->
+               <p:column headerText="Cliente" width="200">
+                  <h:outputText value="#{venta.idCliente.nombre}" />
+               </p:column>
+
+               <!-- Estado -->
+               <p:column headerText="Estado" width="120">
+                  <h:outputText value="#{venta.estado}" 
+                                style="font-weight: bold; color: #27ae60;"/>
+               </p:column>
+
+               <!-- Total -->
+               <p:column headerText="Total" width="120">
+                  <h:outputText value="#{venta.total}">
+                     <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                  </h:outputText>
+               </p:column>
+
+               <!-- Fecha de Venta -->
+               <p:column headerText="Fecha Venta" width="150">
+                  <h:outputText value="#{venta.fecha}">
+                     <f:converter converterId="offsetDateTimeConverter" />
+                  </h:outputText>
+               </p:column>
+
+               <!-- Observaciones -->
+               <p:column headerText="Observaciones" width="200">
+                  <h:outputText value="#{venta.observaciones}" />
+               </p:column>
+
+               <p:ajax event="rowSelect"
+                       listener="#{despachoBodegaFrm.seleccionarRegistro}"
+                       update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle :tabDespachoBodega"/>
+            </p:dataTable>
+
+            <!-- Remote Command para actualización automática vía WebSocket -->
+            <p:remoteCommand name="refrescarTablaVentas"
+                             actionListener="#{despachoBodegaFrm.actualizarTablaAutomaticamente}"
+                             update="tblVentasAprobadas"
+                             process="@none"
+                             global="false"
+                             async="true"
+                             onstart="console.log('[DespachoBodega] Iniciando actualización...');"
+                             oncomplete="console.log('[DespachoBodega] Tabla actualizada correctamente');"/>
+
+         </h:form>
+      </h:panelGroup>
+   </ui:define>
+
+   <!-- Detalle (Formulario con pestañas) -->
+   <ui:define name="contenido-detalle">
+      <h:panelGroup id="pnlDespachoBodegaDetalle">
+         <p:tabView id="tabDespachoBodega" cache="false" dynamic="true"
+                    rendered="#{despachoBodegaFrm.estado!='NADA'}">
+
+            <!-- Pestaña Información de Venta -->
+            <p:tab id="tabInfo" closable="false" title="Información de Venta">
+               <h:form id="frmDespachoBodegaInfo">
+                  <h:panelGrid columns="2" style="width: 100%;">
+
+                     <!-- ID (Solo lectura) -->
+                     <p:outputLabel for="txtVentaId" value="ID Venta:"/>
+                     <p:inputText id="txtVentaId" value="#{despachoBodegaFrm.registro.id}"
+                                  readonly="true" disabled="true" size="35"/>
+
+                     <!-- Cliente (Solo lectura) -->
+                     <p:outputLabel for="txtCliente" value="Cliente:"/>
+                     <p:inputText id="txtCliente" value="#{despachoBodegaFrm.registro.idCliente.nombre}"
+                                  readonly="true" disabled="true" size="50"/>
+
+                     <!-- Estado (Solo lectura) -->
+                     <p:outputLabel for="txtEstado" value="Estado:"/>
+                     <p:inputText id="txtEstado" value="#{despachoBodegaFrm.registro.estado}"
+                                  readonly="true" disabled="true" 
+                                  style="font-weight: bold; color: #27ae60;"/>
+
+                     <!-- Fecha (Solo lectura) -->
+                     <p:outputLabel for="dpFecha" value="Fecha Venta:"/>
+                     <p:datePicker id="dpFecha"
+                                   value="#{despachoBodegaFrm.fechaVenta}"
+                                   showTime="true"
+                                   hourFormat="24"
+                                   timeZone="America/El_Salvador"
+                                   pattern="yyyy-MM-dd'T'HH:mm"
+                                   readonly="true"
+                                   disabled="true"/>
+
+                     <!-- Total (Solo lectura) -->
+                     <p:outputLabel for="txtTotal" value="Total Venta:"/>
+                     <p:inputText id="txtTotal" value="#{despachoBodegaFrm.totalVenta}"
+                                  readonly="true" disabled="true"
+                                  style="font-weight: bold; font-size: 14px;">
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                     </p:inputText>
+
+                     <!-- Observaciones (Solo lectura) -->
+                     <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
+                     <p:inputTextarea id="txtObservaciones"
+                                      value="#{despachoBodegaFrm.registro.observaciones}"
+                                      rows="4" cols="50"
+                                      readonly="true" disabled="true"/>
+
+                  </h:panelGrid>
+
+                  <!-- Botón para marcar como ENTREGADO -->
+                  <h:panelGrid columns="1" style="margin-top: 20px;">
+                     <p:commandButton value="Marcar como ENTREGADO"
+                                      actionListener="#{despachoBodegaFrm.marcarComoEntregado}"
+                                      update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
+                                      icon="pi pi-check"
+                                      styleClass="ui-button-success"
+                                      style="width: 250px;"/>
+                  </h:panelGrid>
+
+               </h:form>
+            </p:tab>
+
+            <!-- Pestaña Productos (Detalles de Venta) - SOLO LECTURA -->
+            <p:tab id="tabProductos" closable="false" title="Productos a Despachar">
+               <h:panelGroup id="pnlDespachoBodegaDetalleTabla">
+                  <h:form id="frmTablaDetalleDespacho">
+                     <p:dataTable id="tblDetallesDespacho"
+                                  value="#{despachoBodegaFrm.ventaDetalleFrm.modelo}"
+                                  var="detalle"
+                                  paginator="true"
+                                  paginatorPosition="bottom"
+                                  lazy="true"
+                                  rowKey="#{detalle.id}"
+                                  rows="#{despachoBodegaFrm.ventaDetalleFrm.registrosPorPagina}">
+
+                        <!-- ID Detalle -->
+                        <p:column headerText="ID" width="80">
+                           <h:outputText value="#{detalle.id}" />
+                        </p:column>
+
+                        <!-- Producto -->
+                        <p:column headerText="Producto" width="250">
+                           <h:outputText value="#{detalle.idProducto.nombreProducto}" 
+                                         style="font-weight: bold;"/>
+                        </p:column>
+
+                        <!-- Referencia -->
+                        <p:column headerText="Referencia" width="120">
+                           <h:outputText value="#{detalle.idProducto.referenciaExterna}" />
+                        </p:column>
+
+                        <!-- Cantidad -->
+                        <p:column headerText="Cantidad" width="100">
+                           <h:outputText value="#{detalle.cantidad}" 
+                                         style="font-weight: bold; color: #2980b9;">
+                              <f:convertNumber pattern="0.##" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Precio Unitario -->
+                        <p:column headerText="Precio Unitario" width="120">
+                           <h:outputText value="#{detalle.precio}">
+                              <f:convertNumber type="currency" currencySymbol="$" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Subtotal -->
+                        <p:column headerText="Subtotal" width="120">
+                           <h:outputText value="#{detalle.cantidad * detalle.precio}"
+                                         style="font-weight: bold;">
+                              <f:convertNumber type="currency" currencySymbol="$" />
+                           </h:outputText>
+                        </p:column>
+
+                        <!-- Estado -->
+                        <p:column headerText="Estado" width="100">
+                           <h:outputText value="#{detalle.estado}" />
+                        </p:column>
+
+                        <!-- Observaciones -->
+                        <p:column headerText="Observaciones" width="200">
+                           <h:outputText value="#{detalle.observaciones}" />
+                        </p:column>
+
+                     </p:dataTable>
+
+                  </h:form>
+               </h:panelGroup>
+
+            </p:tab>
+
+         </p:tabView>
+      </h:panelGroup>
+   </ui:define>
+
+   <!-- WebSocket JSF para actualización automática en tiempo real -->
+   <ui:define name="extras">
+      <!-- WebSocket JSF para recibir notificaciones de ventas aprobadas -->
+      <f:websocket channel="ventasAprobadas" onmessage="handleWebSocketMessage" scope="application" />
+
+      <h:outputScript>
+         function handleWebSocketMessage(message) {
+             console.log('[DespachoBodega] WebSocket mensaje recibido:', message);
+             if (message === 'refresh') {
+                 console.log('[DespachoBodega] Actualizando tabla automáticamente...');
+                 // Llamar al remote command para refrescar solo la tabla
+                 if (typeof refrescarTablaVentas !== 'undefined') {
+                     refrescarTablaVentas();
+                 } else {
+                     console.error('[DespachoBodega] refrescarTablaVentas no está definido');
+                 }
+             }
+         }
+      </h:outputScript>
+   </ui:define>
+
+</ui:composition>
