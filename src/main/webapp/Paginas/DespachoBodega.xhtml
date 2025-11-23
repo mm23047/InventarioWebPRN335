@@ -73,9 +73,7 @@
                              update="tblVentasAprobadas"
                              process="@none"
                              global="false"
-                             async="true"
-                             onstart="console.log('[DespachoBodega] Iniciando actualización...');"
-                             oncomplete="console.log('[DespachoBodega] Tabla actualizada correctamente');"/>
+                             async="true"/>
 
          </h:form>
       </h:panelGroup>
@@ -225,141 +223,49 @@
    <!-- WebSocket JavaScript Puro para actualización automática en tiempo real -->
    <ui:define name="extras">
       <h:outputScript>
-         // ========================================
-         // WebSocket JavaScript Puro (sin JSF <f:websocket>)
-         // ========================================
-         
+         //<![CDATA[
          let ws = null;
          let reconnectAttempts = 0;
-         const MAX_RECONNECT_ATTEMPTS = 10;
-         const RECONNECT_DELAY = 3000; // 3 segundos
+         const MAX_RECONNECT_ATTEMPTS = 5;
+         const RECONNECT_DELAY = 3000;
          
-         /**
-          * Conectar al WebSocket del servidor
-          */
          function conectarWebSocket() {
              try {
-                 // Determinar protocolo (ws o wss según HTTP/HTTPS)
                  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                 const host = window.location.host; // localhost:9080 o dominio en producción
-                 const contextPath = '#{request.contextPath}'; // /InventarioWebapprn335-1.0-SNAPSHOT
-                 const wsUrl = protocol + '//' + host + contextPath + '/websocket/ventas';
-                 
-                 console.log('[DespachoBodega] Conectando WebSocket a:', wsUrl);
+                 const wsUrl = protocol + '//' + window.location.host + '#{request.contextPath}' + '/websocket/ventas';
                  
                  ws = new WebSocket(wsUrl);
                  
-                 ws.onopen = function(event) {
-                     console.log('[DespachoBodega] WebSocket conectado exitosamente');
-                     reconnectAttempts = 0; // Reset contador de reintentos
-                     
-                     // Opcional: Enviar mensaje de prueba al servidor
-                     // ws.send('Cliente DespachoBodega conectado');
+                 ws.onopen = function() {
+                     reconnectAttempts = 0;
                  };
                  
                  ws.onmessage = function(event) {
-                     console.log('[DespachoBodega] Mensaje WebSocket recibido:', event.data);
-                     
-                     if (event.data === 'refresh') {
-                         console.log('[DespachoBodega] Actualizando tabla automaticamente...');
-                         
-                         // Llamar al remote command de PrimeFaces para actualizar la tabla
-                         if (typeof refrescarTablaVentas !== 'undefined') {
-                             refrescarTablaVentas();
-                         } else {
-                             console.error('[DespachoBodega] Funcion refrescarTablaVentas no esta definida');
-                         }
-                     } else if (event.data === 'pong') {
-                         console.log('[DespachoBodega] Pong recibido del servidor');
-                     } else {
-                         console.log('[DespachoBodega] Mensaje desconocido:', event.data);
+                     if (event.data === 'refresh' && typeof refrescarTablaVentas !== 'undefined') {
+                         refrescarTablaVentas();
                      }
                  };
                  
-                 ws.onclose = function(event) {
-                     console.log('[DespachoBodega] WebSocket desconectado. Codigo:', event.code, 'Razon:', event.reason);
-                     
-                     // Intentar reconectar automáticamente
+                 ws.onclose = function() {
                      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                          reconnectAttempts++;
-                         console.log('[DespachoBodega] Reintentando conexion (' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS + ') en ' + (RECONNECT_DELAY/1000) + 's...');
                          setTimeout(conectarWebSocket, RECONNECT_DELAY);
-                     } else {
-                         console.error('[DespachoBodega] Maximo de reintentos alcanzado. No se pudo reconectar al WebSocket.');
                      }
-                 };
-                 
-                 ws.onerror = function(error) {
-                     console.error('[DespachoBodega] Error en WebSocket:', error);
                  };
                  
              } catch (error) {
-                 console.error('[DespachoBodega] Error al crear WebSocket:', error);
+                 console.error('Error WebSocket:', error);
              }
          }
          
-         /**
-          * Enviar ping al servidor (opcional - para testing)
-          */
-         function enviarPing() {
-             if (ws && ws.readyState === WebSocket.OPEN) {
-                 console.log('[DespachoBodega] Enviando ping al servidor...');
-                 ws.send('ping');
-             } else {
-                 console.warn('[DespachoBodega] WebSocket no esta conectado. Estado:', ws ? ws.readyState : 'null');
-             }
-         }
+         window.addEventListener('load', conectarWebSocket);
          
-         /**
-          * Obtener estado de la conexión WebSocket
-          */
-         function getWebSocketStatus() {
-             if (!ws) return 'No inicializado';
-             
-             const states = {
-                 [WebSocket.CONNECTING]: 'Conectando...',
-                 [WebSocket.OPEN]: 'Conectado',
-                 [WebSocket.CLOSING]: 'Cerrando...',
-                 [WebSocket.CLOSED]: 'Desconectado'
-             };
-             
-             return states[ws.readyState] || 'Estado desconocido';
-         }
-         
-         // ========================================
-         // Inicialización y Cleanup
-         // ========================================
-         
-         // Conectar automáticamente al cargar la página
-         window.addEventListener('load', function() {
-             console.log('[DespachoBodega] Pagina cargada. Iniciando WebSocket...');
-             conectarWebSocket();
-         });
-         
-         // Cerrar limpiamente al salir de la página
          window.addEventListener('beforeunload', function() {
              if (ws && ws.readyState === WebSocket.OPEN) {
-                 console.log('[DespachoBodega] Cerrando WebSocket...');
-                 ws.close(1000, 'Usuario salió de la página'); // 1000 = cierre normal
+                 ws.close();
              }
          });
-         
-         // Exponer funciones globales para debugging en la consola del navegador
-         window.despachoBodegaWS = {
-             status: getWebSocketStatus,
-             ping: enviarPing,
-             reconnect: conectarWebSocket,
-             close: function() {
-                 if (ws) {
-                     ws.close();
-                     console.log('[DespachoBodega] WebSocket cerrado manualmente');
-                 }
-             }
-         };
-         
-         console.log('[DespachoBodega] Funciones de debug disponibles en: window.despachoBodegaWS');
-         console.log('[DespachoBodega] Usa despachoBodegaWS.status() para ver el estado');
-         console.log('[DespachoBodega] Usa despachoBodegaWS.ping() para enviar ping');
+         //]]>
       </h:outputScript>
    </ui:define>
 
