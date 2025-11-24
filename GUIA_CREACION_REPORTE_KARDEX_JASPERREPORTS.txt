@@ -82,10 +82,11 @@ SELECT
     k.cantidad_actual,
     k.precio_actual,
     k.referencia_externa,
-    k.observaciones,
+    k.observaciones AS kardex_observaciones,
     p.nombre_producto,
     p.referencia_externa AS producto_referencia,
-    a.nombre AS almacen_nombre,
+    a.id_almacen,
+    a.observaciones AS almacen_observaciones,
     CASE 
         WHEN k.tipo_movimiento = 'ENTRADA' THEN k.cantidad
         ELSE 0
@@ -190,10 +191,10 @@ Diseño de columnas (Total width: 802px):
 
 ┌──────────┬────────────┬───────┬───────┬────────┬────────┬─────────┬──────────┐
 │ Fecha    │ Tipo Mov.  │ Ref.  │ Alm.  │ Entr.  │ Salid. │ P.Unit. │ Saldo    │
-│ 80px     │ 70px       │ 60px  │ 60px  │ 60px   │ 60px   │ 70px    │ 70px     │
+│ 80px     │ 70px       │ 60px  │ 40px  │ 60px   │ 60px   │ 70px    │ 70px     │
 ├──────────┼────────────┼───────┼───────┼────────┼────────┼─────────┼──────────┤
 │ P.Prom.  │ Valor Tot. │ Observaciones                                        │
-│ 70px     │ 80px       │ 222px                                                │
+│ 70px     │ 80px       │ 242px                                                │
 └──────────┴────────────┴──────────────────────────────────────────────────────┘
 
 Para cada columna:
@@ -207,14 +208,14 @@ Columnas:
 1. Fecha (x=0, width=80)
 2. Tipo Movimiento (x=80, width=70)
 3. Referencia (x=150, width=60)
-4. Almacén (x=210, width=60)
-5. Entrada (x=270, width=60)
-6. Salida (x=330, width=60)
-7. P. Unitario (x=390, width=70)
-8. Saldo Cant. (x=460, width=70)
-9. P. Promedio (x=530, width=70)
-10. Valor Total (x=600, width=80)
-11. Observaciones (x=680, width=122)
+4. Almacén ID (x=210, width=40)
+5. Entrada (x=250, width=60)
+6. Salida (x=310, width=60)
+7. P. Unitario (x=370, width=70)
+8. Saldo Cant. (x=440, width=70)
+9. P. Promedio (x=510, width=70)
+10. Valor Total (x=580, width=80)
+11. Observaciones (x=660, width=142)
 
 ================================================================================
 8. DETAIL BAND - DATOS DE MOVIMIENTOS
@@ -235,49 +236,50 @@ Para cada columna del DETAIL, agregar Text Field con Expression:
    - Expression: $F{referencia_externa}
    - x=150, width=60
 
-4. Almacén:
-   - Expression: $F{almacen_nombre}
-   - x=210, width=60
+4. Almacén ID:
+   - Expression: $F{id_almacen}
+   - x=210, width=40
+   - Alignment: Center
 
 5. Entrada:
    - Expression: $F{cantidad_entrada}
    - Pattern: #,##0.00
-   - x=270, width=60
+   - x=250, width=60
    - Alignment: Right
 
 6. Salida:
    - Expression: $F{cantidad_salida}
    - Pattern: #,##0.00
-   - x=330, width=60
+   - x=310, width=60
    - Alignment: Right
 
 7. Precio Unitario:
    - Expression: $F{precio}
    - Pattern: $#,##0.00
-   - x=390, width=70
+   - x=370, width=70
    - Alignment: Right
 
 8. Saldo Cantidad:
    - Expression: $F{cantidad_actual}
    - Pattern: #,##0.00
-   - x=460, width=70
+   - x=440, width=70
    - Alignment: Right
 
 9. Precio Promedio:
    - Expression: $F{precio_actual}
    - Pattern: $#,##0.00
-   - x=530, width=70
+   - x=510, width=70
    - Alignment: Right
 
 10. Valor Total:
     - Expression: $F{valor_total}
     - Pattern: $#,##0.00
-    - x=600, width=80
+    - x=580, width=80
     - Alignment: Right
 
 11. Observaciones:
-    - Expression: $F{observaciones}
-    - x=680, width=122
+    - Expression: $F{kardex_observaciones}
+    - x=660, width=142
     - Text Adjustment: Stretch Height
 
 IMPORTANTE: Todos los campos deben tener:
