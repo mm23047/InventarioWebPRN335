@@ -53,14 +53,26 @@
                        update=":pnlProductoTabla :pnlProductoDetalle"/>
             </p:dataTable>
 
-            <ues:botones-top formulario="#{productoFrm}"
-                             actualizar=":pnlProductoTabla :pnlProductoDetalle"/>
-            
-            <p:commandButton value="Reportes" 
-                             icon="pi pi-file-pdf" 
-                             onclick="PF('dlgReportes').show(); return false;"
-                             styleClass="ui-button-info"
-                             style="margin-top: 10px;"/>
+            <!-- Botones personalizados para Producto (Nuevo y Reportes juntos) -->
+            <h:panelGrid columns="2" style="margin-top: 10px;">
+               <p:commandButton id="btnNuevo"
+                                value="#{crud['frm.botones.nuevo']} #{productoFrm.nombreBean}"
+                                rendered="#{productoFrm.estado=='NADA'}"
+                                actionListener="#{productoFrm.btnNuevoHandler}"
+                                update=":pnlProductoTabla :pnlProductoDetalle"/>
+               
+               <p:commandButton value="Reportes" 
+                                icon="pi pi-file-pdf" 
+                                onclick="PF('dlgReportes').show(); return false;"
+                                rendered="#{productoFrm.estado=='NADA'}"
+                                styleClass="ui-button-info"/>
+               
+               <p:commandButton id="btnCancelar"
+                                value="#{crud['frm.botones.cancelar']} #{productoFrm.nombreBean}"
+                                rendered="#{productoFrm.estado!='NADA'}"
+                                actionListener="#{productoFrm.btnCancelarHandler}"
+                                update=":pnlProductoTabla :pnlProductoDetalle"/>
+            </h:panelGrid>
          </h:form>
       </h:panelGroup>
    </ui:define>
@@ -422,7 +434,6 @@
                                forceSelection="true"
                                dropdown="true"
                                minQueryLength="0"
-                               required="true"
                                size="40">
                   <p:column>
                      <h:outputText value="#{p.nombreProducto}" />
@@ -433,36 +444,38 @@
                <p:calendar id="calFechaInicioReporte" 
                            value="#{productoFrm.fechaInicioReporte}"
                            pattern="dd/MM/yyyy" 
-                           showOn="button" 
-                           required="true"/>
+                           showOn="button"/>
                
                <p:outputLabel for="calFechaFinReporte" value="Fecha Fin:"/>
                <p:calendar id="calFechaFinReporte" 
                            value="#{productoFrm.fechaFinReporte}"
                            pattern="dd/MM/yyyy" 
-                           showOn="button" 
-                           required="true"/>
+                           showOn="button"/>
             </h:panelGrid>
             
-            <h:panelGrid columns="2" style="text-align: center; margin-top: 15px;">
-               <h:commandButton value="Generar PDF"
-                                disabled="#{!productoFrm.reporteKardexValido}"
-                                onclick="window.open('#{productoFrm.urlReporteKardex}', '_blank'); return false;"
-                                styleClass="ui-button ui-button-success"
-                                style="background-color: #28a745; border-color: #28a745; color: white; padding: 8px 16px;">
-                  <span class="pi pi-file-pdf" style="margin-right: 5px;"></span>
-               </h:commandButton>
+            <div style="text-align: center; margin-top: 15px;">
+               <!-- Botón con Ajax explícito -->
+               <p:commandButton value="Generar PDF" 
+                                icon="pi pi-file-pdf"
+                                styleClass="ui-button-success"
+                                style="margin-right: 10px;">
+                  <p:ajax listener="#{productoFrm.generarReporteKardex}" 
+                          process="@form" 
+                          update="@none"/>
+               </p:commandButton>
                
                <p:commandButton value="Cancelar" 
+                                type="button"
                                 onclick="PF('dlgReportes').hide(); return false;"
                                 styleClass="ui-button-secondary"/>
-            </h:panelGrid>
+            </div>
             
             <p:messages showDetail="true" closable="true"/>
          </h:form>
       </p:dialog>
 
-      <!-- Diálogo de carga -->
+      <!-- Diálogo de carga COMENTADO - falta loading.gif -->
+      <!--
       <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false"
                 showHeader="false" style="background: transparent; border: none; box-shadow: none;">
          <h:form>
@@ -472,5 +485,6 @@
             </h:panelGrid>
          </h:form>
       </p:dialog>
+      -->
    </ui:define>
 </ui:composition>

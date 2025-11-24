@@ -6,6 +6,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.primefaces.PrimeFaces;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
@@ -36,10 +37,10 @@ public class ProductoFrm extends DefaultFrm<Producto> {
 
     public ProductoFrm() {
         this.nombreBean = "Producto";
-        // Inicializar fechas por defecto (último mes)
+        // Inicializar fechas por defecto - TODO EL AÑO 2025 para pruebas
+        LocalDate inicioAnio = LocalDate.of(2025, 1, 1);
         LocalDate hoy = LocalDate.now();
-        LocalDate inicioMes = hoy.withDayOfMonth(1);
-        this.fechaInicioReporte = Date.from(inicioMes.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        this.fechaInicioReporte = Date.from(inicioAnio.atStartOfDay(ZoneId.systemDefault()).toInstant());
         this.fechaFinReporte = Date.from(hoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
@@ -154,16 +155,34 @@ public class ProductoFrm extends DefaultFrm<Producto> {
             return "#";
         }
         
-        FacesContext context = getFacesContext();
-        ExternalContext externalContext = context.getExternalContext();
-        String contextPath = externalContext.getRequestContextPath();
-        
-        return String.format("%s/resources/v1/reporte/kardex?idProducto=%s&fechaInicio=%d&fechaFin=%d",
-            contextPath,
-            productoSeleccionadoReporte.getId().toString(),
-            fechaInicioReporte.getTime(),
-            fechaFinReporte.getTime()
-        );
+        try {
+            FacesContext context = getFacesContext();
+            if (context == null) {
+                Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
+                    "FacesContext es null al intentar generar URL de reporte");
+                return "#";
+            }
+            
+            ExternalContext externalContext = context.getExternalContext();
+            if (externalContext == null) {
+                Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
+                    "ExternalContext es null al intentar generar URL de reporte");
+                return "#";
+            }
+            
+            String contextPath = externalContext.getRequestContextPath();
+            
+            return String.format("%s/resources/v1/reporte/kardex?idProducto=%s&fechaInicio=%d&fechaFin=%d",
+                contextPath,
+                productoSeleccionadoReporte.getId().toString(),
+                fechaInicioReporte.getTime(),
+                fechaFinReporte.getTime()
+            );
+        } catch (Exception e) {
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.SEVERE, 
+                "Error generando URL de reporte Kardex", e);
+            return "#";
+        }
     }
     
     // Método para validar antes de generar reporte
@@ -181,6 +200,54 @@ public class ProductoFrm extends DefaultFrm<Producto> {
         }
         
         return true;
+    }
+    
+    // Método para generar reporte Kardex - Redirige directamente al PDF
+    public void generarReporteKardex() {
+        try {
+            // Validar datos
+            if (productoSeleccionadoReporte == null || productoSeleccionadoReporte.getId() == null) {
+                addErrorMessage("Debe seleccionar un producto");
+                return;
+            }
+            
+            if (fechaInicioReporte == null || fechaFinReporte == null) {
+                addErrorMessage("Debe seleccionar las fechas");
+                return;
+            }
+            
+            if (fechaInicioReporte.after(fechaFinReporte)) {
+                addErrorMessage("La fecha de inicio debe ser anterior a la fecha fin");
+                return;
+            }
+            
+            // Construir URL del reporte
+            FacesContext context = FacesContext.getCurrentInstance();
+            ExternalContext externalContext = context.getExternalContext();
+            String contextPath = externalContext.getRequestContextPath();
+            
+            String url = String.format("%s/resources/v1/reporte/kardex?idProducto=%s&fechaInicio=%d&fechaFin=%d",
+                contextPath,
+                productoSeleccionadoReporte.getId().toString(),
+                fechaInicioReporte.getTime(),
+                fechaFinReporte.getTime()
+            );
+            
+            // Abrir en nueva ventana usando JavaScript
+            String script = String.format("window.open('%s', '_blank');", url);
+            org.primefaces.PrimeFaces.current().executeScript(script);
+                
+        } catch (Exception e) {
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.SEVERE, "Error al generar reporte Kardex", e);
+            addErrorMessage("Error al generar reporte: " + e.getMessage());
+        }
+    }
+    
+    private void addErrorMessage(String mensaje) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", mensaje));
+        }
     }
 
     // Getters y Setters
