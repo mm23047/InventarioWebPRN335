@@ -2,12 +2,15 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control;
 
 import jakarta.ejb.ActivationConfigProperty;
 import jakarta.ejb.MessageDriven;
+
 import jakarta.enterprise.event.Event;
+
 import jakarta.inject.Inject;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
 import jakarta.jms.TextMessage;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.ws.KardexEndpoint;
 
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -19,6 +22,9 @@ import java.util.logging.Logger;
         @ActivationConfigProperty(propertyName = "connectionFactoryLookup", propertyValue = "jms/JmsFactory")
 })
 public class ReceptorKardex implements MessageListener {
+    @Inject
+    KardexEndpoint kardexEndpoint;
+
 
     @Inject
     @VentaEvent
@@ -32,6 +38,7 @@ public class ReceptorKardex implements MessageListener {
     public void onMessage(Message message) {
         TextMessage textMessage = (TextMessage) message;
         try {
+//<<<<<<< Updated upstream
             String mensajeTexto = textMessage.getText();
             Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
                 "Mensaje recibido en ReceptorKardex: " + mensajeTexto);
@@ -52,6 +59,10 @@ public class ReceptorKardex implements MessageListener {
                     }
                 }
             }
+//=======
+            System.out.println("Mensaje recibido en ReceptorKardex: " + textMessage.getText());
+            kardexEndpoint.enviarMensajeBroadcast(textMessage.getText());
+//>>>>>>> Stashed changes
         } catch (JMSException ex) {
             Logger.getLogger(ReceptorKardex.class.getName()).log(Level.SEVERE, null, ex);
         }

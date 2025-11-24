@@ -1,0 +1,216 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="../WEB-INF/templates/default.xhtml">
+
+    <!-- Header -->
+    <ui:define name="header"><h1>#{recepcionKardexFrm.nombreBean}</h1></ui:define>
+
+    <!-- Contenido Principal -->
+    <ui:define name="contenido-tabla">
+        <h:panelGrid>
+            <h:outputText value="#{recepcionKardexFrm.ramdom}"/>
+            <h:form id="frmTop">
+                <p:remoteCommand
+                        name="actualizar" update=":frmTop" actionListener="#{recepcionKardexFrm.actualizarTabla}"/>
+
+                <p:dataTable id="tblCompras"
+                             value="#{recepcionKardexFrm.modelo}" var="compra"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             lazy="true"
+                             selection="#{recepcionKardexFrm.registro}"
+                             selectionMode="single"
+                             rows="#{recepcionKardexFrm.registrosPorPagina}"
+                             rendered="#{recepcionKardexFrm.estado=='NADA'}"
+                             rowKey="#{compra.id}"> <!-- IMPORTANTE: Agregar rowKey -->
+
+                    <!-- ID Compra -->
+                    <p:column headerText="ID" width="80">
+                        <h:outputText value="#{compra.id}" />
+                    </p:column>
+
+                    <!-- Proveedor -->
+                    <p:column headerText="Proveedor" width="200">
+                        <h:outputText value="#{compra.proveedor.nombre}" />
+                    </p:column>
+
+                    <!-- Estado -->
+                    <p:column headerText="Estado" width="120">
+                        <h:outputText value="#{compra.estado}" />
+                    </p:column>
+
+                    <!-- Fecha de Compra -->
+                    <p:column headerText="Fecha Compra" width="150">
+                        <h:outputText value="#{compra.fecha}">
+                            <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss XXX" />
+                        </h:outputText>
+                    </p:column>
+
+                    <!-- Observaciones -->
+                    <p:column headerText="Observaciones" width="200">
+                        <h:outputText value="#{compra.observaciones}" />
+                    </p:column>
+
+                    <!-- CORRECCIÓN: Evento rowSelect corregido -->
+                    <p:ajax event="rowSelect"
+                            listener="#{recepcionKardexFrm.seleccionarRegistro}"
+                            update="frmTop"
+                            oncomplete="if(#{recepcionKardexFrm.registro != null}) PF('dlgRecepcion').show()"/>
+
+                </p:dataTable>
+
+                <h:panelGrid columns="1" style="margin-top: 20px;">
+                    <!-- Botón Recibir Productos - Siempre visible -->
+                    <p:commandButton value="Recibir Productos"
+                                     action="#{recepcionKardexFrm.recibirProductos}"
+                                     update="frmTop"
+                                     disabled="#{recepcionKardexFrm.registro == null}"
+                                     icon="pi pi-check"/>
+                </h:panelGrid>
+
+                <!-- Mensajes -->
+                <p:messages id="messages" showDetail="true" autoUpdate="true" />
+            </h:form>
+        </h:panelGrid>
+    </ui:define>
+
+    <!-- Sin contenido de detalle -->
+    <ui:define name="contenido-detalle">
+        <!-- Vacío para esta página -->
+    </ui:define>
+
+    <!-- Diálogo Modal para Recepción de Productos -->
+    <ui:define name="extras">
+        <!-- WebSocket -->
+        <script>
+            var ws=new WebSocket("ws://localhost:9080/InventarioWebapprn335-1.0-SNAPSHOT/kardex");
+            ws.onmessage=function(event){
+                let message=event.data;
+                console.log(message);
+                actualizar();
+            };
+            ws.onopen=(o)=>{
+                console.log("Conexión WebSocket establecida.");
+            }
+        </script>
+
+        <!-- Diálogo de Recepción -->
+        <p:dialog id="dlgRecepcion"
+                  widgetVar="dlgRecepcion"
+                  header="Recepción de Productos - Compra #{recepcionKardexFrm.registro != null ? recepcionKardexFrm.registro.id : ''}"
+                  modal="true"
+                  closable="true"
+                  resizable="false"
+                  width="90%"
+                  height="600"
+                  dynamic="true">
+
+            <h:form id="frmRecepcion">
+                <!-- Solo mostrar si hay registro seleccionado -->
+                <h:panelGroup rendered="#{recepcionKardexFrm.registro != null}">
+                    <!-- Información de la Compra -->
+                    <h:panelGrid columns="2" style="margin-bottom: 20px; width: 100%;">
+                        <h:outputText value="Proveedor:" style="font-weight: bold;"/>
+                        <h:outputText value="#{recepcionKardexFrm.registro.proveedor.nombre}"/>
+
+                        <h:outputText value="Fecha Compra:" style="font-weight: bold;"/>
+                        <h:outputText value="#{recepcionKardexFrm.registro.fecha}">
+                            <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss" />
+                        </h:outputText>
+
+                        <h:outputText value="Observaciones:" style="font-weight: bold;"/>
+                        <h:outputText value="#{recepcionKardexFrm.registro.observaciones}"/>
+                    </h:panelGrid>
+
+                    <!-- Tabla de Productos de la Compra -->
+                    <p:dataTable id="tblProductosCompra"
+                                 value="#{recepcionKardexFrm.detallesCompra}"
+                                 var="detalle"
+                                 emptyMessage="No hay productos en esta compra"
+                                 style="margin-bottom: 20px;">
+
+                        <!-- Producto -->
+                        <p:column headerText="Producto" width="250">
+                            <h:outputText value="#{detalle.idProducto.nombreProducto}" />
+                        </p:column>
+
+                        <!-- Cantidad -->
+                        <p:column headerText="Cantidad" width="100">
+                            <h:outputText value="#{detalle.cantidad}">
+                                <f:convertNumber pattern="0.00" />
+                            </h:outputText>
+                        </p:column>
+
+                        <!-- Precio Unitario -->
+                        <p:column headerText="Precio Unitario" width="120">
+                            <h:outputText value="#{detalle.precio}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </p:column>
+
+                        <!-- Subtotal -->
+                        <p:column headerText="Subtotal" width="120">
+                            <h:outputText value="#{detalle.cantidad * detalle.precio}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </p:column>
+
+                        <!-- Selección de Almacén -->
+                        <p:column headerText="Almacén Destino" width="200">
+                            <p:selectOneMenu value="#{recepcionKardexFrm.almacenSeleccionado[detalle.id]}"
+                                             style="width: 100%"
+                                             required="true"
+                                             requiredMessage="Seleccione un almacén">
+                                <f:selectItem itemLabel="-- Seleccione Almacén --" itemValue="#{null}" />
+                                <f:selectItems value="#{recepcionKardexFrm.almacenesActivos}"
+                                               var="almacen"
+                                               itemLabel="#{almacen.idTipoAlmacen.nombre} - #{almacen.id}"
+                                               itemValue="#{almacen.id}" />
+                            </p:selectOneMenu>
+                        </p:column>
+
+                        <!-- Observaciones de Recepción -->
+                        <p:column headerText="Observaciones Recepción" width="200">
+                            <p:inputTextarea value="#{recepcionKardexFrm.observacionesRecepcion[detalle.id]}"
+                                             rows="2"
+                                             cols="30"
+                                             placeholder="Observaciones específicas para este producto"/>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <!-- Botones del Diálogo -->
+                    <h:panelGrid columns="3" style="margin-top: 20px; text-align: center;">
+                        <p:commandButton value="Confirmar Recepción"
+                                         action="#{recepcionKardexFrm.confirmarRecepcion}"
+                                         update=":frmTop :messages"
+                                         process="@form"
+                                         icon="pi pi-check"
+                                         oncomplete="if(!args.validationFailed) PF('dlgRecepcion').hide()"/>
+
+                        <p:commandButton value="Procesar Más Tarde"
+                                         action="#{recepcionKardexFrm.procesarMasTarde}"
+                                         update=":frmTop"
+                                         process="@this"
+                                         oncomplete="PF('dlgRecepcion').hide()"
+                                         icon="pi pi-clock"/>
+
+                        <p:commandButton value="Cancelar"
+                                         onclick="PF('dlgRecepcion').hide()"
+                                         icon="pi pi-times"
+                                         type="button"/>
+                    </h:panelGrid>
+                </h:panelGroup>
+
+                <!-- Mensaje cuando no hay registro seleccionado -->
+                <h:panelGroup rendered="#{recepcionKardexFrm.registro == null}">
+                    <h:outputText value="No hay compra seleccionada" style="color: red; font-weight: bold;"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

@@ -70,7 +70,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             this.listaProveedores = proveedorDAO.findByActivos(0, Integer.MAX_VALUE);
 
             // Definir estados disponibles
-            this.estadosCompra = Arrays.asList("ORDEN", "CREADO", "APROBADO", "RECHAZADO", "ANULADO");
+            this.estadosCompra = Arrays.asList("ORDEN", "CREADO", "APROBADO", "RECHAZADO", "ANULADO", "PAGADA");
 
             Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
                     "Listas de compra inicializadas correctamente. Proveedores activos cargados: " + listaProveedores.size());
@@ -186,6 +186,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     public CompraDetalleFrm getCompraDetalleFrm() {
         return compraDetalleFrm;
     }
+
     public List<Proveedor> buscarProveedoresPorNombre(final String nombre) {
         try {
             if (nombre != null && !nombre.isBlank()) {
@@ -198,8 +199,8 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     }
 
 
-    public void notificarCambioKardex(ActionEvent actionEvent){
-        if(this.registro!=null && this.registro.getId()!=null){
+    public void notificarCambioKardex(ActionEvent actionEvent) {
+        if (this.registro != null && this.registro.getId() != null) {
             this.registro.setEstado("PAGADA"); // Estado de la entidad (String)
             super.btnModificarHandler(actionEvent);
             notificadorKardex.notificarCambioKardex("Compra actualizada: ");
@@ -268,5 +269,4 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         }
         return BigDecimal.ZERO;
     }
-
 }

@@ -105,4 +105,10 @@ public class CompraDetalleDAO extends InventarioDefaultDataAccess<CompraDetalle>
             return null;
         }
     }
+
+    public List<CompraDetalle> findByCompra(Long id) {
+        TypedQuery<CompraDetalle> query = em.createNamedQuery("CompraDetalle.findByCompra", CompraDetalle.class);
+        query.setParameter("idCompra", id);
+        return query.getResultList();
+    }
 }
