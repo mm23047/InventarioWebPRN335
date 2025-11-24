@@ -1,0 +1,20 @@
+services:
+  inventario-app:
+    build: .
+    container_name: inventario-web
+    ports:
+      - "9080:9080"
+      - "9443:9443"
+    networks:
+      - inventario-network
+    environment:
+      - TZ=America/El_Salvador
+    # volumes:
+      # Opcional: Para hot-reload durante desarrollo
+      # - ./target/InventarioWebapprn335-1.0-SNAPSHOT.war:/opt/wlp/usr/servers/defaultServer/apps/inventario.war
+    restart: unless-stopped
+
+networks:
+  inventario-network:
+    name: inventario-network
+    external: true

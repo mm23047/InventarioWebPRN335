@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Inventario PRN335 - Docker">
+
+    <!-- Enable features -->
+    <featureManager>
+        <feature>jakartaee-10.0</feature>
+        <feature>jdbc-4.2</feature>
+    </featureManager>
+
+    <basicRegistry id="basic" realm="BasicRealm">
+        <!-- <user name="yourUserName" password="" />  -->
+    </basicRegistry>
+
+    <!-- IMPORTANTE: host="*" para acceso desde fuera del contenedor -->
+    <httpEndpoint id="defaultHttpEndpoint"
+                  host="*"
+                  httpPort="9080"
+                  httpsPort="9443" />
+
+    <!-- Automatically expand WAR files and EAR files -->
+    <applicationManager autoExpand="true"/>
+
+    <!-- Default keyStore para SSL/ORB - se genera automáticamente -->
+    <keyStore id="defaultKeyStore" 
+              password="Liberty"
+              type="PKCS12"
+              location="${server.config.dir}/resources/security/key.p12" />
+    
+    <!-- SSL configuration para ORB (requerido por EJB) -->
+    <ssl id="defaultSSLConfig" 
+         keyStoreRef="defaultKeyStore" 
+         trustDefaultCerts="true"
+         sslProtocol="TLSv1.2" />
+    
+    <!-- ORB configuration (requerido por EJB @Stateless) -->
+    <orb id="defaultOrb" sslRef="defaultSSLConfig"/>
+
+    <!-- Aplicación web -->
+    <webApplication id="inventario"
+                    location="inventario.war"
+                    contextRoot="/"
+                    name="inventario">
+        <classloader delegation="parentLast" />
+    </webApplication>
+    
+    <!-- JVM Options para JasperReports -->
+    <jvm>
+        <jvmOptions value="-Djava.awt.headless=true"/>
+        <jvmOptions value="-Dnet.sf.jasperreports.awt.ignore.missing.font=true"/>
+    </jvm>
+    
+    <!-- JMS Queue para Kardex (usado por @MessageDriven) -->
+    <messaging>
+        <wasJmsEndpoint host="*" wasJmsPort="7276" wasJmsSSLPort="7286"/>
+    </messaging>
+    
+    <messagingEngine>
+        <queue id="kardexQueue"/>
+    </messagingEngine>
+
+    <!-- DataSource para PostgreSQL en contenedor db17 -->
+    <dataSource id="PostgresDs"
+                jndiName="jdbc/pgdb"
+                jdbcDriverRef="postgresql-driver"
+                type="javax.sql.ConnectionPoolDataSource"
+                transactional="true" >
+        <properties serverName="db17"
+                    databaseName="inventario_prn335"
+                    portNumber="5432"
+                    user="postgres"
+                    password="abc123"/>
+    </dataSource>
+
+    <jdbcDriver id="postgresql-driver"
+                javax.sql.DataSource="org.postgresql.ds.PGSimpleDataSource"
+                javax.sql.ConnectionPoolDataSource="org.postgresql.ds.PGConnectionPoolDataSource"
+                libraryRef="postgresql-library"/>
+
+    <library id="postgresql-library">
+        <fileset id="PostgresqlFileSet"
+                 dir="${wlp.install.dir}/lib"
+                 includes="postgresql-42.7.4.jar"/>
+    </library>
+
+</server>

@@ -1,0 +1,755 @@
+# Dockerización de InventarioWebPRN335
+
+## 🚀 Inicio Rápido - Configuración Desde Cero
+
+**Si acabas de clonar el repositorio** y es la primera vez que lo configuras, sigue estos pasos en orden:
+
+### 📋 Pre-requisitos
+Asegúrate de tener instalado:
+- ✅ [Docker Desktop](https://www.docker.com/products/docker-desktop) corriendo
+- ✅ [Java JDK 21](https://www.oracle.com/java/technologies/downloads/#java21)
+- ✅ [Maven](https://maven.apache.org/download.cgi)
+- ✅ VS Code o IntelliJ IDEA
+
+### 🎯 Pasos de Configuración (Ejecútalo en este orden)
+
+```powershell
+# PASO 1: Navegar al directorio del proyecto
+cd c:\Users\TU_USUARIO\Desktop\InventarioWebPRN335
+
+# PASO 2: Compilar la aplicación con Maven
+mvn clean package
+
+# PASO 3: Verificar que se creó el WAR
+ls target\InventarioWebapprn335-1.0-SNAPSHOT.war
+
+# PASO 4: Crear la red Docker
+docker network create inventario-network
+
+# PASO 5: Verificar que tienes PostgreSQL corriendo
+docker ps --filter "name=db17"
+
+# PASO 6: Si db17 NO está corriendo, créalo:
+# (Si ya existe y está corriendo, OMITE este paso)
+docker run -d `
+  --name db17 `
+  --network inventario-network `
+  -e POSTGRES_USER=postgres `
+  -e POSTGRES_PASSWORD=postgres `
+  -e POSTGRES_DB=inventario_prn335 `
+  -p 5432:5432 `
+  postgres:17.5-alpine
+
+# PASO 7: Si db17 ya existía, conéctalo a la red
+docker network connect inventario-network db17
+
+# PASO 8: Construir la imagen Docker (descarga el driver automáticamente)
+docker-compose build inventario-app
+
+# PASO 9: Levantar la aplicación
+docker-compose up -d inventario-app
+
+# PASO 10: Ver los logs para confirmar que inició correctamente
+docker logs -f inventario-web
+# Presiona Ctrl+C para salir de los logs
+
+# PASO 11: Abrir en el navegador
+# http://localhost:9080
+```
+
+### ✅ Verificación Final
+
+Ejecuta estos comandos para verificar que todo está corriendo:
+
+```powershell
+# Ver contenedores corriendo (deberías ver inventario-web y db17)
+docker ps
+
+# Probar acceso a la aplicación
+Start-Process "http://localhost:9080"
+
+# Verificar librerías de fuentes (debería mostrar ~50)
+docker exec inventario-web bash -c "fc-list | wc -l"
+```
+
+**¡Listo!** Tu aplicación debería estar corriendo en http://localhost:9080
+
+---
+
+## 🔄 Inicio Rápido - Si Ya Está Configurado
+
+Si ya configuraste todo anteriormente y solo necesitas levantar la aplicación:
+
+```powershell
+# Navegar al proyecto
+cd c:\Users\TU_USUARIO\Desktop\InventarioWebPRN335
+
+# Levantar la aplicación
+docker-compose up -d inventario-app
+
+# Ver logs
+docker logs -f inventario-web
+```
+
+---
+
+## 📋 Requisitos Previos
+- ✅ Docker Desktop instalado y corriendo
+- ✅ Docker Compose incluido con Docker Desktop
+- ✅ Java JDK 21 y Maven instalados (para compilar)
+- ✅ PostgreSQL contenedor `db17` corriendo (o crear uno nuevo)
+
+**Nota**: El driver PostgreSQL se descarga automáticamente durante la construcción de la imagen Docker, no necesitas descargarlo manualmente.
+
+## 📁 Estructura de Archivos Docker
+
+```
+InventarioWebPRN335/
+├── Dockerfile                      # 🐳 Imagen de la aplicación
+├── docker-compose.yml              # 🔧 Orquestación de servicios
+├── server.xml                      # ⚙️  Configuración OpenLiberty
+├── init-server.sh                  # 🚀 Script de inicio del servidor
+├── .dockerignore                   # 🚫 Archivos excluidos del build
+├── .gitignore                      # 🚫 Archivos excluidos de Git
+├── pom.xml                         # 🔨 Configuración Maven
+└── target/
+    └── InventarioWebapprn335-1.0-SNAPSHOT.war  # 📦 WAR compilado
+```
+
+**Nota**: El driver PostgreSQL (`postgresql-42.7.4.jar`) ya NO es necesario en el proyecto. Se descarga automáticamente durante el build de Docker.
+
+## 🔨 Paso 1: Compilar la Aplicación
+
+```bash
+mvn clean package
+```
+
+**Verifica que se compiló correctamente:**
+```powershell
+# Windows PowerShell
+ls target\InventarioWebapprn335-1.0-SNAPSHOT.war
+
+# Linux/Mac
+ls -lh target/InventarioWebapprn335-1.0-SNAPSHOT.war
+```
+
+Deberías ver un archivo WAR de aproximadamente **20-30 MB**.
+
+## 🐳 Paso 2: Construir la Imagen Docker
+
+### Opción A: Con Docker Compose (Recomendado)
+```bash
+docker-compose build inventario-app
+```
+
+### Opción B: Con Docker directamente
+```bash
+# Construcción normal (usa caché)
+docker build -t inventario-web:latest .
+
+# Construcción completa (sin caché - usa esto si hay problemas)
+docker build --no-cache -t inventario-web:latest .
+```
+
+**Nota**: La construcción tarda **5-10 minutos** la primera vez porque descarga:
+- JDK 21 (~170 MB)
+- OpenLiberty (~45 MB)
+- Driver PostgreSQL (~1 MB) - **Se descarga automáticamente**
+
+## 🚀 Paso 3: Ejecutar la Aplicación
+
+### Opción 1: Usar Base de Datos Existente (db17)
+
+Si ya tienes un contenedor PostgreSQL llamado `db17` corriendo:
+
+```powershell
+# 1. Verificar que db17 esté corriendo
+docker ps --filter "name=db17"
+
+# 2. Crear la red inventario-network (si no existe)
+docker network create inventario-network
+
+# 3. Conectar db17 a la red (ignora el error si ya está conectado)
+docker network connect inventario-network db17
+
+# 4. Levantar solo la aplicación inventario
+docker-compose up -d inventario-app
+```
+
+### Opción 2: Crear Todo Desde Cero
+
+Si necesitas crear también la base de datos:
+
+```bash
+# Edita docker-compose.yml y descomenta la sección db17
+# Luego ejecuta:
+docker-compose up -d
+```
+
+### Verificar que Levantó Correctamente
+
+```powershell
+# Ver contenedores corriendo
+docker ps
+
+# Deberías ver:
+# - inventario-web (puertos 9080, 9443)
+# - db17 (puerto 5432)
+```
+
+## ✅ Paso 4: Verificar el Despliegue
+
+### Ver logs en tiempo real
+```bash
+docker logs -f inventario-web
+```
+
+### ¿Qué mensajes son normales?
+
+✅ **ÉXITO** - Busca este mensaje:
+```
+[AUDIT] CWWKZ0001I: Application inventario started in XX.XXX seconds.
+[AUDIT] CWWKF0011I: The defaultServer server is ready to run a smarter planet.
+```
+
+⚠️ **WARNINGS ESPERADOS** (puedes ignorarlos):
+- `CWWKS9582E` sobre SSL/ORB - El keyStore se genera automáticamente, es normal
+- `CNTR4016W` sobre JmsQueue - Normal si no usas mensajería JMS
+- `MyFaces Core is running in DEVELOPMENT mode` - Esperado en desarrollo
+- `CWWKZ0022W: Application inventario has not started in 30 seconds` - Solo informativo, espera unos segundos más
+
+❌ **ERRORES REALES** (necesitan corrección):
+- `Could not initialize class sun.awt.X11FontManager` - Ver sección Troubleshooting
+- `Connection refused` a la base de datos - Verifica que db17 esté corriendo
+
+### Ver logs de la base de datos
+```bash
+docker logs -f db17
+```
+
+### Verificar que la aplicación esté corriendo
+```bash
+docker ps
+```
+
+Deberías ver:
+- `inventario-web` corriendo en puertos 9080, 9443
+- `db17` corriendo en puerto 5432
+
+## 🌐 Acceder a la Aplicación
+
+Una vez que veas el mensaje de éxito en los logs:
+
+### URLs de Acceso
+- 🌍 **HTTP**: http://localhost:9080
+- 🔒 **HTTPS**: https://localhost:9443
+
+### Probar Funcionalidad Básica
+1. Abre http://localhost:9080 en tu navegador
+2. Deberías ver la página principal de la aplicación
+
+### Probar Reportes Kardex (JasperReports)
+¡Esto es lo que corregimos! Ahora debería funcionar sin errores:
+
+1. Navega a: http://localhost:9080/Paginas/Producto.xhtml
+2. Selecciona un producto de la lista
+3. Haz clic en **"Reportes"** o el botón de reporte
+4. Selecciona el rango de fechas
+5. Haz clic en **"Generar Reporte PDF"**
+6. El PDF debería descargarse automáticamente
+
+✅ **Si funciona**: ¡Perfecto! Las librerías de fuentes están correctamente instaladas.
+❌ **Si falla**: Ver sección de Troubleshooting abajo.
+
+## 🛑 Detener y Reiniciar
+
+### Detener la aplicación (mantiene los datos)
+```bash
+docker-compose down
+```
+
+### Reiniciar la aplicación
+```bash
+docker-compose up -d inventario-app
+```
+
+### Detener Y ELIMINAR volúmenes (¡CUIDADO! Pierdes datos de BD)
+```bash
+docker-compose down -v
+```
+
+### Ver estado de contenedores
+```bash
+# Contenedores corriendo
+docker ps
+
+# Todos los contenedores (incluyendo detenidos)
+docker ps -a
+```
+
+## 🔧 Troubleshooting (Solución de Problemas)
+
+### ❌ Error: "Could not initialize class sun.awt.X11FontManager"
+
+**Síntoma**: Al generar reportes PDF con JasperReports, sale este error.
+
+**Causa**: Faltan las librerías de fuentes (`libfreetype`) o los symlinks no están configurados.
+
+**Solución**:
+
+1. **Reconstruir la imagen completamente**:
+```powershell
+docker-compose down
+docker-compose build --no-cache inventario-app
+docker-compose up -d inventario-app
+```
+
+2. **Verificar que las librerías estén instaladas**:
+```bash
+# Verificar libfreetype
+docker exec inventario-web ls -lh /usr/lib/x86_64-linux-gnu/libfreetype.so.6
+
+# Verificar symlinks
+docker exec inventario-web ls -lh /usr/lib/libfreetype.so.6
+docker exec inventario-web ls -lh /opt/jdk-21/lib/libfreetype.so.6
+
+# Verificar fuentes instaladas (debería mostrar ~50 fuentes)
+docker exec inventario-web bash -c "fc-list | wc -l"
+```
+
+3. **Verificar que el WAR contenga los .jasper**:
+```bash
+docker exec inventario-web unzip -l /opt/wlp/usr/servers/defaultServer/apps/inventario.war | grep jasper
+```
+
+Deberías ver:
+```
+reports/kardex.jasper
+reports/tipo_unidad_medida.jasper
+```
+
+---
+
+### ❌ Error: "Cannot connect to database"
+
+**Síntoma**: La aplicación no puede conectarse a PostgreSQL.
+
+**Soluciones**:
+
+1. **Verificar que db17 esté corriendo**:
+```bash
+docker ps --filter "name=db17"
+```
+
+2. **Verificar que db17 esté en la misma red**:
+```bash
+docker network inspect inventario-network
+```
+
+Deberías ver `db17` en la lista de contenedores.
+
+3. **Conectar db17 manualmente**:
+```bash
+docker network connect inventario-network db17
+```
+
+4. **Probar conexión directa a la BD**:
+```bash
+docker exec -it db17 psql -U postgres -d inventario_prn335 -c "\dt"
+```
+
+---
+
+### ❌ Error: "Address already in use" (Puerto en uso)
+
+**Síntoma**: No puede levantar el contenedor porque el puerto 9080 o 5432 ya está en uso.
+
+**Solución 1** - Detener el proceso que usa el puerto:
+```powershell
+# Ver qué proceso usa el puerto 9080
+netstat -ano | findstr :9080
+
+# Matar el proceso (reemplaza PID con el número que viste)
+Stop-Process -Id PID -Force
+```
+
+**Solución 2** - Cambiar el puerto en `docker-compose.yml`:
+```yaml
+ports:
+  - "8080:9080"  # Usar puerto 8080 en lugar de 9080
+  - "8443:9443"  # Usar puerto 8443 en lugar de 9443
+```
+
+---
+
+### ❌ Error: "postgresql-42.7.4.jar not found"
+
+**Síntoma**: Al construir la imagen, falla porque no encuentra el driver JDBC.
+
+**Solución**:
+```powershell
+# Descargar el driver en el directorio del proyecto
+Invoke-WebRequest -Uri https://jdbc.postgresql.org/download/postgresql-42.7.4.jar -OutFile postgresql-42.7.4.jar
+
+# Verificar que existe
+ls postgresql-42.7.4.jar
+```
+
+---
+
+### 🔍 Ver Logs Completos del Servidor
+
+Si necesitas ver logs más detallados:
+
+```bash
+# Entrar al contenedor
+docker exec -it inventario-web bash
+
+# Ver logs de OpenLiberty
+cat /opt/wlp/usr/servers/defaultServer/logs/messages.log
+cat /opt/wlp/usr/servers/defaultServer/logs/console.log
+
+# Salir del contenedor
+exit
+```
+
+## 🔄 Hot Reload Durante Desarrollo
+
+**¿Qué es?** Permite recompilar y ver cambios sin reconstruir la imagen Docker.
+
+### Cómo Activar
+
+1. **Descomentar el volumen en `docker-compose.yml`**:
+```yaml
+services:
+  inventario-app:
+    volumes:
+      - ./target/InventarioWebapprn335-1.0-SNAPSHOT.war:/opt/wlp/usr/servers/defaultServer/apps/inventario.war
+```
+
+2. **Flujo de trabajo**:
+```bash
+# 1. Hacer cambios en el código Java
+# 2. Recompilar
+mvn clean package
+
+# 3. OpenLiberty detecta el cambio automáticamente y recarga
+# 4. Espera 5-10 segundos
+# 5. Refresca el navegador
+```
+
+3. **Ver la recarga en los logs**:
+```bash
+docker logs -f inventario-web
+
+# Busca:
+# [AUDIT] CWWKT0017I: Web application removed (default_host): http://...
+# [AUDIT] CWWKZ0009I: The application inventario has stopped successfully.
+# [AUDIT] CWWKZ0018I: Starting application inventario.
+# [AUDIT] CWWKZ0001I: Application inventario started in X.XXX seconds.
+```
+
+**Nota**: Solo funciona para cambios en código Java. Para cambios en `Dockerfile` o `server.xml`, debes reconstruir.
+
+## 🔧 Reconstruir la Imagen
+
+### ¿Cuándo reconstruir?
+
+Reconstruye la imagen cuando modifiques:
+- ✅ `Dockerfile`
+- ✅ `server.xml`
+- ✅ `init-server.sh`
+- ✅ Dependencias del `pom.xml` (librerías)
+- ✅ Archivos de configuración (`.properties`, `persistence.xml`)
+
+**NO** necesitas reconstruir para cambios en:
+- ❌ Código Java (.java files) - usa Hot Reload
+- ❌ Páginas XHTML - usa Hot Reload
+
+### Comandos de Reconstrucción
+
+```bash
+# Reconstrucción rápida (usa caché)
+docker-compose down
+docker-compose build inventario-app
+docker-compose up -d inventario-app
+```
+
+```bash
+# Reconstrucción completa (sin caché - usa si hay problemas)
+docker-compose down
+docker-compose build --no-cache inventario-app
+docker-compose up -d inventario-app
+```
+
+```bash
+# Ver el progreso de la construcción
+docker-compose build --progress=plain inventario-app
+```
+
+## ⚙️ Variables de Entorno Disponibles
+
+Puedes personalizar estas variables en `docker-compose.yml`:
+
+```yaml
+services:
+  inventario-app:
+    environment:
+      # Zona horaria
+      - TZ=America/El_Salvador
+      
+      # Configuración de Java para JasperReports
+      - JAVA_OPTS=-Djava.awt.headless=true -Dnet.sf.jasperreports.awt.ignore.missing.font=true
+      
+      # Configuración de memoria JVM (opcional)
+      - JAVA_OPTS=-Xmx1024m -Xms512m
+  
+  db17:
+    environment:
+      # Credenciales de PostgreSQL
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=tu_password_seguro
+      - POSTGRES_DB=inventario_prn335
+```
+
+**Nota**: Las variables `JAVA_OPTS` ya están configuradas en el `init-server.sh`, pero puedes sobrescribirlas si necesitas ajustes personalizados.
+
+## 🚀 Configuración para Producción
+
+### ⚠️ IMPORTANTE: Cambios Necesarios para Producción
+
+1. **Cambiar MyFaces a PRODUCTION mode**
+
+Edita `web.xml` y agrega:
+```xml
+<context-param>
+    <param-name>jakarta.faces.PROJECT_STAGE</param-name>
+    <param-value>Production</param-value>
+</context-param>
+```
+
+2. **Usar secrets para contraseñas**
+
+En lugar de poner contraseñas en `docker-compose.yml`:
+
+```yaml
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+services:
+  inventario-app:
+    secrets:
+      - db_password
+```
+
+3. **Configurar límites de recursos**
+
+```yaml
+services:
+  inventario-app:
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+```
+
+4. **Usar volúmenes nombrados para persistencia**
+
+```yaml
+volumes:
+  postgres-data:
+
+services:
+  db17:
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+```
+
+5. **Configurar health checks**
+
+```yaml
+services:
+  inventario-app:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+```
+
+6. **Configurar política de reinicio**
+
+```yaml
+services:
+  inventario-app:
+    restart: always  # Cambiar de "unless-stopped" a "always"
+```
+
+## 📝 Comandos Útiles
+
+### Gestión de Contenedores
+
+```bash
+# Ver contenedores corriendo
+docker ps
+
+# Ver todos los contenedores (incluidos detenidos)
+docker ps -a
+
+# Ver logs en tiempo real
+docker logs -f inventario-web
+
+# Ver últimas 50 líneas de logs
+docker logs --tail 50 inventario-web
+
+# Entrar al contenedor (bash interactivo)
+docker exec -it inventario-web bash
+
+# Reiniciar solo la aplicación
+docker restart inventario-web
+
+# Detener la aplicación
+docker stop inventario-web
+
+# Eliminar el contenedor
+docker rm inventario-web
+```
+
+### Gestión de Imágenes
+
+```bash
+# Ver imágenes
+docker images
+
+# Eliminar imagen
+docker rmi inventariowebprn335-inventario-app:latest
+
+# Limpiar imágenes sin usar
+docker image prune -a
+```
+
+### Gestión de Redes
+
+```bash
+# Ver redes
+docker network ls
+
+# Inspeccionar red
+docker network inspect inventario-network
+
+# Ver qué contenedores están en la red
+docker network inspect inventario-network | findstr Name
+
+# Desconectar contenedor de la red
+docker network disconnect inventario-network db17
+```
+
+### Base de Datos
+
+```bash
+# Conectarse a PostgreSQL
+docker exec -it db17 psql -U postgres -d inventario_prn335
+
+# Ver tablas
+docker exec -it db17 psql -U postgres -d inventario_prn335 -c "\dt"
+
+# Consulta SQL rápida
+docker exec -it db17 psql -U postgres -d inventario_prn335 -c "SELECT COUNT(*) FROM producto;"
+
+# Backup de la base de datos
+docker exec db17 pg_dump -U postgres inventario_prn335 > backup.sql
+
+# Restaurar backup
+docker exec -i db17 psql -U postgres inventario_prn335 < backup.sql
+```
+
+### Limpieza General
+
+```bash
+# Limpiar todo (contenedores detenidos, redes sin usar, imágenes sin usar)
+docker system prune -a
+
+# Limpiar volúmenes sin usar (¡CUIDADO! Pierdes datos)
+docker volume prune
+
+# Ver espacio usado por Docker
+docker system df
+```
+
+---
+
+## 📦 Stack Tecnológico del Contenedor
+
+| Componente | Versión | Descripción |
+|------------|---------|-------------|
+| **Sistema Operativo** | Debian 12 (Bookworm) | Base ligera y estable |
+| **Java** | Oracle JDK 21 | Última versión LTS de Java |
+| **Servidor de Aplicaciones** | OpenLiberty 25.0.0.8 | Compatible con Jakarta EE 10.0 |
+| **Base de Datos** | PostgreSQL 17 | Última versión de PostgreSQL |
+| **Driver JDBC** | postgresql-42.7.4.jar | Driver oficial de PostgreSQL |
+| **Framework Web** | PrimeFaces 15.0.8 | UI components para JSF |
+| **Reportes** | JasperReports 7.0.3 | Generación de PDF |
+| **Fuentes** | DejaVu, Liberation | Fuentes para reportes PDF |
+
+## ✅ Características Configuradas
+
+### Jakarta EE 10.0 Features Instaladas
+
+✅ Jakarta EE 10.0 Core  
+✅ Jakarta Faces 4.0 (JSF)  
+✅ Jakarta RESTful Web Services 3.1  
+✅ Jakarta Persistence 3.1 (JPA)  
+✅ Jakarta Enterprise Beans 4.0 (EJB)  
+✅ Jakarta Bean Validation 3.0  
+✅ Jakarta Contexts and Dependency Injection 4.0 (CDI)  
+✅ Jakarta JSON Binding 3.0 / JSON Processing 2.1  
+✅ Jakarta WebSocket 2.1  
+✅ Jakarta Mail 2.1  
+✅ Jakarta Security 3.0  
+
+### Configuraciones Especiales
+
+✅ **JasperReports**: Librerías de fuentes instaladas (`libfreetype6`, `libfreetype6-dev`)  
+✅ **Acceso Externo**: `host="*"` en httpEndpoint  
+✅ **DataSource**: Configurado para `db17:5432`  
+✅ **Auto-expansión**: WAR se despliega automáticamente  
+✅ **SSL**: Certificados autofirmados generados automáticamente  
+✅ **Timezone**: America/El_Salvador  
+✅ **Modo Headless**: Java configurado para reportes sin GUI  
+
+## 🔌 Puertos Expuestos
+
+| Puerto | Protocolo | Descripción |
+|--------|-----------|-------------|
+| **9080** | HTTP | Aplicación web (principal) |
+| **9443** | HTTPS | Aplicación web segura |
+| **5432** | TCP | PostgreSQL (solo si usas el servicio db17 del compose) |
+
+---
+
+## 📚 Recursos Adicionales
+
+- [Documentación de OpenLiberty](https://openliberty.io/docs/)
+- [Jakarta EE 10 Specification](https://jakarta.ee/specifications/platform/10/)
+- [JasperReports Documentation](https://community.jaspersoft.com/documentation)
+- [Docker Compose Reference](https://docs.docker.com/compose/compose-file/)
+- [PostgreSQL Docker Hub](https://hub.docker.com/_/postgres)
+
+## 🆘 Soporte
+
+Si tienes problemas:
+1. ✅ Revisa la sección **Troubleshooting** arriba
+2. ✅ Verifica los logs: `docker logs -f inventario-web`
+3. ✅ Busca en los logs de PostgreSQL: `docker logs -f db17`
+4. ✅ Revisa que todos los requisitos previos estén cumplidos
+
+---
+
+**Última actualización**: Noviembre 2025  
+**Versión**: 1.0 con soporte completo para JasperReports
