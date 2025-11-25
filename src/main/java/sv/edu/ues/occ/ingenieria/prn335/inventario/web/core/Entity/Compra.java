@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "compra", schema = "public")
@@ -39,6 +40,11 @@ public class Compra {
     @Lob
     @Column(name = "observaciones")
     private String observaciones;
+
+    // ========== RELACIÓN BIDIRECCIONAL CON CASCADE ==========
+    @OneToMany(mappedBy = "idCompra", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<CompraDetalle> compraDetalleList;
+    //
 
     public Long getId() {
         return id;
@@ -84,12 +90,21 @@ public class Compra {
         return proveedor != null ? proveedor.getId() : null;
     }
 
+    // Getter y Setter para la lista de detalles
+    public List<CompraDetalle> getCompraDetalleList() {
+        return compraDetalleList;
+    }
+
+    public void setCompraDetalleList(List<CompraDetalle> compraDetalleList) {
+        this.compraDetalleList = compraDetalleList;
+    }
+
     @Transient
     private BigDecimal montoTotal;
-
     public BigDecimal getMontoTotal() {
         return montoTotal;
     }
+
 
     public void setMontoTotal(BigDecimal montoTotal) {
         this.montoTotal = montoTotal;
