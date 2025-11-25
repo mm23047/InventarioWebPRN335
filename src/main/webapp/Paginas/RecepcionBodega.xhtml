@@ -21,11 +21,10 @@
                              paginator="true"
                              paginatorPosition="bottom"
                              lazy="true"
-                             selection="#{recepcionBodegaFrm.registro}"
                              selectionMode="single"
                              rows="#{recepcionBodegaFrm.registrosPorPagina}"
                              rendered="#{recepcionBodegaFrm.estado=='NADA'}"
-                             rowKey="#{compra.id}"> <!-- IMPORTANTE: Agregar rowKey -->
+                             rowKey="#{compra.id}">
 
                     <!-- ID Compra -->
                     <p:column headerText="ID" width="80">
@@ -57,8 +56,8 @@
                     <!-- CORRECCIÓN: Evento rowSelect corregido -->
                     <p:ajax event="rowSelect"
                             listener="#{recepcionBodegaFrm.seleccionarRegistro}"
-                            update="frmTop"
-                            oncomplete="if(#{recepcionBodegaFrm.registro != null}) PF('dlgRecepcion').show()"/>
+                            update=":frmRecepcion"
+                            oncomplete="PF('dlgRecepcion').show()"/>
 
                 </p:dataTable>
 
@@ -207,6 +206,9 @@
                                                itemLabel="#{almacen.idTipoAlmacen.nombre} - #{almacen.id}"
                                                itemValue="#{almacen.id}" />
                                 <f:converter converterId="jakarta.faces.Integer" />
+                                <p:ajax event="change"
+                                        update="btnConfirmar msgAdvertencia"
+                                        process="@this"/>
                             </p:selectOneMenu>
                         </p:column>
 
@@ -220,21 +222,26 @@
 
                     </p:dataTable>
 
+                    <!-- Notificación si faltan almacenes - FUERA DE LOS BOTONES -->
+                    <h:panelGroup id="msgAdvertencia"
+                                  rendered="#{not recepcionBodegaFrm.validarAlmacenesSeleccionados()}"
+                                  style="display: block; margin-bottom: 15px;">
+                        <h:outputText value="Debe seleccionar un almacén para todos los productos"
+                                     style="color: #f7630c; font-weight: bold; display: block; text-align: center;"/>
+                    </h:panelGroup>
+
                     <!-- Botones del Diálogo -->
-                    <h:panelGrid columns="2" style="margin-top: 20px; text-align: center;">
-                        <p:commandButton value="Confirmar Recepción"
+                    <h:panelGrid columns="2" style="margin-top: 20px; margin-left: auto; margin-right: auto;">
+                        <p:commandButton id="btnConfirmar"
+                                         value="Confirmar Recepción"
                                          action="#{recepcionBodegaFrm.confirmarRecepcion}"
                                          update=":frmTop :messages"
                                          process="@form"
                                          icon="pi pi-check"
-                                         oncomplete="if(!args.validationFailed) PF('dlgRecepcion').hide()"/>
+                                         disabled="#{not recepcionBodegaFrm.validarAlmacenesSeleccionados()}"
+                                         oncomplete="if(!args.validationFailed) PF('dlgRecepcion').hide()"
+                                         title="Todos los productos deben tener un almacén seleccionado"/>
 
-                        <p:commandButton value="Procesar Más Tarde"
-                                         action="#{recepcionBodegaFrm.procesarMasTarde}"
-                                         update=":frmTop"
-                                         process="@this"
-                                         oncomplete="PF('dlgRecepcion').hide()"
-                                         icon="pi pi-clock"/>
 
                         <p:commandButton value="Cancelar"
                                          onclick="PF('dlgRecepcion').hide()"
