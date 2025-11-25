@@ -2,12 +2,15 @@ package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control;
 
 import jakarta.ejb.ActivationConfigProperty;
 import jakarta.ejb.MessageDriven;
+
 import jakarta.enterprise.event.Event;
+
 import jakarta.inject.Inject;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
 import jakarta.jms.TextMessage;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.ws.KardexEndpoint;
 
 import java.io.Serializable;
 import java.util.logging.Level;
@@ -19,6 +22,8 @@ import java.util.logging.Logger;
         @ActivationConfigProperty(propertyName = "connectionFactoryLookup", propertyValue = "jms/JmsFactory")
 })
 public class ReceptorKardex implements MessageListener {
+    @Inject
+    KardexEndpoint kardexEndpoint;
 
     @Inject
     @VentaEvent
@@ -33,25 +38,28 @@ public class ReceptorKardex implements MessageListener {
         TextMessage textMessage = (TextMessage) message;
         try {
             String mensajeTexto = textMessage.getText();
-            Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
-                "Mensaje recibido en ReceptorKardex: " + mensajeTexto);
-            
+            Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO,
+                    "Mensaje recibido en ReceptorKardex: " + mensajeTexto);
+
             // Disparar evento específico según el tipo de mensaje
             if (mensajeTexto != null) {
                 if (mensajeTexto.contains("Venta actualizada")) {
                     if (ventaAprobadaEvent != null) {
                         ventaAprobadaEvent.fire(mensajeTexto);
-                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
-                            "Evento CDI de VENTA disparado");
+                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO,
+                                "Evento CDI de VENTA disparado");
                     }
                 } else if (mensajeTexto.contains("Compra actualizada")) {
                     if (compraPagadaEvent != null) {
                         compraPagadaEvent.fire(mensajeTexto);
-                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
-                            "Evento CDI de COMPRA disparado");
+                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO,
+                                "Evento CDI de COMPRA disparado");
                     }
                 }
             }
+
+            // Enviar mensaje por WebSocket a todos los clientes conectados
+            kardexEndpoint.enviarMensajeBroadcast(mensajeTexto);
         } catch (JMSException ex) {
             Logger.getLogger(ReceptorKardex.class.getName()).log(Level.SEVERE, null, ex);
         }

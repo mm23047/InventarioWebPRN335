@@ -7,12 +7,13 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 @ServerEndpoint("/kardex")
-public class KardexEndpoint {
+public class KardexEndpoint implements Serializable {
 
     @Inject
     SessionHandler sessionHandler;

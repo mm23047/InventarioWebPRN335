@@ -75,4 +75,31 @@ public class CompraDAO extends InventarioDefaultDataAccess<Compra> implements Se
             return List.of();
         }
     }
+
+    public long countByEstado(String estado) {
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(c) FROM Compra c WHERE c.estado = :estado", Long.class);
+            query.setParameter("estado", estado);
+            return query.getSingleResult();
+        } catch (Exception e) {
+            Logger.getLogger(CompraDAO.class.getName()).log(Level.SEVERE, "Error al contar compras por estado: " + estado, e);
+            return 0L;
+        }
+    }
+
+    public List<Compra> findByFechaRange(java.time.OffsetDateTime fechaInicio, java.time.OffsetDateTime fechaFin, int first, int max) {
+        try {
+            TypedQuery<Compra> query = em.createNamedQuery("Compra.findByFechaRange", Compra.class);
+            query.setParameter("fechaInicio", fechaInicio);
+            query.setParameter("fechaFin", fechaFin);
+            query.setFirstResult(first);
+            query.setMaxResults(max);
+            return query.getResultList();
+        } catch (Exception e) {
+            Logger.getLogger(CompraDAO.class.getName()).log(Level.SEVERE,
+                    "Error al buscar compras por rango de fechas: " + fechaInicio + " - " + fechaFin, e);
+            return List.of();
+        }
+    }
 }
