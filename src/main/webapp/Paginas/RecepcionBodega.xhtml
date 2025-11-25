@@ -6,25 +6,25 @@
                 template="../WEB-INF/templates/default.xhtml">
 
     <!-- Header -->
-    <ui:define name="header"><h1>#{recepcionKardexFrm.nombreBean}</h1></ui:define>
+    <ui:define name="header"><h1>#{recepcionBodegaFrm.nombreBean}</h1></ui:define>
 
     <!-- Contenido Principal -->
     <ui:define name="contenido-tabla">
         <h:panelGrid>
-            <h:outputText value="#{recepcionKardexFrm.ramdom}"/>
+            <h:outputText value="#{recepcionBodegaFrm.ramdom}"/>
             <h:form id="frmTop">
                 <p:remoteCommand
-                        name="actualizar" update=":frmTop" actionListener="#{recepcionKardexFrm.actualizarTabla}"/>
+                        name="actualizar" update=":frmTop" actionListener="#{recepcionBodegaFrm.actualizarTabla}"/>
 
                 <p:dataTable id="tblCompras"
-                             value="#{recepcionKardexFrm.modelo}" var="compra"
+                             value="#{recepcionBodegaFrm.modelo}" var="compra"
                              paginator="true"
                              paginatorPosition="bottom"
                              lazy="true"
-                             selection="#{recepcionKardexFrm.registro}"
+                             selection="#{recepcionBodegaFrm.registro}"
                              selectionMode="single"
-                             rows="#{recepcionKardexFrm.registrosPorPagina}"
-                             rendered="#{recepcionKardexFrm.estado=='NADA'}"
+                             rows="#{recepcionBodegaFrm.registrosPorPagina}"
+                             rendered="#{recepcionBodegaFrm.estado=='NADA'}"
                              rowKey="#{compra.id}"> <!-- IMPORTANTE: Agregar rowKey -->
 
                     <!-- ID Compra -->
@@ -56,18 +56,18 @@
 
                     <!-- CORRECCIÓN: Evento rowSelect corregido -->
                     <p:ajax event="rowSelect"
-                            listener="#{recepcionKardexFrm.seleccionarRegistro}"
+                            listener="#{recepcionBodegaFrm.seleccionarRegistro}"
                             update="frmTop"
-                            oncomplete="if(#{recepcionKardexFrm.registro != null}) PF('dlgRecepcion').show()"/>
+                            oncomplete="if(#{recepcionBodegaFrm.registro != null}) PF('dlgRecepcion').show()"/>
 
                 </p:dataTable>
 
                 <h:panelGrid columns="1" style="margin-top: 20px;">
                     <!-- Botón Recibir Productos - Siempre visible -->
                     <p:commandButton value="Recibir Productos"
-                                     action="#{recepcionKardexFrm.recibirProductos}"
+                                     action="#{recepcionBodegaFrm.recibirProductos}"
                                      update="frmTop"
-                                     disabled="#{recepcionKardexFrm.registro == null}"
+                                     disabled="#{recepcionBodegaFrm.registro == null}"
                                      icon="pi pi-check"/>
                 </h:panelGrid>
 
@@ -100,7 +100,7 @@
         <!-- Diálogo de Recepción -->
         <p:dialog id="dlgRecepcion"
                   widgetVar="dlgRecepcion"
-                  header="Recepción de Productos - Compra #{recepcionKardexFrm.registro != null ? recepcionKardexFrm.registro.id : ''}"
+                  header="Recepción de Productos - Compra #{recepcionBodegaFrm.registro != null ? recepcionBodegaFrm.registro.id : ''}"
                   modal="true"
                   closable="true"
                   resizable="false"
@@ -110,24 +110,24 @@
 
             <h:form id="frmRecepcion">
                 <!-- Solo mostrar si hay registro seleccionado -->
-                <h:panelGroup rendered="#{recepcionKardexFrm.registro != null}">
+                <h:panelGroup rendered="#{recepcionBodegaFrm.registro != null}">
                     <!-- Información de la Compra -->
                     <h:panelGrid columns="2" style="margin-bottom: 20px; width: 100%;">
                         <h:outputText value="Proveedor:" style="font-weight: bold;"/>
-                        <h:outputText value="#{recepcionKardexFrm.registro.proveedor.nombre}"/>
+                        <h:outputText value="#{recepcionBodegaFrm.registro.proveedor.nombre}"/>
 
                         <h:outputText value="Fecha Compra:" style="font-weight: bold;"/>
-                        <h:outputText value="#{recepcionKardexFrm.registro.fecha}">
+                        <h:outputText value="#{recepcionBodegaFrm.registro.fecha}">
                             <f:convertDateTime type="offsetDateTime" pattern="dd/MM/yyyy HH:mm:ss" />
                         </h:outputText>
 
                         <h:outputText value="Observaciones:" style="font-weight: bold;"/>
-                        <h:outputText value="#{recepcionKardexFrm.registro.observaciones}"/>
+                        <h:outputText value="#{recepcionBodegaFrm.registro.observaciones}"/>
                     </h:panelGrid>
 
                     <!-- Tabla de Productos de la Compra -->
                     <p:dataTable id="tblProductosCompra"
-                                 value="#{recepcionKardexFrm.detallesCompra}"
+                                 value="#{recepcionBodegaFrm.detallesCompra}"
                                  var="detalle"
                                  emptyMessage="No hay productos en esta compra"
                                  style="margin-bottom: 20px;">
@@ -160,12 +160,12 @@
 
                         <!-- Selección de Almacén -->
                         <p:column headerText="Almacén Destino" width="200">
-                            <p:selectOneMenu value="#{recepcionKardexFrm.almacenSeleccionado[detalle.id]}"
+                            <p:selectOneMenu value="#{recepcionBodegaFrm.almacenSeleccionado[detalle.id]}"
                                              style="width: 100%"
                                              required="true"
                                              requiredMessage="Seleccione un almacén">
                                 <f:selectItem itemLabel="-- Seleccione Almacén --" itemValue="#{null}" />
-                                <f:selectItems value="#{recepcionKardexFrm.almacenesActivos}"
+                                <f:selectItems value="#{recepcionBodegaFrm.almacenesActivos}"
                                                var="almacen"
                                                itemLabel="#{almacen.idTipoAlmacen.nombre} - #{almacen.id}"
                                                itemValue="#{almacen.id}" />
@@ -174,7 +174,7 @@
 
                         <!-- Observaciones de Recepción -->
                         <p:column headerText="Observaciones Recepción" width="200">
-                            <p:inputTextarea value="#{recepcionKardexFrm.observacionesRecepcion[detalle.id]}"
+                            <p:inputTextarea value="#{recepcionBodegaFrm.observacionesRecepcion[detalle.id]}"
                                              rows="2"
                                              cols="30"
                                              placeholder="Observaciones específicas para este producto"/>
@@ -185,14 +185,14 @@
                     <!-- Botones del Diálogo -->
                     <h:panelGrid columns="3" style="margin-top: 20px; text-align: center;">
                         <p:commandButton value="Confirmar Recepción"
-                                         action="#{recepcionKardexFrm.confirmarRecepcion}"
+                                         action="#{recepcionBodegaFrm.confirmarRecepcion}"
                                          update=":frmTop :messages"
                                          process="@form"
                                          icon="pi pi-check"
                                          oncomplete="if(!args.validationFailed) PF('dlgRecepcion').hide()"/>
 
                         <p:commandButton value="Procesar Más Tarde"
-                                         action="#{recepcionKardexFrm.procesarMasTarde}"
+                                         action="#{recepcionBodegaFrm.procesarMasTarde}"
                                          update=":frmTop"
                                          process="@this"
                                          oncomplete="PF('dlgRecepcion').hide()"
@@ -206,7 +206,7 @@
                 </h:panelGroup>
 
                 <!-- Mensaje cuando no hay registro seleccionado -->
-                <h:panelGroup rendered="#{recepcionKardexFrm.registro == null}">
+                <h:panelGroup rendered="#{recepcionBodegaFrm.registro == null}">
                     <h:outputText value="No hay compra seleccionada" style="color: red; font-weight: bold;"/>
                 </h:panelGroup>
             </h:form>

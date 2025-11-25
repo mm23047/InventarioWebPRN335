@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializable {
+public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializable {
 
     @Inject
     private FacesContext facesContext;
@@ -37,8 +37,9 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
     private CompraDAO compraDAO;
 
     public String getNombreBean() {
-        return nombreBean="Recibir Productos";
+        return nombreBean = "Recepci\u00f3n en Bodega";
     }
+
     @Override
     protected InventarioDAOInterface<Compra> getDao() {
         return compraDAO;
@@ -74,27 +75,30 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
                     try {
                         // Contar solo compras con estado PAGADA
                         long count = compraDAO.countByEstado("PAGADA");
-                        Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.INFO,
+                        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
                                 "Contando compras PAGADAS, total: " + count);
                         return (int) Math.min(count, Integer.MAX_VALUE);
                     } catch (Exception e) {
-                        Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.SEVERE, "Error al contar registros", e);
+                        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
+                                "Error al contar registros", e);
                         return 0;
                     }
                 }
 
                 @Override
-                public List<Compra> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+                public List<Compra> load(int first, int pageSize, Map<String, SortMeta> sortBy,
+                        Map<String, FilterMeta> filterBy) {
                     try {
                         // Cargar solo compras con estado PAGADA
                         List<Compra> comprasPagadas = compraDAO.findByEstado("PAGADA", first, pageSize);
-                        Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.INFO,
+                        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
                                 "Cargando compras PAGADAS - first: " + first +
                                         ", pageSize: " + pageSize +
                                         ", encontradas: " + comprasPagadas.size());
                         return comprasPagadas;
                     } catch (Exception e) {
-                        Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.SEVERE, "Error al cargar registros", e);
+                        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
+                                "Error al cargar registros", e);
                         return List.of();
                     }
                 }
@@ -105,7 +109,7 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
 
         } catch (Exception e) {
             enviarMensajeError("Error al inicializar registros: " + e.getMessage());
-            Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.SEVERE, "Error en inicializarRegistros", e);
+            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error en inicializarRegistros", e);
         }
     }
 
@@ -121,7 +125,8 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
                 Long buscado = Long.valueOf(id);
                 return compraDAO.leer(buscado);
             } catch (Exception e) {
-                Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.SEVERE, "Error al convertir ID: " + id, e);
+                Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error al convertir ID: " + id,
+                        e);
             }
         }
         return null;
@@ -150,7 +155,7 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
             // CAMBIO IMPORTANTE: Mantenemos el estado en NADA para no abrir detalles
             this.estado = ESTADO_CRUD.NADA;
 
-            Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.INFO,
+            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
                     "Compra seleccionada para recepción - ID: " + this.registro.getId() +
                             ", Proveedor: " + this.registro.getProveedor().getNombre() +
                             ", Estado: " + this.estado);
@@ -172,7 +177,7 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
         // No se configuran nuevos registros en esta pantalla
     }
 
-    public String getRamdom(){
+    public String getRamdom() {
         return UUID.randomUUID().toString();
     }
 
@@ -290,7 +295,7 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
 
         } catch (Exception e) {
             enviarMensajeError("Error al recibir productos: " + e.getMessage());
-            Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.SEVERE, "Error en confirmarRecepcion", e);
+            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error en confirmarRecepcion", e);
         }
     }
 
@@ -305,7 +310,7 @@ public class RecepcionKardexFrm extends DefaultFrm<Compra> implements Serializab
     private void procesarMovimientoKardex(CompraDetalle detalle, Integer idAlmacen, String observaciones) {
         // TODO: Implementar la lógica específica para crear movimientos de kardex
         // Esto dependerá de tu estructura de entidades para kardex e inventario
-        Logger.getLogger(RecepcionKardexFrm.class.getName()).log(Level.INFO,
+        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
                 "Procesando movimiento - Producto: " + detalle.getIdProducto().getNombreProducto() +
                         ", Almacén: " + idAlmacen +
                         ", Cantidad: " + detalle.getCantidad());

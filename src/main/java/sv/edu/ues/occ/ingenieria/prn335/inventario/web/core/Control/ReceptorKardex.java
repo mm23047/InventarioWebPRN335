@@ -25,7 +25,6 @@ public class ReceptorKardex implements MessageListener {
     @Inject
     KardexEndpoint kardexEndpoint;
 
-
     @Inject
     @VentaEvent
     private Event<String> ventaAprobadaEvent;
@@ -38,31 +37,29 @@ public class ReceptorKardex implements MessageListener {
     public void onMessage(Message message) {
         TextMessage textMessage = (TextMessage) message;
         try {
-//<<<<<<< Updated upstream
             String mensajeTexto = textMessage.getText();
-            Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
-                "Mensaje recibido en ReceptorKardex: " + mensajeTexto);
-            
+            Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO,
+                    "Mensaje recibido en ReceptorKardex: " + mensajeTexto);
+
             // Disparar evento específico según el tipo de mensaje
             if (mensajeTexto != null) {
                 if (mensajeTexto.contains("Venta actualizada")) {
                     if (ventaAprobadaEvent != null) {
                         ventaAprobadaEvent.fire(mensajeTexto);
-                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
-                            "Evento CDI de VENTA disparado");
+                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO,
+                                "Evento CDI de VENTA disparado");
                     }
                 } else if (mensajeTexto.contains("Compra actualizada")) {
                     if (compraPagadaEvent != null) {
                         compraPagadaEvent.fire(mensajeTexto);
-                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO, 
-                            "Evento CDI de COMPRA disparado");
+                        Logger.getLogger(ReceptorKardex.class.getName()).log(Level.INFO,
+                                "Evento CDI de COMPRA disparado");
                     }
                 }
             }
-//=======
-            System.out.println("Mensaje recibido en ReceptorKardex: " + textMessage.getText());
-            kardexEndpoint.enviarMensajeBroadcast(textMessage.getText());
-//>>>>>>> Stashed changes
+
+            // Enviar mensaje por WebSocket a todos los clientes conectados
+            kardexEndpoint.enviarMensajeBroadcast(mensajeTexto);
         } catch (JMSException ex) {
             Logger.getLogger(ReceptorKardex.class.getName()).log(Level.SEVERE, null, ex);
         }
