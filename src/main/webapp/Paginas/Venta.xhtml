@@ -247,6 +247,7 @@
                      <p:commandButton value="Nuevo Detalle de Venta"
                                       actionListener="#{ventaFrm.ventaDetalleFrm.btnNuevoHandler}"
                                       rendered="#{ventaFrm.ventaDetalleFrm.estado=='NADA' and ventaFrm.registro.estado != 'ENTREGADO'}"
+                                      disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                       update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario"
                                       style="margin-top: 10px;"/>
 
@@ -277,6 +278,7 @@
                                            dropdown="true"
                                            required="true"
                                            requiredMessage="Seleccione un producto"
+                                           disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                            size="50">
                               <f:converter converterId="productoConverter" />
                               <p:ajax event="itemSelect"
@@ -293,6 +295,7 @@
                                           maxValue="999999.99"
                                           required="true"
                                           requiredMessage="Ingrese la cantidad"
+                                          disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                           style="width: 120px;"/>
 
                            <!-- Precio Unitario (Manual) -->
@@ -304,13 +307,15 @@
                                           maxValue="999999.99"
                                           required="true"
                                           requiredMessage="Ingrese el precio unitario"
+                                          disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                           style="width: 120px;"/>
 
                            <!-- Estado (Dropdown) -->
                            <p:outputLabel for="selEstadoDetalle" value="Estado:"/>
                            <p:selectOneMenu id="selEstadoDetalle"
                                             value="#{ventaFrm.ventaDetalleFrm.registro.estado}"
-                                            required="true" requiredMessage="Seleccione un estado">
+                                            required="true" requiredMessage="Seleccione un estado"
+                                            disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}">
                               <f:selectItems value="#{ventaFrm.ventaDetalleFrm.estadosDetalle}"
                                              var="estado"
                                              itemLabel="#{estado}"
@@ -321,7 +326,8 @@
                            <p:outputLabel for="txtObsDetalle" value="Observaciones:"/>
                            <p:inputTextarea id="txtObsDetalle"
                                             value="#{ventaFrm.ventaDetalleFrm.registro.observaciones}"
-                                            rows="3" cols="50"/>
+                                            rows="3" cols="50"
+                                            disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"/>
 
                         </h:panelGrid>
 
@@ -330,18 +336,21 @@
                            <p:commandButton value="#{crud['frm.botones.guardar']}"
                                             actionListener="#{ventaFrm.ventaDetalleFrm.btnGuardarHandler}"
                                             rendered="#{ventaFrm.ventaDetalleFrm.estado=='CREAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
+                                            disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                             update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
                                             process="@form"/>
 
                            <p:commandButton value="#{crud['frm.botones.modificar']}"
                                             actionListener="#{ventaFrm.ventaDetalleFrm.btnModificarHandler}"
                                             rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
+                                            disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                             update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
                                             process="@form"/>
 
                            <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                             actionListener="#{ventaFrm.ventaDetalleFrm.btnEliminarHandler}"
                                             rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
+                                            disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"
                                             update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
                                             process="@form"/>
 
