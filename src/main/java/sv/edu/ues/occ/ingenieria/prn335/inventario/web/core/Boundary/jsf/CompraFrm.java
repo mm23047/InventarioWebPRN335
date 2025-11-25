@@ -73,7 +73,8 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             this.estadosCompra = Arrays.asList("ORDEN", "CREADO", "APROBADO", "RECHAZADO", "ANULADO", "PAGADA");
 
             Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
-                    "Listas de compra inicializadas correctamente. Proveedores activos cargados: " + listaProveedores.size());
+                    "Listas de compra inicializadas correctamente. Proveedores activos cargados: "
+                            + listaProveedores.size());
         } catch (Exception e) {
             Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al cargar listas", e);
             estadosCompra = Arrays.asList("CREADO");
@@ -149,6 +150,12 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             if (this.registro.getFecha() == null) {
                 this.registro.setFecha(OffsetDateTime.now());
             }
+
+            // Validar que el proveedor no sea nulo
+            if (this.registro.getProveedor() == null) {
+                Logger.getLogger(CompraFrm.class.getName()).log(Level.WARNING,
+                        "Intento de crear compra sin proveedor");
+            }
         }
     }
 
@@ -198,7 +205,6 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
         return List.of();
     }
 
-
     public void notificarCambioKardex(ActionEvent actionEvent) {
         if (this.registro != null && this.registro.getId() != null) {
             this.registro.setEstado("PAGADA"); // Estado de la entidad (String)
@@ -232,7 +238,8 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
                 }
 
                 @Override
-                public List<Compra> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+                public List<Compra> load(int first, int pageSize, Map<String, SortMeta> sortBy,
+                        Map<String, FilterMeta> filterBy) {
                     try {
                         List<Compra> compras = getDao().findRange(first, pageSize);
 
@@ -260,7 +267,6 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error en inicializarRegistros", e);
         }
     }
-
 
     // Método para calcular el monto total de una compra específica
     public BigDecimal getMontoTotal(Compra compra) {

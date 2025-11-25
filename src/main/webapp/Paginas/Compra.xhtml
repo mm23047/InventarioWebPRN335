@@ -236,7 +236,13 @@
                                       update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
                                       style="margin-top: 10px;"/>
 
-                     <!-- Botones Cancelar para Detalle -->
+                     <!-- Botón Cancelar para Detalle -->
+                     <p:commandButton value="#{crud['frm.botones.cancelar']}"
+                                      actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
+                                      rendered="#{compraFrm.compraDetalleFrm.estado!='NADA'}"
+                                      update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
+                                      style="margin-top: 10px;"/>
+
                   </h:form>
                </h:panelGroup>
 
@@ -328,6 +334,11 @@
                                             rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR'}"
                                             update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
                                             process="@form"/>
+
+                           <p:commandButton value="#{crud['frm.botones.cancelar']}"
+                                            actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
+                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
+                                            process="@this"/>
 
                         </h:panelGrid>
 
