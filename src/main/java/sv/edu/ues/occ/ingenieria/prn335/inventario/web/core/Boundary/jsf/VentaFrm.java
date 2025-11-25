@@ -47,7 +47,13 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     @Override
     public void inicializarListas() {
-        this.estadosVenta = Arrays.asList("CREADO", "PENDIENTE", "APROBADO", "ENTREGADO", "CANCELADO");
+        // ENTREGADO se asigna automáticamente desde DespachoBodegaFrm, no seleccionable aquí
+        // EXCEPTO si la venta ya tiene estado ENTREGADO (para visualización)
+        if (this.registro != null && "ENTREGADO".equals(this.registro.getEstado())) {
+            this.estadosVenta = Arrays.asList("CREADO", "PENDIENTE", "APROBADO", "ENTREGADO", "CANCELADO");
+        } else {
+            this.estadosVenta = Arrays.asList("CREADO", "PENDIENTE", "APROBADO", "CANCELADO");
+        }
     }
 
     @Override
@@ -82,6 +88,9 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
             if (this.registro.getIdCliente() != null) {
                 this.clienteSeleccionado = this.registro.getIdCliente();
             }
+
+            // Actualizar lista de estados según el estado actual de la venta
+            inicializarListas();
 
             // Configurar el ventaDetalleFrm con la venta seleccionada
             this.ventaDetalleFrm.setIdVenta(this.registro.getId());
@@ -214,6 +223,12 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     public void btnGuardarHandler(jakarta.faces.event.ActionEvent actionEvent) {
         if (registro == null) {
             enviarMensajeError("No hay venta para guardar");
+            return;
+        }
+
+        // Validar que no se modifiquen ventas entregadas
+        if (estado == ESTADO_CRUD.MODIFICAR && "ENTREGADO".equals(registro.getEstado())) {
+            enviarMensajeError("No se puede modificar una venta que ya fue entregada");
             return;
         }
 

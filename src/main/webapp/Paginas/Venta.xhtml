@@ -112,7 +112,8 @@
                                         required="true"
                                         requiredMessage="Seleccione un cliente"
                                         size="50"
-                                        placeholder="Escriba el nombre...">
+                                        placeholder="Escriba el nombre..."
+                                        disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}">
                            <f:converter converterId="clienteConverter" />
                            <p:ajax event="itemSelect"
                                    listener="#{ventaFrm.seleccionarCliente}"
@@ -124,7 +125,8 @@
                      <!-- Estado (Dropdown con opciones) -->
                      <p:outputLabel for="selEstado" value="Estado:"/>
                      <p:selectOneMenu id="selEstado" value="#{ventaFrm.registro.estado}"
-                                      required="true" requiredMessage="Seleccione un estado">
+                                      required="true" requiredMessage="Seleccione un estado"
+                                      disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}">
                         <f:selectItems value="#{ventaFrm.estadosVenta}"
                                        var="estado"
                                        itemLabel="#{estado}"
@@ -147,7 +149,8 @@
                      <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
                      <p:inputTextarea id="txtObservaciones"
                                       value="#{ventaFrm.registro.observaciones}"
-                                      rows="4" cols="50"/>
+                                      rows="4" cols="50"
+                                      disabled="#{ventaFrm.registro.estado == 'ENTREGADO'}"/>
 
                   </h:panelGrid>
 
@@ -161,13 +164,13 @@
 
                      <p:commandButton value="#{crud['frm.botones.modificar']}"
                                       actionListener="#{ventaFrm.btnModificarHandler}"
-                                      rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                       update=":pnlVentaTabla :pnlVentaDetalle"
                                       process="@form"/>
 
                      <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                       actionListener="#{ventaFrm.btnEliminarHandler}"
-                                      rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                       update=":pnlVentaTabla :pnlVentaDetalle"
                                       process="@form"/>
 
@@ -175,7 +178,7 @@
                      <p:commandButton value="Cerrar venta"
                                       actionListener="#{ventaFrm.notificarCambioKardex}"
                                       update=":pnlVentaDetalle :pnlVentaTabla"
-                                      rendered="#{ventaFrm.estado=='MODIFICAR'}"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                       process="@form"/>
 
                   </h:panelGrid>
@@ -243,7 +246,7 @@
                      <!-- Botón Nuevo Detalle de Venta -->
                      <p:commandButton value="Nuevo Detalle de Venta"
                                       actionListener="#{ventaFrm.ventaDetalleFrm.btnNuevoHandler}"
-                                      rendered="#{ventaFrm.ventaDetalleFrm.estado=='NADA'}"
+                                      rendered="#{ventaFrm.ventaDetalleFrm.estado=='NADA' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                       update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario"
                                       style="margin-top: 10px;"/>
 
@@ -326,19 +329,19 @@
                         <h:panelGrid columns="4" style="margin-top: 20px; text-align: center;">
                            <p:commandButton value="#{crud['frm.botones.guardar']}"
                                             actionListener="#{ventaFrm.ventaDetalleFrm.btnGuardarHandler}"
-                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='CREAR'}"
+                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='CREAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                             update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
                                             process="@form"/>
 
                            <p:commandButton value="#{crud['frm.botones.modificar']}"
                                             actionListener="#{ventaFrm.ventaDetalleFrm.btnModificarHandler}"
-                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR'}"
+                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                             update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
                                             process="@form"/>
 
                            <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                             actionListener="#{ventaFrm.ventaDetalleFrm.btnEliminarHandler}"
-                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR'}"
+                                            rendered="#{ventaFrm.ventaDetalleFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                             update=":tabVenta:pnlVentaDetalleTabla :tabVenta:pnlVentaDetalleFormulario :pnlVentaTabla"
                                             process="@form"/>
 

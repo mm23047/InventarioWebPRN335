@@ -134,14 +134,21 @@
 
                   </h:panelGrid>
 
-                  <!-- Botón para marcar como ENTREGADO -->
-                  <h:panelGrid columns="1" style="margin-top: 20px;">
+                  <!-- Botones de acción -->
+                  <h:panelGrid columns="2" style="margin-top: 20px;">
                      <p:commandButton value="Marcar como ENTREGADO"
                                       actionListener="#{despachoBodegaFrm.marcarComoEntregado}"
                                       update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
                                       icon="pi pi-check"
                                       styleClass="ui-button-success"
-                                      style="width: 250px;"/>
+                                      style="width: 200px;"/>
+                     
+                     <p:commandButton value="#{crud['frm.botones.cancelar']}"
+                                      actionListener="#{despachoBodegaFrm.btnCancelarHandler}"
+                                      update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
+                                      icon="pi pi-times"
+                                      styleClass="ui-button-secondary"
+                                      style="width: 200px;"/>
                   </h:panelGrid>
 
                </h:form>
