@@ -63,12 +63,7 @@
                 </p:dataTable>
 
                 <h:panelGrid columns="1" style="margin-top: 20px;">
-                    <!-- Botón Recibir Productos - Siempre visible -->
-                    <p:commandButton value="Recibir Productos"
-                                     action="#{recepcionBodegaFrm.recibirProductos}"
-                                     update="frmTop"
-                                     disabled="#{recepcionBodegaFrm.registro == null}"
-                                     icon="pi pi-check"/>
+
                 </h:panelGrid>
 
                 <!-- Mensajes -->
@@ -85,7 +80,7 @@
     <!-- Diálogo Modal para Recepción de Productos -->
     <ui:define name="extras">
         <!-- WebSocket con Reconexión Automática -->
-        <h:outputScript>
+        <script>
             //<![CDATA[
             const MAX_RECONNECT_ATTEMPTS = 5;
             const RECONNECT_DELAY = 3000;
@@ -96,21 +91,21 @@
                 try {
                     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                     const wsUrl = protocol + '//' + window.location.host + '/InventarioWebapprn335-1.0-SNAPSHOT/kardex';
-                    
+
                     ws = new WebSocket(wsUrl);
-                    
+
                     ws.onopen = function() {
                         console.log('Conexión WebSocket establecida - RecepcionBodega');
                         reconnectAttempts = 0;
                     };
-                    
+
                     ws.onmessage = function(event) {
                         console.log('Mensaje recibido:', event.data);
                         if (typeof actualizar !== 'undefined') {
                             actualizar();
                         }
                     };
-                    
+
                     ws.onclose = function() {
                         console.log('Conexión WebSocket cerrada');
                         if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
@@ -119,25 +114,25 @@
                             setTimeout(conectarWebSocket, RECONNECT_DELAY);
                         }
                     };
-                    
+
                     ws.onerror = function(error) {
                         console.error('Error WebSocket:', error);
                     };
-                    
+
                 } catch (error) {
                     console.error('Error al crear WebSocket:', error);
                 }
             }
-            
+
             window.addEventListener('load', conectarWebSocket);
-            
+
             window.addEventListener('beforeunload', function() {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.close();
                 }
             });
             //]]>
-        </h:outputScript>
+        </script>
 
         <!-- Diálogo de Recepción -->
         <p:dialog id="dlgRecepcion"
@@ -211,6 +206,7 @@
                                                var="almacen"
                                                itemLabel="#{almacen.idTipoAlmacen.nombre} - #{almacen.id}"
                                                itemValue="#{almacen.id}" />
+                                <f:converter converterId="jakarta.faces.Integer" />
                             </p:selectOneMenu>
                         </p:column>
 
@@ -225,7 +221,7 @@
                     </p:dataTable>
 
                     <!-- Botones del Diálogo -->
-                    <h:panelGrid columns="3" style="margin-top: 20px; text-align: center;">
+                    <h:panelGrid columns="2" style="margin-top: 20px; text-align: center;">
                         <p:commandButton value="Confirmar Recepción"
                                          action="#{recepcionBodegaFrm.confirmarRecepcion}"
                                          update=":frmTop :messages"

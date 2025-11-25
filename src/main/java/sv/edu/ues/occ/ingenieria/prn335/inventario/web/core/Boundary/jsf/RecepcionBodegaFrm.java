@@ -185,28 +185,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         System.out.println("Actualizando tabla de compras");
     }
 
-    public void recibirProductos() {
-        if (this.registro != null && this.registro.getId() != null) {
-            try {
-                // Cambiar el estado de la compra
-                this.registro.setEstado("RECIBIDA");
-                compraDAO.actualizar(this.registro);
-
-                // Mensaje de éxito
-                enviarMensajeExito("Compra recibida correctamente - ID: " + this.registro.getId());
-
-                // Limpiar selección pero MANTENER estado NADA
-                this.registro = null;
-                this.estado = ESTADO_CRUD.NADA; // ← Esto es importante
-                inicializarRegistros();
-
-            } catch (Exception e) {
-                enviarMensajeError("Error al recibir la compra: " + e.getMessage());
-            }
-        } else {
-            enviarMensajeError("Seleccione una compra para recibir");
-        }
-    }
 
     // Agregar estos nuevos métodos y propiedades a tu clase RecepcionKardexFrm
 
@@ -239,6 +217,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         return almacenesActivos;
     }
 
+
     public Map<UUID, Integer> getAlmacenSeleccionado() {
         return almacenSeleccionado;
     }
@@ -256,63 +235,92 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
     }
 
     public void confirmarRecepcion() {
-        if (this.registro == null || this.detallesCompra == null) {
-            enviarMensajeError("No hay compra seleccionada para recibir");
-            return;
-        }
+        if (this.registro != null && this.registro.getId() != null) {
+            try {
+                // Validar que todos los productos tengan almacén seleccionado
+                if (this.detallesCompra != null && !this.detallesCompra.isEmpty()) {
+                    for (CompraDetalle detalle : detallesCompra) {
+                        String idAlmacenStr = String.valueOf(almacenSeleccionado.get(detalle.getId()));
+                        if (idAlmacenStr == null || idAlmacenStr.trim().isEmpty()) {
+                            enviarMensajeError("Debe seleccionar un almacén para el producto: " +
+                                    detalle.getIdProducto().getNombreProducto());
+                            return;
+                        }
 
-        try {
-            // Validar que todos los productos tengan almacén seleccionado
-            for (CompraDetalle detalle : detallesCompra) {
-                Integer idAlmacen = almacenSeleccionado.get(detalle.getId());
-                if (idAlmacen == null) {
-                    enviarMensajeError("Debe seleccionar un almacén para todos los productos");
-                    return;
+                        try {
+                            // Convertir String a Integer
+                            Integer idAlmacen = Integer.valueOf(idAlmacenStr);
+
+                            String observaciones = observacionesRecepcion.get(detalle.getId());
+
+                            // Aquí iría la lógica para crear el movimiento de kardex
+                            procesarMovimientoKardex(detalle, idAlmacen, observaciones);
+
+                        } catch (NumberFormatException e) {
+                            enviarMensajeError("ID de almacén inválido para el producto: " +
+                                    detalle.getIdProducto().getNombreProducto());
+                            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
+                                    "Error al convertir ID almacén: " + idAlmacenStr, e);
+                            return;
+                        }
+                    }
                 }
+
+                // Cambiar el estado de la compra a RECIBIDA
+                this.registro.setEstado("RECIBIDA");
+                compraDAO.actualizar(this.registro);
+
+                // Mensaje de éxito
+                enviarMensajeExito("Compra recibida correctamente - ID: " + this.registro.getId());
+
+                // Limpiar selecciones
+                this.almacenSeleccionado.clear();
+                this.observacionesRecepcion.clear();
+                this.detallesCompra = null;
+
+                // Limpiar selección pero MANTENER estado NADA
+                this.registro = null;
+                this.estado = ESTADO_CRUD.NADA;
+                inicializarRegistros();
+
+            } catch (Exception e) {
+                enviarMensajeError("Error al recibir la compra: " + e.getMessage());
+                Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error en confirmarRecepcion", e);
             }
-
-            // Procesar la recepción de cada producto
-            for (CompraDetalle detalle : detallesCompra) {
-                Integer idAlmacen = almacenSeleccionado.get(detalle.getId());
-                String observaciones = observacionesRecepcion.get(detalle.getId());
-
-                // Aquí iría la lógica para crear el movimiento de kardex
-                // y actualizar el inventario en el almacén seleccionado
-                procesarMovimientoKardex(detalle, idAlmacen, observaciones);
-            }
-
-            // Cambiar estado de la compra a RECIBIDA
-            this.registro.setEstado("RECIBIDA");
-            compraDAO.actualizar(this.registro);
-
-            // Limpiar selecciones
-            this.almacenSeleccionado.clear();
-            this.observacionesRecepcion.clear();
-            this.detallesCompra = null;
-
-            enviarMensajeExito("Productos recibidos correctamente en los almacenes seleccionados");
-            inicializarRegistros();
-
-        } catch (Exception e) {
-            enviarMensajeError("Error al recibir productos: " + e.getMessage());
-            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error en confirmarRecepcion", e);
+        } else {
+            enviarMensajeError("Seleccione una compra para recibir");
         }
     }
 
+    // También actualiza el método procesarMovimientoKardex para mayor robustez
+    private void procesarMovimientoKardex(CompraDetalle detalle, Integer idAlmacen, String observaciones) {
+        try {
+            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
+                    "Procesando movimiento kardex - Producto: {0}, Almacén: {1}, Cantidad: {2}, Precio: {3}, Observaciones: {4}",
+                    new Object[]{
+                            detalle.getIdProducto().getNombreProducto(),
+                            idAlmacen,
+                            detalle.getCantidad(),
+                            detalle.getPrecio(),
+                            observaciones != null ? observaciones : "Sin observaciones"
+                    });
+
+            // TODO: Implementar la lógica específica para crear movimientos de kardex
+            // kardexService.registrarEntrada(detalle, idAlmacen, observaciones);
+
+        } catch (Exception e) {
+            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
+                    "Error al procesar movimiento kardex para producto: " +
+                            detalle.getIdProducto().getNombreProducto(), e);
+            throw new RuntimeException("Error en procesamiento de kardex para producto: " +
+                    detalle.getIdProducto().getNombreProducto(), e);
+        }
+    }
     public void procesarMasTarde() {
         // Limpiar selecciones temporales pero mantener la compra seleccionada
         this.almacenSeleccionado.clear();
         this.observacionesRecepcion.clear();
         this.detallesCompra = null;
         enviarMensajeExito("Puede continuar con la recepción más tarde");
-    }
-
-    private void procesarMovimientoKardex(CompraDetalle detalle, Integer idAlmacen, String observaciones) {
-        // TODO: Implementar la lógica específica para crear movimientos de kardex
-        // Esto dependerá de tu estructura de entidades para kardex e inventario
-        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
-                "Procesando movimiento - Producto: " + detalle.getIdProducto().getNombreProducto() +
-                        ", Almacén: " + idAlmacen +
-                        ", Cantidad: " + detalle.getCantidad());
     }
 }
