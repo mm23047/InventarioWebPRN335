@@ -1,0 +1,19 @@
+# No copiar al contexto de Docker
+.git
+.gitignore
+.idea
+*.iml
+target/maven-archiver
+target/maven-status
+target/classes
+target/generated-sources
+target/surefire-reports
+target/tmp
+README.md
+pom.xml
+src
+.dockerignore
+docker-compose.yml
+how --stat 0292f9c
+mvnw
+mvnw.cmd
