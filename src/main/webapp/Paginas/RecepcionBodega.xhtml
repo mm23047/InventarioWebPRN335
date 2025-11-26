@@ -13,7 +13,7 @@
         <h:panelGrid>
             <h:form id="frmTop">
                 <p:remoteCommand
-                        name="actualizar" update=":frmTop" actionListener="#{recepcionBodegaFrm.actualizarTabla}"/>
+                        name="actualizar" update=":pnlTabla:growlGlobal :frmTop:tblCompras" actionListener="#{recepcionBodegaFrm.actualizarTabla}"/>
 
                 <p:dataTable id="tblCompras"
                              value="#{recepcionBodegaFrm.modelo}" var="compra"
@@ -88,37 +88,55 @@
             function conectarWebSocket() {
                 try {
                     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                    const wsUrl = protocol + '//' + window.location.host + '/InventarioWebapprn335-1.0-SNAPSHOT/kardex';
-
+                    const wsUrl = protocol + '//' + window.location.host + '#{request.contextPath}' + '/kardex';
+                    
+                    console.log('[RecepcionBodega] Intentando conectar WebSocket a:', wsUrl);
                     ws = new WebSocket(wsUrl);
 
                     ws.onopen = function() {
-                        console.log('Conexión WebSocket establecida - RecepcionBodega');
+                        console.log('[RecepcionBodega] Conexión WebSocket establecida - ID:', this.url);
                         reconnectAttempts = 0;
                     };
 
-                    ws.onmessage = function(event) {
-                        console.log('Mensaje recibido:', event.data);
-                        if (typeof actualizar !== 'undefined') {
-                            actualizar();
+                ws.onmessage = function(event) {
+                    console.log('[RecepcionBodega] Mensaje recibido:', event.data);
+                    
+                    // Actualizar tabla primero
+                    if (typeof actualizar !== 'undefined') {
+                        actualizar();
+                        console.log('[RecepcionBodega] Tabla actualizada');
+                    }
+                    
+                    // Mostrar notificación usando PrimeFaces
+                    try {
+                        if (typeof PF === 'function' && PF('growlWidget')) {
+                            console.log('[RecepcionBodega] Mostrando notificación...');
+                            PF('growlWidget').show([{
+                                severity: 'info',
+                                summary: '¡Nueva Compra Disponible!',
+                                detail: 'Se ha marcado una compra como PAGADA. La tabla se actualizará automáticamente.'
+                            }]);
+                        } else {
+                            console.warn('[RecepcionBodega] PrimeFaces growl no disponible, PF=' + typeof PF);
                         }
-                    };
-
-                    ws.onclose = function() {
-                        console.log('Conexión WebSocket cerrada');
+                    } catch (e) {
+                        console.error('[RecepcionBodega] Error al mostrar notificación:', e);
+                    }
+                };                    ws.onclose = function() {
+                        console.log('[RecepcionBodega] Conexión WebSocket cerrada');
                         if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                             reconnectAttempts++;
-                            console.log('Intentando reconectar... Intento ' + reconnectAttempts);
+                            console.log('[RecepcionBodega] Intentando reconectar... Intento ' + reconnectAttempts + '/' + MAX_RECONNECT_ATTEMPTS);
                             setTimeout(conectarWebSocket, RECONNECT_DELAY);
                         }
                     };
 
                     ws.onerror = function(error) {
-                        console.error('Error WebSocket:', error);
+                        console.error('[RecepcionBodega] Error WebSocket:', error);
                     };
 
                 } catch (error) {
-                    console.error('Error al crear WebSocket:', error);
+                    console.error('[RecepcionBodega] Error al crear WebSocket:', error);
                 }
             }
 

@@ -21,6 +21,7 @@ public class KardexEndpoint implements Serializable {
     @OnOpen
     public void abrirConexion(Session session) {
         sessionHandler.addSession(session);
+        Logger.getLogger(KardexEndpoint.class.getName()).log(Level.INFO, ">>> WebSocket ABIERTO: " + session.getId() + " - Total sesiones: " + sessionHandler.getSessions().size());
     }
 
 
@@ -30,14 +31,21 @@ public class KardexEndpoint implements Serializable {
     }
 
     public void enviarMensajeBroadcast(String mensaje) {
+        Logger.getLogger(KardexEndpoint.class.getName()).log(Level.INFO, ">>> KardexEndpoint: Enviando broadcast '" + mensaje + "' a " + sessionHandler.getSessions().size() + " sesiones");
+        int enviados = 0;
         for (Session session : sessionHandler.getSessions()) {
             if (session.isOpen()) {
                 try {
                     session.getBasicRemote().sendText(mensaje);
+                    enviados++;
+                    Logger.getLogger(KardexEndpoint.class.getName()).log(Level.INFO, ">>> Mensaje enviado a sesión: " + session.getId());
                 } catch (Exception e) {
                     Logger.getLogger(KardexEndpoint.class.getName()).log(Level.SEVERE, "Error enviando mensaje WebSocket", e);
                 }
+            } else {
+                Logger.getLogger(KardexEndpoint.class.getName()).log(Level.WARNING, ">>> Sesión cerrada: " + session.getId());
             }
         }
+        Logger.getLogger(KardexEndpoint.class.getName()).log(Level.INFO, ">>> Total mensajes enviados: " + enviados + "/" + sessionHandler.getSessions().size());
     }
 }

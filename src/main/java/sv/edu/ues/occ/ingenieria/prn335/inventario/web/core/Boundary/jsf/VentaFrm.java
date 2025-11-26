@@ -1,6 +1,7 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
 import jakarta.ejb.EJB;
+import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -8,6 +9,7 @@ import jakarta.inject.Named;
 import org.primefaces.event.SelectEvent;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.*;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.ws.VentaWebSocketEndpoint;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -34,9 +36,6 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
     @Inject
     private VentaDetalleFrm ventaDetalleFrm;
-
-    @Inject
-    NotificadorKardex notificadorKardex;
 
     private Cliente clienteSeleccionado;
     private List<String> estadosVenta;
@@ -366,10 +365,46 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     }
 
     public void notificarCambioKardex(jakarta.faces.event.ActionEvent actionEvent) {
+        Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> INICIO notificarCambioKardex - Venta ID: " + (this.registro != null ? this.registro.getId() : "null"));
         if (this.registro != null && this.registro.getId() != null) {
-            this.registro.setEstado("APROBADO");
-            super.btnModificarHandler(actionEvent);
-            notificadorKardex.notificarCambioKardex("Venta actualizada: ");
+            try {
+                String estadoAnterior = this.registro.getEstado();
+                UUID ventaId = this.registro.getId();
+                
+                this.registro.setEstado("APROBADO");
+                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, 
+                    ">>> Estado cambiado en memoria: " + estadoAnterior + " → APROBADO");
+                
+                // GUARDAR EN BD sin limpiar formulario
+                getDao().actualizar(this.registro);
+                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> Registro actualizado en BD");
+                
+                // Actualizar tabla
+                inicializarRegistros();
+                
+                // Mensaje de confirmación
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Estado Actualizado", 
+                    "Venta #" + ventaId + " cambiada de '" + estadoAnterior + "' a 'APROBADO'"));
+                
+                // Notificar directamente por WebSocket
+                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> Llamando VentaWebSocketEndpoint.broadcast");
+                VentaWebSocketEndpoint.broadcast("refresh");
+                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> Mensaje WebSocket enviado - VENTA APROBADA");
+                
+                // Limpiar formulario DESPUÉS de los mensajes
+                limpiarFormulario();
+                
+            } catch (Exception e) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "Error", 
+                    "No se pudo cambiar el estado: " + e.getMessage()));
+                Logger.getLogger(VentaFrm.class.getName()).log(Level.SEVERE, "Error en notificarCambioKardex", e);
+            }
+        } else {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                "Advertencia", 
+                "No hay venta seleccionada para modificar"));
         }
     }
 }

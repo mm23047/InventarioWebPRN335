@@ -57,7 +57,13 @@ public class DespachoBodegaFrm extends DefaultFrm<Venta> {
         try {
             // El LazyDataModel se recargará automáticamente cuando PrimeFaces
             // actualice el componente tblVentasAprobadas
-            // No necesitamos hacer nada más aquí, el update del remoteCommand se encarga
+            
+            // Mostrar notificación visual al usuario
+            getFacesContext().addMessage(null, new jakarta.faces.application.FacesMessage(
+                jakarta.faces.application.FacesMessage.SEVERITY_INFO,
+                "¡Nueva Venta Aprobada!",
+                "Se ha aprobado una venta. La tabla se ha actualizado automáticamente."
+            ));
 
         } catch (Exception e) {
             Logger.getLogger(DespachoBodegaFrm.class.getName()).log(Level.SEVERE,

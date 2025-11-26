@@ -6,13 +6,10 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.primefaces.PrimeFaces;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -23,7 +20,7 @@ import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class ProductoFrm extends DefaultFrm<Producto> implements Serializable {
+public class ProductoFrm extends DefaultFrm<Producto> {
 
     @Inject
     ProductoDAO productoDAO;
@@ -203,7 +200,7 @@ public class ProductoFrm extends DefaultFrm<Producto> implements Serializable {
         return true;
     }
     
-    // Método para generar reporte Kardex - Construye URL y la devuelve al cliente
+    // Método para generar reporte Kardex - Genera URL del REST endpoint y retorna vía callback
     public void generarReporteKardex() {
         try {
             Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
@@ -217,38 +214,40 @@ public class ProductoFrm extends DefaultFrm<Producto> implements Serializable {
             
             FacesContext context = FacesContext.getCurrentInstance();
             
-            // Validar datos
+            // VALIDACIÓN 1: Producto seleccionado
             if (productoSeleccionadoReporte == null || productoSeleccionadoReporte.getId() == null) {
                 addErrorMessage("Debe seleccionar un producto");
                 Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
                     "Producto no seleccionado o sin ID");
                 if (context != null) {
-                    context.getExternalContext().getRequestMap().put("validationFailed", true);
+                    org.primefaces.PrimeFaces.current().ajax().addCallbackParam("validationFailed", true);
                 }
                 return;
             }
             
+            // VALIDACIÓN 2: Fechas no nulas
             if (fechaInicioReporte == null || fechaFinReporte == null) {
-                addErrorMessage("Debe seleccionar las fechas");
+                addErrorMessage("Debe seleccionar fecha desde y fecha hasta");
                 Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
                     "Fechas no seleccionadas");
                 if (context != null) {
-                    context.getExternalContext().getRequestMap().put("validationFailed", true);
+                    org.primefaces.PrimeFaces.current().ajax().addCallbackParam("validationFailed", true);
                 }
                 return;
             }
             
+            // VALIDACIÓN 3: Rango de fechas válido
             if (fechaInicioReporte.after(fechaFinReporte)) {
-                addErrorMessage("La fecha de inicio debe ser anterior a la fecha fin");
+                addErrorMessage("Fecha desde no puede ser mayor que fecha hasta");
                 Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
                     "Fecha inicio posterior a fecha fin");
                 if (context != null) {
-                    context.getExternalContext().getRequestMap().put("validationFailed", true);
+                    org.primefaces.PrimeFaces.current().ajax().addCallbackParam("validationFailed", true);
                 }
                 return;
             }
             
-            // Construir URL del reporte
+            // Construir URL del REST endpoint que generará el PDF
             ExternalContext externalContext = context.getExternalContext();
             String contextPath = externalContext.getRequestContextPath();
             
@@ -262,7 +261,7 @@ public class ProductoFrm extends DefaultFrm<Producto> implements Serializable {
             Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
                 "URL del reporte: " + url);
             
-            // Pasar URL al cliente vía RequestContext
+            // Pasar URL al cliente vía callback de PrimeFaces para abrir en nueva pestaña
             org.primefaces.PrimeFaces.current().ajax().addCallbackParam("pdfUrl", url);
             org.primefaces.PrimeFaces.current().ajax().addCallbackParam("validationFailed", false);
                 

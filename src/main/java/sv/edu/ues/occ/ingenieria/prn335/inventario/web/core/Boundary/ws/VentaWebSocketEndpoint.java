@@ -21,6 +21,7 @@ public class VentaWebSocketEndpoint {
     @OnOpen
     public void onOpen(Session session) {
         sessions.add(session);
+        LOGGER.log(Level.INFO, ">>> WebSocket ABIERTO: " + session.getId() + " - Total sesiones: " + sessions.size());
     }
 
     // Elimina conexión cuando cliente se desconecta
@@ -38,18 +39,24 @@ public class VentaWebSocketEndpoint {
 
     // Envía mensaje a todos los clientes conectados
     public static void broadcast(String message) {
+        LOGGER.log(Level.INFO, ">>> VentaWebSocketEndpoint: Enviando broadcast '" + message + "' a " + sessions.size() + " sesiones");
         Set<Session> closedSessions = new HashSet<>();
+        int enviados = 0;
         
         synchronized (sessions) {
             for (Session session : sessions) {
                 if (session.isOpen()) {
                     try {
                         session.getBasicRemote().sendText(message);
+                        enviados++;
+                        LOGGER.log(Level.INFO, ">>> Mensaje enviado a sesión: " + session.getId());
                     } catch (IOException e) {
                         closedSessions.add(session);
+                        LOGGER.log(Level.WARNING, ">>> Error enviando a sesión: " + session.getId(), e);
                     }
                 } else {
                     closedSessions.add(session);
+                    LOGGER.log(Level.WARNING, ">>> Sesión cerrada: " + session.getId());
                 }
             }
         }
@@ -57,6 +64,7 @@ public class VentaWebSocketEndpoint {
         if (!closedSessions.isEmpty()) {
             sessions.removeAll(closedSessions);
         }
+        LOGGER.log(Level.INFO, ">>> Total mensajes enviados: " + enviados + "/" + sessions.size());
     }
 
 }

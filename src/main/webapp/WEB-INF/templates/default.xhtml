@@ -29,7 +29,7 @@
 
         <article>
             <h:panelGroup id="pnlTabla">
-                <p:growl showSummary="true" showDetail="true" keepAlive="3600" sticky="false"/>
+                <p:growl id="growlGlobal" showSummary="true" showDetail="true" life="5000" sticky="false" autoUpdate="true"/>
                 <ui:insert name="contenido-tabla"></ui:insert>
             </h:panelGroup>
 

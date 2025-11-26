@@ -1,5 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
+import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
@@ -11,6 +12,7 @@ import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.ws.KardexEndpoint;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -30,7 +32,7 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     private FacesContext facesContext;
 
     @Inject
-    NotificadorKardex notificadorKardex;
+    KardexEndpoint kardexEndpoint;
 
     @Inject
     private CompraDAO compraDAO;
@@ -204,10 +206,50 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     }
 
     public void notificarCambioKardex(ActionEvent actionEvent) {
+        Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> INICIO notificarCambioKardex - Compra ID: " + (this.registro != null ? this.registro.getId() : "null"));
         if (this.registro != null && this.registro.getId() != null) {
-            this.registro.setEstado("PAGADA"); // Estado de la entidad (String)
-            super.btnModificarHandler(actionEvent);
-            notificadorKardex.notificarCambioKardex("Compra actualizada: ");
+            try {
+                String estadoAnterior = this.registro.getEstado();
+                Long compraId = this.registro.getId();
+                
+                this.registro.setEstado("PAGADA");
+                Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, 
+                    ">>> Estado cambiado en memoria: " + estadoAnterior + " → PAGADA");
+                
+                // GUARDAR EN BD sin limpiar formulario
+                getDao().actualizar(this.registro);
+                Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> Registro actualizado en BD");
+                
+                // Actualizar tabla
+                inicializarRegistros();
+                
+                // Mensaje de confirmación
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "Estado Actualizado", 
+                    "Compra #" + compraId + " cambiada de '" + estadoAnterior + "' a 'PAGADA'"));
+                
+                // Notificar directamente por WebSocket
+                if (kardexEndpoint != null) {
+                    Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> Llamando kardexEndpoint.enviarMensajeBroadcast");
+                    kardexEndpoint.enviarMensajeBroadcast("refresh");
+                    Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> Mensaje WebSocket enviado - COMPRA PAGADA");
+                } else {
+                    Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, ">>> kardexEndpoint es NULL");
+                }
+                
+                // Limpiar formulario DESPUÉS de los mensajes
+                limpiarFormulario();
+                
+            } catch (Exception e) {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "Error", 
+                    "No se pudo cambiar el estado: " + e.getMessage()));
+                Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error en notificarCambioKardex", e);
+            }
+        } else {
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                "Advertencia", 
+                "No hay compra seleccionada para modificar"));
         }
     }
 

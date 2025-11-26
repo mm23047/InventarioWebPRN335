@@ -183,6 +183,13 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
 
     public void actualizarTabla(ActionEvent actionEvent) {
         System.out.println("Actualizando tabla de compras");
+        
+        // Mostrar notificación visual al usuario
+        facesContext.addMessage(null, new jakarta.faces.application.FacesMessage(
+            jakarta.faces.application.FacesMessage.SEVERITY_INFO,
+            "¡Nueva Compra Disponible!",
+            "Se ha marcado una compra como PAGADA. La tabla se ha actualizado automáticamente."
+        ));
     }
 
     private List<CompraDetalle> detallesCompra;

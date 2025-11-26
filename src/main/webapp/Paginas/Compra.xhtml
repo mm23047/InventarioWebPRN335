@@ -14,6 +14,7 @@
 
    <!-- Tabla de registros (Tabla 1) -->
    <ui:define name="contenido-tabla">
+      <p:growl id="growl" showDetail="true" life="4000" sticky="false"/>
       <h:panelGroup id="pnlCompraTabla">
          <h:form id="frmCompraTop">
             <p:dataTable id="tblCompras"
@@ -161,10 +162,12 @@
                                       process="@form"/>
 
                      <!-- Botón Cerrar compra -->
-                     <p:commandButton value="Cerrar compra"
+                     <p:commandButton value="Marcar como PAGADA"
+                                      icon="pi pi-check"
+                                      styleClass="ui-button-success"
                                       actionListener="#{compraFrm.notificarCambioKardex}"
-                                      update=":pnlCompraDetalle :pnlCompraTabla"
-                                      rendered="#{compraFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'RECIBIDA'}"
+                                      update=":growl :pnlCompraDetalle :pnlCompraTabla"
+                                      rendered="#{compraFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'PAGADA'}"
                                       process="@form"/>
 
 

@@ -49,14 +49,25 @@
         <jvmOptions value="-Dnet.sf.jasperreports.awt.ignore.missing.font=true"/>
     </jvm>
     
-    <!-- JMS Queue para Kardex (usado por @MessageDriven) -->
-    <messaging>
-        <wasJmsEndpoint host="*" wasJmsPort="7276" wasJmsSSLPort="7286"/>
-    </messaging>
-    
-    <messagingEngine>
-        <queue id="kardexQueue"/>
+    <!-- JMS Configuration usando motor interno de OpenLiberty -->
+    <messagingEngine id="defaultME">
+        <queue id="QUEUE1" maxQueueDepth="5000"/>
     </messagingEngine>
+    
+    <!-- JMS Connection Factory -->
+    <jmsQueueConnectionFactory jndiName="jms/JmsFactory">
+        <properties.messagingEngine/>
+    </jmsQueueConnectionFactory>
+    
+    <!-- JMS Queue JNDI -->
+    <jmsQueue jndiName="jms/JmsQueue">
+        <properties.messagingEngine queueName="QUEUE1" deliveryMode="Persistent"/>
+    </jmsQueue>
+    
+    <!-- JMS Activation Spec para ReceptorKardex -->
+    <jmsActivationSpec id="InventarioWebapprn335-1.0-SNAPSHOT/ReceptorKardex">
+        <properties.messagingEngine destinationRef="jms/JmsQueue"/>
+    </jmsActivationSpec>
 
     <!-- DataSource para PostgreSQL en contenedor db17 -->
     <dataSource id="PostgresDs"

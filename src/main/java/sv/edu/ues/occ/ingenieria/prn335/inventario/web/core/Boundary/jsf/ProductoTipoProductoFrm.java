@@ -302,7 +302,7 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
                 this.caracteristicasSeleccionadas = new ArrayList<>(this.caracteristicasObligatorias);
                 this.valoresCaracteristicas = new HashMap<>(); // Reiniciar valores
 
-                // ✅✅✅ AGREGAR ESTA LÍNEA ✅✅✅
+                // Seleccionar primera característica sin valor
                 seleccionarPrimeraSinValor();
 
             } else {
@@ -402,13 +402,13 @@ public class ProductoTipoProductoFrm extends DefaultFrm<ProductoTipoProducto> im
             enviarMensajeExito("Valor '" + valorCaracteristica + "' guardado para '" +
                     caracteristicaSeleccionadaSeleccionada.getIdCaracteristica().getNombre() + "'");
 
-            // ✅✅✅ GUARDAR EL VALOR TEMPORALMENTE Y LIMPIAR INMEDIATAMENTE
+            // Guardar el valor temporalmente y limpiar inmediatamente
             Double valorGuardado = valorCaracteristica;
 
-            // ✅✅✅ LIMPIAR INMEDIATAMENTE - ESTO ES LO MÁS IMPORTANTE
+            // Limpiar inmediatamente - esto es lo más importante
             valorCaracteristica = null;
 
-            // ✅✅✅ FORZAR ACTUALIZACIÓN DEL COMPONENTE PRIMERO
+            // Forzar actualización del componente primero
             FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("formId:txtValorCaracteristica");
 
             // BUSCAR LA SIGUIENTE CARACTERÍSTICA SIN VALOR

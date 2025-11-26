@@ -1,17 +1,17 @@
 # Dockerización de InventarioWebPRN335
 
-## 🚀 Inicio Rápido - Configuración Desde Cero
+## Inicio Rápido - Configuración Desde Cero
 
 **Si acabas de clonar el repositorio** y es la primera vez que lo configuras, sigue estos pasos en orden:
 
-### 📋 Pre-requisitos
+### Pre-requisitos
 Asegúrate de tener instalado:
-- ✅ [Docker Desktop](https://www.docker.com/products/docker-desktop) corriendo
-- ✅ [Java JDK 21](https://www.oracle.com/java/technologies/downloads/#java21)
-- ✅ [Maven](https://maven.apache.org/download.cgi)
-- ✅ VS Code o IntelliJ IDEA
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) corriendo
+- [Java JDK 21](https://www.oracle.com/java/technologies/downloads/#java21)
+- [Maven](https://maven.apache.org/download.cgi)
+- VS Code o IntelliJ IDEA
 
-### 🎯 Pasos de Configuración (Ejecútalo en este orden)
+### Pasos de Configuración (Ejecútalo en este orden)
 
 ```powershell
 # PASO 1: Navegar al directorio del proyecto
@@ -52,7 +52,7 @@ docker network inspect inventario-network --format '{{range .Containers}}{{.Name
 # Esta vista es necesaria para que funcionen los reportes Kardex
 docker exec -i db17 psql -U postgres -d inventario_prn335 < create_kardex_view.sql
 
-# PASO 11: ⚠️ IMPORTANTE - Crear la vista Kardex_Implementado en PostgreSQL
+# PASO 11: IMPORTANTE - Crear la vista Kardex_Implementado en PostgreSQL
 # Esta vista es NECESARIA para que funcionen los reportes de Kardex
 # Si no ejecutas esto, los PDFs saldrán en blanco
 Get-Content create_kardex_view.sql | docker exec -i db17 psql -U postgres -d inventario_prn335
@@ -72,7 +72,7 @@ curl http://localhost:9080/resources/v1/tipo_almacen
 # http://localhost:9080/resources/v1/tipo_almacen
 ```
 
-### ✅ Verificación Final
+### Verificación Final
 
 Ejecuta estos comandos para verificar que todo está corriendo:
 
@@ -102,7 +102,7 @@ cd C:\Users\melya\Desktop\e\InventarioWebPRN335
 # Levantar la aplicación
 docker-compose up -d inventario-app
 
-# ⚠️ IMPORTANTE: Si los reportes de Kardex salen en blanco, ejecuta esto:
+# IMPORTANTE: Si los reportes de Kardex salen en blanco, ejecuta esto:
 Get-Content create_kardex_view.sql | docker exec -i db17 psql -U postgres -d inventario_prn335
 
 # Ver logs
@@ -111,7 +111,7 @@ docker logs -f inventario-web
 
 ---
 
-## ⚠️ Solución de Problemas
+## Solución de Problemas
 
 ### PDFs de Kardex salen en blanco
 
@@ -131,32 +131,32 @@ Deberías ver `Kardex_Implementado` en la lista.
 
 ---
 
-## 📋 Requisitos Previos
-- ✅ Docker Desktop instalado y corriendo
-- ✅ Docker Compose incluido con Docker Desktop
-- ✅ Java JDK 21 y Maven instalados (para compilar)
-- ✅ PostgreSQL contenedor `db17` corriendo (o crear uno nuevo)
+## Requisitos Previos
+- Docker Desktop instalado y corriendo
+- Docker Compose incluido con Docker Desktop
+- Java JDK 21 y Maven instalados (para compilar)
+- PostgreSQL contenedor `db17` corriendo (o crear uno nuevo)
 
 **Nota**: El driver PostgreSQL se descarga automáticamente durante la construcción de la imagen Docker, no necesitas descargarlo manualmente.
 
-## 📁 Estructura de Archivos Docker
+## Estructura de Archivos Docker
 
 ```
 InventarioWebPRN335/
-├── Dockerfile                      # 🐳 Imagen de la aplicación
-├── docker-compose.yml              # 🔧 Orquestación de servicios
-├── server.xml                      # ⚙️  Configuración OpenLiberty
-├── init-server.sh                  # 🚀 Script de inicio del servidor
-├── .dockerignore                   # 🚫 Archivos excluidos del build
-├── .gitignore                      # 🚫 Archivos excluidos de Git
-├── pom.xml                         # 🔨 Configuración Maven
+├── Dockerfile                      # Imagen de la aplicación
+├── docker-compose.yml              # Orquestación de servicios
+├── server.xml                      # Configuración OpenLiberty
+├── init-server.sh                  # Script de inicio del servidor
+├── .dockerignore                   # Archivos excluidos del build
+├── .gitignore                      # Archivos excluidos de Git
+├── pom.xml                         # Configuración Maven
 └── target/
-    └── InventarioWebapprn335-1.0-SNAPSHOT.war  # 📦 WAR compilado
+    └── InventarioWebapprn335-1.0-SNAPSHOT.war  # WAR compilado
 ```
 
 **Nota**: El driver PostgreSQL (`postgresql-42.7.4.jar`) ya NO es necesario en el proyecto. Se descarga automáticamente durante el build de Docker.
 
-## 🔨 Paso 1: Compilar la Aplicación
+## Paso 1: Compilar la Aplicación
 
 ```bash
 mvn clean package
@@ -173,7 +173,7 @@ ls -lh target/InventarioWebapprn335-1.0-SNAPSHOT.war
 
 Deberías ver un archivo WAR de aproximadamente **20-30 MB**.
 
-## 🐳 Paso 2: Construir la Imagen Docker
+## Paso 2: Construir la Imagen Docker
 
 ### Opción A: Con Docker Compose (Recomendado)
 ```bash
@@ -194,7 +194,7 @@ docker build --no-cache -t inventario-web:latest .
 - OpenLiberty (~45 MB)
 - Driver PostgreSQL (~1 MB) - **Se descarga automáticamente**
 
-## 🚀 Paso 3: Ejecutar la Aplicación
+## Paso 3: Ejecutar la Aplicación
 
 ### Usar Base de Datos Existente (db17)
 
@@ -228,7 +228,7 @@ docker ps
 # - db17 (puerto 5432)
 ```
 
-## ✅ Paso 4: Verificar el Despliegue
+## Paso 4: Verificar el Despliegue
 
 ### Ver logs en tiempo real
 ```bash
@@ -237,19 +237,19 @@ docker logs -f inventario-web
 
 ### ¿Qué mensajes son normales?
 
-✅ **ÉXITO** - Busca este mensaje:
+**ÉXITO** - Busca este mensaje:
 ```
 [AUDIT] CWWKZ0001I: Application inventario started in XX.XXX seconds.
 [AUDIT] CWWKF0011I: The defaultServer server is ready to run a smarter planet.
 ```
 
-⚠️ **WARNINGS ESPERADOS** (puedes ignorarlos):
+**WARNINGS ESPERADOS** (puedes ignorarlos):
 - `CWWKS9582E` sobre SSL/ORB - El keyStore se genera automáticamente, es normal
 - `CNTR4016W` sobre JmsQueue - Normal si no usas mensajería JMS
 - `MyFaces Core is running in DEVELOPMENT mode` - Esperado en desarrollo
 - `CWWKZ0022W: Application inventario has not started in 30 seconds` - Solo informativo, espera unos segundos más
 
-❌ **ERRORES REALES** (necesitan corrección):
+**ERRORES REALES** (necesitan corrección):
 - `Could not initialize class sun.awt.X11FontManager` - Ver sección Troubleshooting
 - `Connection refused` a la base de datos - Verifica que db17 esté corriendo
 
@@ -279,7 +279,7 @@ docker exec -i db17 psql -U postgres -d inventario_prn335 < create_kardex_view.s
 docker exec -i db17 psql -U postgres -d inventario_prn335 -c '\dv "Kardex_Implementado"'
 ```
 
-✅ **Resultado esperado:** Deberías ver la definición de la vista `"Kardex_Implementado"`.
+**Resultado esperado:** Deberías ver la definición de la vista `"Kardex_Implementado"`.
 
 **¿Qué hace esta vista?**
 - Une las tablas `kardex` y `producto`
@@ -334,8 +334,8 @@ curl http://localhost:9080/resources/v1/tipo_almacen/1
 5. Haz clic en **"Generar Reporte PDF"**
 6. El PDF debería descargarse automáticamente
 
-✅ **Si funciona**: ¡Perfecto! Las librerías de fuentes están correctamente instaladas.
-❌ **Si falla**: Ver sección de Troubleshooting abajo.
+**Si funciona**: ¡Perfecto! Las librerías de fuentes están correctamente instaladas.
+**Si falla**: Ver sección de Troubleshooting abajo.
 
 ## 🔄 Detener y Reiniciar
 
@@ -358,9 +358,9 @@ docker ps
 docker ps -a
 ```
 
-## 🔧 Reconstruir la Imagen
+## Reconstruir la Imagen
 
-### ❌ Error: "Could not initialize class sun.awt.X11FontManager"
+### Error: "Could not initialize class sun.awt.X11FontManager"
 
 **Síntoma**: Al generar reportes PDF con JasperReports, sale este error.
 
@@ -401,7 +401,7 @@ reports/tipo_unidad_medida.jasper
 
 ---
 
-### ❌ Error: "Cannot connect to database"
+### Error: "Cannot connect to database"
 
 **Síntoma**: La aplicación no puede conectarse a PostgreSQL.
 
@@ -431,7 +431,7 @@ docker exec -it db17 psql -U postgres -d inventario_prn335 -c "\dt"
 
 ---
 
-### ❌ Error: "Address already in use" (Puerto en uso)
+### Error: "Address already in use" (Puerto en uso)
 
 **Síntoma**: No puede levantar el contenedor porque el puerto 9080 o 5432 ya está en uso.
 
@@ -453,7 +453,7 @@ ports:
 
 ---
 
-### ❌ Error: "postgresql-42.7.4.jar not found"
+### Error: "postgresql-42.7.4.jar not found"
 
 **Síntoma**: Al construir la imagen, falla porque no encuentra el driver JDBC.
 
@@ -517,20 +517,20 @@ docker logs -f inventario-web
 
 **Nota**: Solo funciona para cambios en código Java. Para cambios en `Dockerfile` o `server.xml`, debes reconstruir.
 
-## 🔧 Reconstruir la Imagen
+## Reconstruir la Imagen
 
 ### ¿Cuándo reconstruir?
 
 Reconstruye la imagen cuando modifiques:
-- ✅ `Dockerfile`
-- ✅ `server.xml`
-- ✅ `init-server.sh`
-- ✅ Dependencias del `pom.xml` (librerías)
-- ✅ Archivos de configuración (`.properties`, `persistence.xml`)
+- `Dockerfile`
+- `server.xml`
+- `init-server.sh`
+- Dependencias del `pom.xml` (librerías)
+- Archivos de configuración (`.properties`, `persistence.xml`)
 
 **NO** necesitas reconstruir para cambios en:
-- ❌ Código Java (.java files) - usa Hot Reload
-- ❌ Páginas XHTML - usa Hot Reload
+- Código Java (.java files) - usa Hot Reload
+- Páginas XHTML - usa Hot Reload
 
 ### Comandos de Reconstrucción
 
@@ -627,7 +627,7 @@ docker system df
 
 ---
 
-## 📦 Stack Tecnológico del Contenedor
+## Stack Tecnológico del Contenedor
 
 | Componente | Versión | Descripción |
 |------------|---------|-------------|
@@ -640,41 +640,41 @@ docker system df
 | **Reportes** | JasperReports 7.0.3 | Generación de PDF |
 | **Fuentes** | DejaVu, Liberation | Fuentes para reportes PDF |
 
-## ✅ Características Configuradas
+## Características Configuradas
 
 ### Jakarta EE 10.0 Features Instaladas
 
-✅ Jakarta EE 10.0 Core  
-✅ Jakarta Faces 4.0 (JSF)  
-✅ Jakarta RESTful Web Services 3.1  
-✅ Jakarta Persistence 3.1 (JPA)  
-✅ Jakarta Enterprise Beans 4.0 (EJB)  
-✅ Jakarta Bean Validation 3.0  
-✅ Jakarta Contexts and Dependency Injection 4.0 (CDI)  
-✅ Jakarta JSON Binding 3.0 / JSON Processing 2.1  
-✅ Jakarta WebSocket 2.1  
-✅ Jakarta Mail 2.1  
-✅ Jakarta Security 3.0  
+Jakarta EE 10.0 Core  
+Jakarta Faces 4.0 (JSF)  
+Jakarta RESTful Web Services 3.1  
+Jakarta Persistence 3.1 (JPA)  
+Jakarta Enterprise Beans 4.0 (EJB)  
+Jakarta Bean Validation 3.0  
+Jakarta Contexts and Dependency Injection 4.0 (CDI)  
+Jakarta JSON Binding 3.0 / JSON Processing 2.1  
+Jakarta WebSocket 2.1  
+Jakarta Mail 2.1  
+Jakarta Security 3.0  
 
 ### Configuraciones Especiales
 
-✅ **JasperReports**: Librerías de fuentes instaladas (`libfreetype6`, `libfreetype6-dev`)  
-✅ **Acceso Externo**: `host="*"` en httpEndpoint  
-✅ **DataSource**: Configurado para `db17:5432`  
-✅ **Auto-expansión**: WAR se despliega automáticamente  
-✅ **SSL**: Certificados autofirmados generados automáticamente  
-✅ **Timezone**: America/El_Salvador  
-✅ **Modo Headless**: Java configurado para reportes sin GUI  
+**JasperReports**: Librerías de fuentes instaladas (`libfreetype6`, `libfreetype6-dev`)  
+**Acceso Externo**: `host="*"` en httpEndpoint  
+**DataSource**: Configurado para `db17:5432`  
+**Auto-expansión**: WAR se despliega automáticamente  
+**SSL**: Certificados autofirmados generados automáticamente  
+**Timezone**: America/El_Salvador  
+**Modo Headless**: Java configurado para reportes sin GUI  
 
-## 🐍 Aplicación Cliente Python
+## Aplicación Cliente Python
 
 Este proyecto incluye una aplicación cliente de escritorio desarrollada en Python que consume la API REST.
 
-### 📋 Requisitos
+### Requisitos
 - Python 3.11 o superior
 - Aplicación Java corriendo en Docker (puerto 9080)
 
-### 🚀 Configuración e Inicio
+### Configuración e Inicio
 
 ```powershell
 # 1. Navegar al directorio de la aplicación cliente
@@ -698,7 +698,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-### ✅ Verificación de Conexión
+### Verificación de Conexión
 
 La aplicación cliente se conecta a:
 - **URL Base**: `http://localhost:9080/resources/v1`
@@ -709,15 +709,15 @@ Si la aplicación cliente no puede conectarse:
 2. Prueba el endpoint manualmente: `curl http://localhost:9080/resources/v1/tipo_almacen`
 3. Revisa el archivo `.env` de la aplicación cliente
 
-### 🎯 Funcionalidades
-- ✅ Listar tipos de almacén
-- ✅ Crear nuevos tipos de almacén
-- ✅ Editar tipos existentes
-- ✅ Eliminar tipos de almacén
-- ✅ Búsqueda por nombre
-- ✅ Paginación de resultados
+### Funcionalidades
+- Listar tipos de almacén
+- Crear nuevos tipos de almacén
+- Editar tipos existentes
+- Eliminar tipos de almacén
+- Búsqueda por nombre
+- Paginación de resultados
 
-## 🔌 Puertos Expuestos
+## Puertos Expuestos
 
 | Puerto | Protocolo | Descripción |
 |--------|-----------|-------------|
@@ -738,10 +738,10 @@ Si la aplicación cliente no puede conectarse:
 ## 🆘 Soporte
 
 Si tienes problemas:
-1. ✅ Revisa la sección **Troubleshooting** arriba
-2. ✅ Verifica los logs: `docker logs -f inventario-web`
-3. ✅ Busca en los logs de PostgreSQL: `docker logs -f db17`
-4. ✅ Revisa que todos los requisitos previos estén cumplidos
+1. Revisa la sección **Troubleshooting** arriba
+2. Verifica los logs: `docker logs -f inventario-web`
+3. Busca en los logs de PostgreSQL: `docker logs -f db17`
+4. Revisa que todos los requisitos previos estén cumplidos
 
 ---
 

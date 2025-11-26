@@ -122,4 +122,23 @@ public class KardexDAO extends InventarioDefaultDataAccess<Kardex> implements Se
             return null;
         }
     }
+
+    /**
+     * Obtiene el último movimiento de kardex para un producto (sin importar almacén)
+     * 
+     * @param idProducto UUID del producto
+     * @return Último registro de Kardex o null si no existe
+     */
+    public Kardex findUltimoMovimientoProducto(UUID idProducto) {
+        try {
+            return em.createQuery(
+                    "SELECT k FROM Kardex k WHERE k.idProducto.id = :producto " +
+                    "ORDER BY k.fecha DESC, k.id DESC", Kardex.class)
+                .setParameter("producto", idProducto)
+                .setMaxResults(1)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }

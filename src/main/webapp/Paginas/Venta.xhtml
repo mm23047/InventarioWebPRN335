@@ -13,6 +13,7 @@
 
    <!-- Tabla de registros -->
    <ui:define name="contenido-tabla">
+      <p:growl id="growl" showDetail="true" life="4000" sticky="false"/>
       <h:panelGroup id="pnlVentaTabla">
          <h:form id="frmVentaTop">
             <p:dataTable id="tblVentas"
@@ -175,10 +176,12 @@
                                       process="@form"/>
 
                      <!-- Botón Cerrar venta -->
-                     <p:commandButton value="Cerrar venta"
+                     <p:commandButton value="Marcar como APROBADO"
+                                      icon="pi pi-check"
+                                      styleClass="ui-button-success"
                                       actionListener="#{ventaFrm.notificarCambioKardex}"
-                                      update=":pnlVentaDetalle :pnlVentaTabla"
-                                      rendered="#{ventaFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'ENTREGADO'}"
+                                      update=":growl :pnlVentaDetalle :pnlVentaTabla"
+                                      rendered="#{ventaFrm.estado=='MODIFICAR' and ventaFrm.registro.estado != 'APROBADO' and ventaFrm.registro.estado != 'ENTREGADO'}"
                                       process="@form"/>
 
                   </h:panelGrid>
