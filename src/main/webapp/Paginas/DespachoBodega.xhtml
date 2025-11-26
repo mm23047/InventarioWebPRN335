@@ -70,7 +70,7 @@
             <!-- Remote Command para actualización automática vía WebSocket -->
             <p:remoteCommand name="refrescarTablaVentas"
                              actionListener="#{despachoBodegaFrm.actualizarTablaAutomaticamente}"
-                             update="tblVentasAprobadas"
+                             update=":pnlTabla:growlGlobal tblVentasAprobadas"
                              process="@none"
                              global="false"
                              async="true"/>
@@ -307,8 +307,26 @@
                  };
                  
                  ws.onmessage = function(event) {
+                     console.log('Mensaje recibido en DespachoBodega:', event.data);
+                     
                      if (event.data === 'refresh' && typeof refrescarTablaVentas !== 'undefined') {
+                         // Actualizar tabla primero
                          refrescarTablaVentas();
+                         
+                         // Mostrar notificación usando PrimeFaces
+                         try {
+                             if (typeof PF === 'function' && PF('growlWidgetDespacho')) {
+                                 PF('growlWidgetDespacho').show([{
+                                     severity: 'info',
+                                     summary: '¡Nueva Venta Aprobada!',
+                                     detail: 'Se ha aprobado una venta. La tabla se actualizará automáticamente.'
+                                 }]);
+                             } else {
+                                 console.warn('PrimeFaces growl no disponible en DespachoBodega');
+                             }
+                         } catch (e) {
+                             console.error('Error al mostrar notificación:', e);
+                         }
                      }
                  };
                  
