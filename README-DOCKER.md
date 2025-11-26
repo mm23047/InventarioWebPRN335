@@ -29,32 +29,38 @@ docker network create inventario-network
 # PASO 5: Verificar que tienes PostgreSQL corriendo
 docker ps --filter "name=db17"
 
-# PASO 6: Si db17 NO está corriendo, créalo:
-# (Si ya existe y está corriendo, OMITE este paso)
-docker run -d `
-  --name db17 `
-  --network inventario-network `
-  -e POSTGRES_USER=postgres `
-  -e POSTGRES_PASSWORD=postgres `
-  -e POSTGRES_DB=inventario_prn335 `
-  -p 5432:5432 `
-  postgres:17.5-alpine
+# PASO 6: Verificar que db17 está corriendo
+# IMPORTANTE: db17 debe existir previamente y estar corriendo
+# Si db17 NO está corriendo, inícialo:
+docker start db17
 
-# PASO 7: Si db17 ya existía, conéctalo a la red
+# PASO 7: Conectar db17 a la red inventario-network
+# (Ignora el error si ya está conectado)
 docker network connect inventario-network db17
 
-# PASO 8: Construir la imagen Docker (descarga el driver automáticamente)
+# PASO 8: Construir la imagen Docker
 docker-compose build inventario-app
 
 # PASO 9: Levantar la aplicación
 docker-compose up -d inventario-app
 
-# PASO 10: Ver los logs para confirmar que inició correctamente
+# PASO 10: Verificar que db17 esté en la red inventario-network
+docker network inspect inventario-network --format '{{range .Containers}}{{.Name}} {{end}}'
+# Deberías ver: db17 inventario-web
+
+# PASO 11: Ver los logs para confirmar que inició correctamente
 docker logs -f inventario-web
 # Presiona Ctrl+C para salir de los logs
+# Busca el mensaje: "The defaultServer server is ready to run a smarter planet"
 
-# PASO 11: Abrir en el navegador
-# http://localhost:9080
+# PASO 12: Probar la API REST
+curl http://localhost:9080/resources/v1/tipo_almacen
+
+# PASO 13: Abrir en el navegador
+# Aplicación web JSF:
+# http://localhost:9080/Paginas/TipoAlmacen.jsf
+# API REST:
+# http://localhost:9080/resources/v1/tipo_almacen
 ```
 
 ### ✅ Verificación Final
@@ -158,32 +164,25 @@ docker build --no-cache -t inventario-web:latest .
 
 ## 🚀 Paso 3: Ejecutar la Aplicación
 
-### Opción 1: Usar Base de Datos Existente (db17)
+### Usar Base de Datos Existente (db17)
 
-Si ya tienes un contenedor PostgreSQL llamado `db17` corriendo:
+**IMPORTANTE:** Este proyecto usa un contenedor PostgreSQL existente llamado `db17` que debe estar corriendo previamente.
 
 ```powershell
 # 1. Verificar que db17 esté corriendo
 docker ps --filter "name=db17"
 
-# 2. Crear la red inventario-network (si no existe)
+# 2. Si db17 está detenido, inícialo
+docker start db17
+
+# 3. Crear la red inventario-network (si no existe)
 docker network create inventario-network
 
-# 3. Conectar db17 a la red (ignora el error si ya está conectado)
+# 4. Conectar db17 a la red (ignora el error si ya está conectado)
 docker network connect inventario-network db17
 
-# 4. Levantar solo la aplicación inventario
+# 5. Levantar la aplicación inventario
 docker-compose up -d inventario-app
-```
-
-### Opción 2: Crear Todo Desde Cero
-
-Si necesitas crear también la base de datos:
-
-```bash
-# Edita docker-compose.yml y descomenta la sección db17
-# Luego ejecuta:
-docker-compose up -d
 ```
 
 ### Verificar que Levantó Correctamente
@@ -243,10 +242,36 @@ Una vez que veas el mensaje de éxito en los logs:
 ### URLs de Acceso
 - 🌍 **HTTP**: http://localhost:9080
 - 🔒 **HTTPS**: https://localhost:9443
+- 📡 **API REST Base**: http://localhost:9080/resources/v1
+
+### Probar la API REST
+
+```powershell
+# Listar todos los tipos de almacén
+curl http://localhost:9080/resources/v1/tipo_almacen
+
+# Obtener un tipo de almacén específico (ID=1)
+curl http://localhost:9080/resources/v1/tipo_almacen/1
+```
+
+**Endpoints REST Disponibles:**
+- `/resources/v1/tipo_almacen` - Tipos de almacén
+- `/resources/v1/tipo_producto` - Tipos de producto
+- `/resources/v1/tipo_unidad_medida` - Tipos de unidad de medida
+- `/resources/v1/producto` - Productos
+- `/resources/v1/cliente` - Clientes
+- `/resources/v1/proveedor` - Proveedores
+
+### Probar Páginas JSF Web
+
+1. **Tipo de Almacén**: http://localhost:9080/Paginas/TipoAlmacen.jsf
+2. **Tipo de Producto**: http://localhost:9080/Paginas/TipoProducto.jsf
+3. **Productos**: http://localhost:9080/Paginas/Producto.jsf
+4. **Clientes**: http://localhost:9080/Paginas/Cliente.jsf
 
 ### Probar Funcionalidad Básica
-1. Abre http://localhost:9080 en tu navegador
-2. Deberías ver la página principal de la aplicación
+1. Abre http://localhost:9080/Paginas/TipoAlmacen.jsf en tu navegador
+2. Deberías ver la lista de tipos de almacén con opciones para crear, editar y eliminar
 
 ### Probar Reportes Kardex (JasperReports)
 ¡Esto es lo que corregimos! Ahora debería funcionar sin errores:
@@ -261,7 +286,7 @@ Una vez que veas el mensaje de éxito en los logs:
 ✅ **Si funciona**: ¡Perfecto! Las librerías de fuentes están correctamente instaladas.
 ❌ **Si falla**: Ver sección de Troubleshooting abajo.
 
-## 🛑 Detener y Reiniciar
+## 🔄 Detener y Reiniciar
 
 ### Detener la aplicación (mantiene los datos)
 ```bash
@@ -273,11 +298,6 @@ docker-compose down
 docker-compose up -d inventario-app
 ```
 
-### Detener Y ELIMINAR volúmenes (¡CUIDADO! Pierdes datos de BD)
-```bash
-docker-compose down -v
-```
-
 ### Ver estado de contenedores
 ```bash
 # Contenedores corriendo
@@ -287,7 +307,7 @@ docker ps
 docker ps -a
 ```
 
-## 🔧 Troubleshooting (Solución de Problemas)
+## 🔧 Reconstruir la Imagen
 
 ### ❌ Error: "Could not initialize class sun.awt.X11FontManager"
 
@@ -386,14 +406,9 @@ ports:
 
 **Síntoma**: Al construir la imagen, falla porque no encuentra el driver JDBC.
 
-**Solución**:
-```powershell
-# Descargar el driver en el directorio del proyecto
-Invoke-WebRequest -Uri https://jdbc.postgresql.org/download/postgresql-42.7.4.jar -OutFile postgresql-42.7.4.jar
+**Causa**: El Dockerfile ya descarga automáticamente el driver PostgreSQL. Este error no debería aparecer.
 
-# Verificar que existe
-ls postgresql-42.7.4.jar
-```
+**Solución**: Si aparece este error, verifica que tienes conexión a internet durante el build de Docker. El driver se descarga automáticamente con `wget` en el Dockerfile.
 
 ---
 
@@ -487,110 +502,6 @@ docker-compose up -d inventario-app
 docker-compose build --progress=plain inventario-app
 ```
 
-## ⚙️ Variables de Entorno Disponibles
-
-Puedes personalizar estas variables en `docker-compose.yml`:
-
-```yaml
-services:
-  inventario-app:
-    environment:
-      # Zona horaria
-      - TZ=America/El_Salvador
-      
-      # Configuración de Java para JasperReports
-      - JAVA_OPTS=-Djava.awt.headless=true -Dnet.sf.jasperreports.awt.ignore.missing.font=true
-      
-      # Configuración de memoria JVM (opcional)
-      - JAVA_OPTS=-Xmx1024m -Xms512m
-  
-  db17:
-    environment:
-      # Credenciales de PostgreSQL
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=tu_password_seguro
-      - POSTGRES_DB=inventario_prn335
-```
-
-**Nota**: Las variables `JAVA_OPTS` ya están configuradas en el `init-server.sh`, pero puedes sobrescribirlas si necesitas ajustes personalizados.
-
-## 🚀 Configuración para Producción
-
-### ⚠️ IMPORTANTE: Cambios Necesarios para Producción
-
-1. **Cambiar MyFaces a PRODUCTION mode**
-
-Edita `web.xml` y agrega:
-```xml
-<context-param>
-    <param-name>jakarta.faces.PROJECT_STAGE</param-name>
-    <param-value>Production</param-value>
-</context-param>
-```
-
-2. **Usar secrets para contraseñas**
-
-En lugar de poner contraseñas en `docker-compose.yml`:
-
-```yaml
-secrets:
-  db_password:
-    file: ./secrets/db_password.txt
-
-services:
-  inventario-app:
-    secrets:
-      - db_password
-```
-
-3. **Configurar límites de recursos**
-
-```yaml
-services:
-  inventario-app:
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '1'
-          memory: 1G
-```
-
-4. **Usar volúmenes nombrados para persistencia**
-
-```yaml
-volumes:
-  postgres-data:
-
-services:
-  db17:
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-```
-
-5. **Configurar health checks**
-
-```yaml
-services:
-  inventario-app:
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9080"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-```
-
-6. **Configurar política de reinicio**
-
-```yaml
-services:
-  inventario-app:
-    restart: always  # Cambiar de "unless-stopped" a "always"
-```
-
 ## 📝 Comandos Útiles
 
 ### Gestión de Contenedores
@@ -650,25 +561,6 @@ docker network inspect inventario-network | findstr Name
 docker network disconnect inventario-network db17
 ```
 
-### Base de Datos
-
-```bash
-# Conectarse a PostgreSQL
-docker exec -it db17 psql -U postgres -d inventario_prn335
-
-# Ver tablas
-docker exec -it db17 psql -U postgres -d inventario_prn335 -c "\dt"
-
-# Consulta SQL rápida
-docker exec -it db17 psql -U postgres -d inventario_prn335 -c "SELECT COUNT(*) FROM producto;"
-
-# Backup de la base de datos
-docker exec db17 pg_dump -U postgres inventario_prn335 > backup.sql
-
-# Restaurar backup
-docker exec -i db17 psql -U postgres inventario_prn335 < backup.sql
-```
-
 ### Limpieza General
 
 ```bash
@@ -722,6 +614,57 @@ docker system df
 ✅ **SSL**: Certificados autofirmados generados automáticamente  
 ✅ **Timezone**: America/El_Salvador  
 ✅ **Modo Headless**: Java configurado para reportes sin GUI  
+
+## 🐍 Aplicación Cliente Python
+
+Este proyecto incluye una aplicación cliente de escritorio desarrollada en Python que consume la API REST.
+
+### 📋 Requisitos
+- Python 3.11 o superior
+- Aplicación Java corriendo en Docker (puerto 9080)
+
+### 🚀 Configuración e Inicio
+
+```powershell
+# 1. Navegar al directorio de la aplicación cliente
+cd C:\Users\TU_USUARIO\Downloads\App-cliente\App-cliente
+
+# 2. Crear entorno virtual (primera vez)
+python -m venv venv
+
+# 3. Activar el entorno virtual
+.\venv\Scripts\Activate.ps1
+
+# 4. Instalar dependencias (primera vez)
+pip install -r requirements.txt
+
+# 5. Configurar el archivo .env
+# Asegúrate que tenga:
+# API_BASE_URL=http://localhost:9080/resources/v1
+# DOCKER_PORT=9080
+
+# 6. Ejecutar la aplicación
+python app.py
+```
+
+### ✅ Verificación de Conexión
+
+La aplicación cliente se conecta a:
+- **URL Base**: `http://localhost:9080/resources/v1`
+- **Endpoint TipoAlmacen**: `http://localhost:9080/resources/v1/tipo_almacen`
+
+Si la aplicación cliente no puede conectarse:
+1. Verifica que el contenedor `inventario-web` esté corriendo: `docker ps`
+2. Prueba el endpoint manualmente: `curl http://localhost:9080/resources/v1/tipo_almacen`
+3. Revisa el archivo `.env` de la aplicación cliente
+
+### 🎯 Funcionalidades
+- ✅ Listar tipos de almacén
+- ✅ Crear nuevos tipos de almacén
+- ✅ Editar tipos existentes
+- ✅ Eliminar tipos de almacén
+- ✅ Búsqueda por nombre
+- ✅ Paginación de resultados
 
 ## 🔌 Puertos Expuestos
 

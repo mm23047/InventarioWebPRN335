@@ -202,27 +202,52 @@ public class ProductoFrm extends DefaultFrm<Producto> {
         return true;
     }
     
-    // Método para generar reporte Kardex - Redirige directamente al PDF
+    // Método para generar reporte Kardex - Construye URL y la devuelve al cliente
     public void generarReporteKardex() {
         try {
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
+                "=== GENERANDO REPORTE KARDEX ===");
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
+                "Producto seleccionado: " + (productoSeleccionadoReporte != null ? productoSeleccionadoReporte.getId() : "NULL"));
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
+                "Fecha inicio: " + fechaInicioReporte);
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
+                "Fecha fin: " + fechaFinReporte);
+            
+            FacesContext context = FacesContext.getCurrentInstance();
+            
             // Validar datos
             if (productoSeleccionadoReporte == null || productoSeleccionadoReporte.getId() == null) {
                 addErrorMessage("Debe seleccionar un producto");
+                Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
+                    "Producto no seleccionado o sin ID");
+                if (context != null) {
+                    context.getExternalContext().getRequestMap().put("validationFailed", true);
+                }
                 return;
             }
             
             if (fechaInicioReporte == null || fechaFinReporte == null) {
                 addErrorMessage("Debe seleccionar las fechas");
+                Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
+                    "Fechas no seleccionadas");
+                if (context != null) {
+                    context.getExternalContext().getRequestMap().put("validationFailed", true);
+                }
                 return;
             }
             
             if (fechaInicioReporte.after(fechaFinReporte)) {
                 addErrorMessage("La fecha de inicio debe ser anterior a la fecha fin");
+                Logger.getLogger(ProductoFrm.class.getName()).log(Level.WARNING, 
+                    "Fecha inicio posterior a fecha fin");
+                if (context != null) {
+                    context.getExternalContext().getRequestMap().put("validationFailed", true);
+                }
                 return;
             }
             
             // Construir URL del reporte
-            FacesContext context = FacesContext.getCurrentInstance();
             ExternalContext externalContext = context.getExternalContext();
             String contextPath = externalContext.getRequestContextPath();
             
@@ -233,13 +258,20 @@ public class ProductoFrm extends DefaultFrm<Producto> {
                 fechaFinReporte.getTime()
             );
             
-            // Abrir en nueva ventana usando JavaScript
-            String script = String.format("window.open('%s', '_blank');", url);
-            org.primefaces.PrimeFaces.current().executeScript(script);
+            Logger.getLogger(ProductoFrm.class.getName()).log(Level.INFO, 
+                "URL del reporte: " + url);
+            
+            // Pasar URL al cliente vía RequestContext
+            org.primefaces.PrimeFaces.current().ajax().addCallbackParam("pdfUrl", url);
+            org.primefaces.PrimeFaces.current().ajax().addCallbackParam("validationFailed", false);
                 
         } catch (Exception e) {
             Logger.getLogger(ProductoFrm.class.getName()).log(Level.SEVERE, "Error al generar reporte Kardex", e);
             addErrorMessage("Error al generar reporte: " + e.getMessage());
+            FacesContext context = FacesContext.getCurrentInstance();
+            if (context != null) {
+                org.primefaces.PrimeFaces.current().ajax().addCallbackParam("validationFailed", true);
+            }
         }
     }
     
