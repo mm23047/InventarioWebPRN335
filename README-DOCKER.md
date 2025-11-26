@@ -48,15 +48,19 @@ docker-compose up -d inventario-app
 docker network inspect inventario-network --format '{{range .Containers}}{{.Name}} {{end}}'
 # Deberías ver: db17 inventario-web
 
-# PASO 11: Ver los logs para confirmar que inició correctamente
+# PASO 11: Crear la vista Kardex_Implementado en PostgreSQL
+# Esta vista es necesaria para que funcionen los reportes Kardex
+docker exec -i db17 psql -U postgres -d inventario_prn335 < create_kardex_view.sql
+
+# PASO 12: Ver los logs para confirmar que inició correctamente
 docker logs -f inventario-web
 # Presiona Ctrl+C para salir de los logs
 # Busca el mensaje: "The defaultServer server is ready to run a smarter planet"
 
-# PASO 12: Probar la API REST
+# PASO 13: Probar la API REST
 curl http://localhost:9080/resources/v1/tipo_almacen
 
-# PASO 13: Abrir en el navegador
+# PASO 14: Abrir en el navegador
 # Aplicación web JSF:
 # http://localhost:9080/Paginas/TipoAlmacen.jsf
 # API REST:
@@ -234,6 +238,25 @@ docker ps
 Deberías ver:
 - `inventario-web` corriendo en puertos 9080, 9443
 - `db17` corriendo en puerto 5432
+
+### 🗄️ Configurar la Vista Kardex_Implementado
+
+**IMPORTANTE:** Antes de generar reportes Kardex, necesitas crear una vista en PostgreSQL.
+
+```powershell
+# Ejecutar el script SQL para crear la vista
+docker exec -i db17 psql -U postgres -d inventario_prn335 < create_kardex_view.sql
+
+# Verificar que se creó correctamente
+docker exec -i db17 psql -U postgres -d inventario_prn335 -c '\dv "Kardex_Implementado"'
+```
+
+✅ **Resultado esperado:** Deberías ver la definición de la vista `"Kardex_Implementado"`.
+
+**¿Qué hace esta vista?**
+- Une las tablas `kardex` y `producto`
+- Calcula entradas, salidas, saldo y valores totales
+- Es necesaria para que los reportes PDF funcionen correctamente
 
 ## 🌐 Acceder a la Aplicación
 
