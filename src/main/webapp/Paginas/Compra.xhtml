@@ -103,7 +103,6 @@
                                         size="50"
                                         placeholder="Escriba el nombre..."
                                         disabled="#{compraFrm.registro.estado == 'RECIBIDA'}">
-                           <!-- ESTA LÍNEA ES CRÍTICA -->
                            <f:converter converterId="proveedorConverter" />
                         </p:autoComplete>
                         <p:message for="autoProveedor" display="icon"/>

@@ -103,7 +103,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                 }
             };
 
-            // Forzar un conteo inicial para que el paginador funcione
             this.modelo.setRowCount(this.modelo.count(null));
 
         } catch (Exception e) {
@@ -154,8 +153,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
             // CAMBIO IMPORTANTE: Mantenemos el estado en NADA para no abrir detalles
             this.estado = ESTADO_CRUD.NADA;
 
-            // CRÍTICO: Limpiar los datos en caché para que se recarguen cuando se acceda
-            // Esto evita que los datos del registro anterior se muestren
             this.detallesCompra = null;
             this.almacenSeleccionado.clear();
             this.observacionesRecepcion.clear();
@@ -183,15 +180,10 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         // No se configuran nuevos registros en esta pantalla
     }
 
-    public String getRamdom() {
-        return UUID.randomUUID().toString();
-    }
 
     public void actualizarTabla(ActionEvent actionEvent) {
         System.out.println("Actualizando tabla de compras");
     }
-
-    // Agregar estos nuevos métodos y propiedades a tu clase RecepcionKardexFrm
 
     private List<CompraDetalle> detallesCompra;
     private Map<UUID, Integer> almacenSeleccionado = new HashMap<>();
@@ -303,7 +295,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
 
                         String observaciones = observacionesRecepcion.get(detalle.getId());
 
-                        // Aquí iría la lógica para crear el movimiento de kardex
                         procesarMovimientoKardex(detalle, idAlmacen, observaciones);
                     }
                 }
@@ -312,7 +303,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                 this.registro.setEstado("RECIBIDA");
                 compraDAO.actualizar(this.registro);
 
-                // Mensaje de éxito
                 enviarMensajeExito("Compra recibida correctamente - ID: " + this.registro.getId());
 
                 // Limpiar selecciones
@@ -335,7 +325,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         }
     }
 
-    // También actualiza el método procesarMovimientoKardex para mayor robustez
     private void procesarMovimientoKardex(CompraDetalle detalle, Integer idAlmacen, String observaciones) {
         try {
             Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
@@ -348,9 +337,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                             observaciones != null ? observaciones : "Sin observaciones"
                     });
 
-            // TODO: Implementar la lógica específica para crear movimientos de kardex
-            // kardexService.registrarEntrada(detalle, idAlmacen, observaciones);
-
         } catch (Exception e) {
             Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
                     "Error al procesar movimiento kardex para producto: " +
@@ -360,15 +346,4 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                     detalle.getIdProducto().getNombreProducto(), e);
         }
     }
-<<<<<<< HEAD
-
-    public void procesarMasTarde() {
-        // Limpiar selecciones temporales pero mantener la compra seleccionada
-        this.almacenSeleccionado.clear();
-        this.observacionesRecepcion.clear();
-        this.detallesCompra = null;
-        enviarMensajeExito("Puede continuar con la recepción más tarde");
-    }
-=======
->>>>>>> origin/main
 }
