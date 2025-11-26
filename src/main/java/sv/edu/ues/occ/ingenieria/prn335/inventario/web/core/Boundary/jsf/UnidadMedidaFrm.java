@@ -8,8 +8,8 @@ import org.primefaces.model.LazyDataModel;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoUnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.UnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.UnidadMedida;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoUnidadMedida;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.UnidadMedida;
 
 import java.io.Serializable;
 import java.util.List;

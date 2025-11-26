@@ -138,14 +138,14 @@
                   <h:panelGrid columns="2" style="margin-top: 20px;">
                      <p:commandButton value="Marcar como ENTREGADO"
                                       actionListener="#{despachoBodegaFrm.marcarComoEntregado}"
-                                      update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
+                                      update=":pnlTabla :pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
                                       icon="pi pi-check"
                                       styleClass="ui-button-success"
-                                      style="width: 200px;"/>
+                                      style="width: 220px; font-weight: bold;" />
                      
                      <p:commandButton value="#{crud['frm.botones.cancelar']}"
                                       actionListener="#{despachoBodegaFrm.btnCancelarHandler}"
-                                      update=":pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
+                                      update=":pnlTabla :pnlDespachoBodegaTabla :pnlDespachoBodegaDetalle"
                                       icon="pi pi-times"
                                       styleClass="ui-button-secondary"
                                       style="width: 200px;"/>
@@ -189,6 +189,65 @@
                                          style="font-weight: bold; color: #2980b9;">
                               <f:convertNumber pattern="0.##" />
                            </h:outputText>
+                        </p:column>
+
+                        <!-- Almacén Origen (Dropdown) -->
+                        <p:column headerText="Almacén Origen" width="250">
+                           <p:selectOneMenu 
+                              value="#{despachoBodegaFrm.almacenSeleccionadoPorDetalle[detalle.id]}"
+                              disabled="#{despachoBodegaFrm.registro.estado == 'ENTREGADO'}"
+                              style="width: 100%;">
+                              <f:selectItem itemLabel="-- Seleccione Almacén --" itemValue="#{null}" noSelectionOption="true"/>
+                              <f:selectItems 
+                                 value="#{despachoBodegaFrm.obtenerAlmacenesConStock(detalle)}"
+                                 var="almacen"
+                                 itemValue="#{almacen[0]}"
+                                 itemLabel="#{almacen[1]} (Stock: #{almacen[2]})"
+                                 itemDisabled="#{almacen[2] lt detalle.cantidad}" />
+                              <p:ajax update="@form" />
+                           </p:selectOneMenu>
+                           
+                           <!-- Mensaje si no hay almacenes disponibles -->
+                           <h:outputText 
+                              value=" Sin almacenes disponibles" 
+                              rendered="#{empty despachoBodegaFrm.obtenerAlmacenesConStock(detalle)}"
+                              style="color: #e74c3c; font-weight: bold; font-size: 0.9em;" />
+                        </p:column>
+
+                        <!-- Stock Disponible -->
+                        <p:column headerText="Stock Disponible" width="150">
+                           <h:panelGroup>
+                              <!-- Stock SUFICIENTE (verde) -->
+                              <h:outputText 
+                                 value="#{despachoBodegaFrm.obtenerStockDisponible(detalle.id)}"
+                                 rendered="#{despachoBodegaFrm.obtenerStockDisponible(detalle.id) ge detalle.cantidad 
+                                           and despachoBodegaFrm.almacenSeleccionadoPorDetalle[detalle.id] != null}"
+                                 style="font-weight: bold; font-size: 1.1em; color: #27ae60;">
+                                 <f:convertNumber pattern="0.##" />
+                              </h:outputText>
+                              
+                              <!-- Stock INSUFICIENTE (rojo) -->
+                              <h:outputText 
+                                 value="#{despachoBodegaFrm.obtenerStockDisponible(detalle.id)}"
+                                 rendered="#{despachoBodegaFrm.obtenerStockDisponible(detalle.id) lt detalle.cantidad 
+                                           and despachoBodegaFrm.almacenSeleccionadoPorDetalle[detalle.id] != null}"
+                                 style="font-weight: bold; font-size: 1.1em; color: #e74c3c;">
+                                 <f:convertNumber pattern="0.##" />
+                              </h:outputText>
+                              
+                              <!-- Icono de advertencia si stock insuficiente -->
+                              <h:outputText 
+                                 value="  INSUFICIENTE" 
+                                 rendered="#{despachoBodegaFrm.obtenerStockDisponible(detalle.id) lt detalle.cantidad 
+                                           and despachoBodegaFrm.almacenSeleccionadoPorDetalle[detalle.id] != null}"
+                                 style="color: #e74c3c; font-weight: bold; font-size: 0.85em; margin-left: 5px;" />
+                              
+                              <!-- Mensaje si no hay almacén seleccionado -->
+                              <h:outputText 
+                                 value="-- Seleccione almacén --" 
+                                 rendered="#{despachoBodegaFrm.almacenSeleccionadoPorDetalle[detalle.id] == null}"
+                                 style="color: #95a5a6; font-style: italic; font-size: 0.9em;" />
+                           </h:panelGroup>
                         </p:column>
 
                         <!-- Precio Unitario -->

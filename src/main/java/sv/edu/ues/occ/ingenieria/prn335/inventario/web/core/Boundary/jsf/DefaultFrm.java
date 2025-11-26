@@ -27,11 +27,16 @@ public abstract class DefaultFrm<T> implements Serializable {
 
     // Métodos abstractos que cada bean debe implementar
     protected abstract FacesContext getFacesContext();
+
     protected abstract InventarioDAOInterface<T> getDao();
+
     protected abstract T nuevoRegistro();
+
     protected abstract T buscarRegistroPorId(Object id);
+
     abstract protected String getIdAsText(T r);
-    abstract protected  T getIdByText(String id);
+
+    abstract protected T getIdByText(String id);
 
     @PostConstruct
     public void inicializar() {
@@ -72,7 +77,6 @@ public abstract class DefaultFrm<T> implements Serializable {
                     return null;
                 }
 
-
                 @Override
                 public int count(Map<String, FilterMeta> map) {
                     try {
@@ -100,7 +104,7 @@ public abstract class DefaultFrm<T> implements Serializable {
     }
 
     public void selectionHandler(SelectEvent<T> r) {
-        if(r!=null){
+        if (r != null) {
             this.estado = ESTADO_CRUD.MODIFICAR;
         }
     }
@@ -119,7 +123,8 @@ public abstract class DefaultFrm<T> implements Serializable {
             configurarNuevoRegistro();
 
             // Informar al usuario que el formulario está listo
-            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.formListo"));
+            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(), "crud")
+                    .getString("frm.botones.formListo"));
 
         } catch (Exception e) {
             enviarMensajeError("Error al preparar nuevo registro: " + e.getMessage());
@@ -131,16 +136,17 @@ public abstract class DefaultFrm<T> implements Serializable {
     }
 
     public void btnGuardarHandler(ActionEvent actionEvent) {
-        try{
-            if(registro!=null){
+        try {
+            if (registro != null) {
                 getDao().crear(registro);
-                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.creado"));
-                this.estado= ESTADO_CRUD.NADA;
-                this.registro=null;
+                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(), "crud")
+                        .getString("frm.botones.creado"));
+                this.estado = ESTADO_CRUD.NADA;
+                this.registro = null;
                 this.inicializarRegistros();
                 return;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             enviarMensaje("Error al crear el registro: " + e.getMessage(), FacesMessage.SEVERITY_ERROR);
             return;
         }
@@ -155,7 +161,8 @@ public abstract class DefaultFrm<T> implements Serializable {
             limpiarFormulario();
 
             // Informar al usuario que la operación se canceló
-            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opCancelar"));
+            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(), "crud")
+                    .getString("frm.botones.opCancelar"));
 
         } catch (Exception e) {
             enviarMensajeError("Error al cancelar operación: " + e.getMessage());
@@ -165,7 +172,8 @@ public abstract class DefaultFrm<T> implements Serializable {
             try {
                 limpiarFormulario();
             } catch (Exception ex) {
-                Logger.getLogger(DefaultFrm.class.getName()).log(Level.SEVERE, "Error crítico al limpiar formulario", ex);
+                Logger.getLogger(DefaultFrm.class.getName()).log(Level.SEVERE, "Error crítico al limpiar formulario",
+                        ex);
             }
         }
     }
@@ -184,11 +192,12 @@ public abstract class DefaultFrm<T> implements Serializable {
                 return;
             }
 
-            getDao().actualizar(registro);  // ← ESTA LÍNEA ES CRÍTICA
+            getDao().actualizar(registro); // ← ESTA LÍNEA ES CRÍTICA
 
             // Actualizar la tabla y limpiar el formulario
             inicializarRegistros();
-            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opModificar"));
+            this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(), "crud")
+                    .getString("frm.botones.opModificar"));
             limpiarFormulario();
 
         } catch (Exception e) {
@@ -202,7 +211,8 @@ public abstract class DefaultFrm<T> implements Serializable {
             if (registro != null && getEntityId(registro) != null) {
                 getDao().eliminar(registro);
                 inicializarRegistros();
-                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(),"crud").getString("frm.botones.opEliminar"));
+                this.enviarMensajeExito(getFacesContext().getApplication().getResourceBundle(getFacesContext(), "crud")
+                        .getString("frm.botones.opEliminar"));
                 limpiarFormulario();
             } else {
                 enviarMensajeError("No hay registro seleccionado para eliminar");
@@ -243,6 +253,11 @@ public abstract class DefaultFrm<T> implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", mensaje));
     }
 
+    protected void enviarMensajeAdvertencia(String mensaje) {
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", mensaje));
+    }
+
     // Método enviarMensaje faltante
     protected void enviarMensaje(String mensaje, FacesMessage.Severity severity) {
         FacesContext.getCurrentInstance().addMessage(null,
@@ -251,14 +266,15 @@ public abstract class DefaultFrm<T> implements Serializable {
 
     // Métodos abstractos adicionales para compatibilidad
     protected abstract T createNewEntity();
+
     protected abstract Object getEntityId(T entity);
+
     protected abstract String getEntityName();
 
     // Getters y Setters
     public String getNombreBean() {
         return nombreBean;
     }
-
 
     public T getRegistro() {
         return registro;

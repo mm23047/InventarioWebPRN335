@@ -1,7 +1,6 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
@@ -185,7 +184,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         System.out.println("Actualizando tabla de compras");
     }
 
-
     // Agregar estos nuevos métodos y propiedades a tu clase RecepcionKardexFrm
 
     private List<CompraDetalle> detallesCompra;
@@ -216,7 +214,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
     public List<Almacen> getAlmacenesActivos() {
         return almacenesActivos;
     }
-
 
     public Map<UUID, Integer> getAlmacenSeleccionado() {
         return almacenSeleccionado;
@@ -285,7 +282,8 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
 
             } catch (Exception e) {
                 enviarMensajeError("Error al recibir la compra: " + e.getMessage());
-                Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error en confirmarRecepcion", e);
+                Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE, "Error en confirmarRecepcion",
+                        e);
             }
         } else {
             enviarMensajeError("Seleccione una compra para recibir");
@@ -297,7 +295,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         try {
             Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
                     "Procesando movimiento kardex - Producto: {0}, Almacén: {1}, Cantidad: {2}, Precio: {3}, Observaciones: {4}",
-                    new Object[]{
+                    new Object[] {
                             detalle.getIdProducto().getNombreProducto(),
                             idAlmacen,
                             detalle.getCantidad(),
@@ -311,11 +309,13 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         } catch (Exception e) {
             Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
                     "Error al procesar movimiento kardex para producto: " +
-                            detalle.getIdProducto().getNombreProducto(), e);
+                            detalle.getIdProducto().getNombreProducto(),
+                    e);
             throw new RuntimeException("Error en procesamiento de kardex para producto: " +
                     detalle.getIdProducto().getNombreProducto(), e);
         }
     }
+
     public void procesarMasTarde() {
         // Limpiar selecciones temporales pero mantener la compra seleccionada
         this.almacenSeleccionado.clear();

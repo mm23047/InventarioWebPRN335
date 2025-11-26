@@ -13,7 +13,7 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.VentaDetalleDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Venta;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.VentaDetalle;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

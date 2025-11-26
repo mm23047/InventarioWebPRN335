@@ -4,11 +4,6 @@ import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletContext;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf.CompraFrm;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProveedorDAO;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
 
 @FacesConverter("proveedorConverter")

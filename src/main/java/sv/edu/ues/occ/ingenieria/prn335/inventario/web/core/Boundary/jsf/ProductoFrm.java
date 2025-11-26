@@ -12,6 +12,7 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Producto;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class ProductoFrm extends DefaultFrm<Producto> {
+public class ProductoFrm extends DefaultFrm<Producto> implements Serializable {
 
     @Inject
     ProductoDAO productoDAO;

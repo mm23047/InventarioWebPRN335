@@ -12,7 +12,6 @@ import jakarta.jms.MessageListener;
 import jakarta.jms.TextMessage;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.ws.KardexEndpoint;
 
-import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

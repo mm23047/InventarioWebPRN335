@@ -1,6 +1,5 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Boundary.jsf;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
@@ -11,7 +10,6 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
-import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.CompraDetalle;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
 
 import java.io.Serializable;

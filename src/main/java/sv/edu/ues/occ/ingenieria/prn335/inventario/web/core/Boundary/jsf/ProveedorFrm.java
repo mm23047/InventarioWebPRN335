@@ -8,12 +8,13 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDA
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ProveedorDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Proveedor;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class ProveedorFrm extends DefaultFrm<Proveedor>{
+public class ProveedorFrm extends DefaultFrm<Proveedor> implements Serializable {
 
     @Inject
     ProveedorDAO proveedorDAO;

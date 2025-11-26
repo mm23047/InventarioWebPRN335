@@ -11,6 +11,7 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDA
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoProductoDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoProducto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,7 +21,7 @@ import jakarta.faces.event.ActionEvent;
 
 @Named
 @ViewScoped
-public class TipoProductoFrm extends DefaultFrm<TipoProducto> {
+public class TipoProductoFrm extends DefaultFrm<TipoProducto> implements Serializable {
 
     @Inject
     TipoProductoDAO tPDAO;

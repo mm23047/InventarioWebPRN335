@@ -8,12 +8,13 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDA
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoAlmacenDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoAlmacen;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> {
+public class TipoAlmacenFrm extends DefaultFrm<TipoAlmacen> implements Serializable {
 
     @Inject
     TipoAlmacenDAO tipoAlmacenDAO;

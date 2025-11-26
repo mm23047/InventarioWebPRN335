@@ -23,13 +23,13 @@ import java.util.logging.Logger;
 @ViewScoped
 public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
 
-    @EJB
+    @Inject
     private VentaDAO ventaDAO;
 
-    @EJB
+    @Inject
     private ClienteDAO clienteDAO;
 
-    @EJB
+    @Inject
     private VentaDetalleDAO ventaDetalleDAO;
 
     @Inject

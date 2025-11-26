@@ -10,12 +10,13 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDA
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.TipoUnidadMedidaDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.TipoUnidadMedida;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @ViewScoped
-public class TipoUnidadMedidaFrm extends DefaultFrm<TipoUnidadMedida> {
+public class TipoUnidadMedidaFrm extends DefaultFrm<TipoUnidadMedida> implements Serializable {
 
     @Inject
     TipoUnidadMedidaDAO tipoUnidadMedidaDAO;

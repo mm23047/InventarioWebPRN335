@@ -10,7 +10,6 @@ import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.*;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.*;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Dependent
 @Named
-public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaracteristica> implements Serializable {
+public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaracteristica> {
 
     protected Long idTipoProducto;
 
@@ -65,7 +64,8 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
             try {
                 return getDao().leer(id);
             } catch (Exception e) {
-                Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al buscar registro por ID", e);
+                Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
+                        "Error al buscar registro por ID", e);
             }
         }
         return null;
@@ -78,7 +78,8 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
                 Long idLong = Long.valueOf(id);
                 return getDao().leer(idLong);
             } catch (Exception e) {
-                Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error en getIdByText", e);
+                Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
+                        "Error en getIdByText", e);
             }
         }
         return null;
@@ -130,19 +131,20 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
                         }
                         return getDao().count();
                     } catch (Exception e) {
-                        Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al contar registros", e);
+                        Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
+                                "Error al contar registros", e);
                         return 0;
                     }
                 }
 
                 @Override
                 public List<TipoProductoCaracteristica> load(int first, int pageSize,
-                                                             Map<String, SortMeta> sortBy,
-                                                             Map<String, FilterMeta> filterBy) {
+                        Map<String, SortMeta> sortBy,
+                        Map<String, FilterMeta> filterBy) {
                     try {
                         if (idTipoProducto != null) {
-                            List<TipoProductoCaracteristica> todos =
-                                    tipoProductoCaracteristicaDAO.findByTipoProductoDirecto(idTipoProducto);
+                            List<TipoProductoCaracteristica> todos = tipoProductoCaracteristicaDAO
+                                    .findByTipoProductoDirecto(idTipoProducto);
 
                             // Aplicar paginación manual
                             int fromIndex = Math.min(first, todos.size());
@@ -152,14 +154,16 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
                         }
                         return getDao().findRange(first, pageSize);
                     } catch (Exception e) {
-                        Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al cargar registros", e);
+                        Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
+                                "Error al cargar registros", e);
                         return List.of();
                     }
                 }
             };
         } catch (Exception e) {
             enviarMensajeError("Error al inicializar registros: " + e.getMessage());
-            Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error en inicializarRegistros", e);
+            Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
+                    "Error en inicializarRegistros", e);
         }
     }
 
@@ -191,14 +195,16 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
         try {
             this.caracteristicasDisponibles = caracteristicaDAO.findRange(0, Integer.MAX_VALUE);
         } catch (Exception e) {
-            Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al cargar características disponibles", e);
+            Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
+                    "Error al cargar características disponibles", e);
             this.caracteristicasDisponibles = List.of();
         }
     }
 
     public List<Caracteristica> getCaracteristicasDisponibles() {
         System.out.println("=== GET CARACTERISTICAS DISPONIBLES ===");
-        System.out.println("Lista: " + (caracteristicasDisponibles != null ? caracteristicasDisponibles.size() : "null"));
+        System.out
+                .println("Lista: " + (caracteristicasDisponibles != null ? caracteristicasDisponibles.size() : "null"));
         if (caracteristicasDisponibles != null) {
             for (Caracteristica c : caracteristicasDisponibles) {
                 System.out.println("  - " + c.getNombre() + " (ID: " + c.getId() + ")");
@@ -221,6 +227,7 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
 
     /**
      * Método para buscar características por nombre (para p:autoComplete)
+     * 
      * @param nombre texto a buscar
      * @return lista de características que coinciden con el nombre
      */
@@ -241,13 +248,12 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
         return List.of();
     }
 
-
     public void btnSeleccionarCaracteristicaHandler() {
         try {
             if (this.registro != null && this.registro.getIdCaracteristica() != null) {
                 Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.INFO,
                         "Característica seleccionada: {0} (ID: {1})",
-                        new Object[]{
+                        new Object[] {
                                 this.registro.getIdCaracteristica().getNombre(),
                                 this.registro.getIdCaracteristica().getId()
                         });
@@ -268,17 +274,18 @@ public class TipoProductoCaracteristicaFrm extends DefaultFrm<TipoProductoCaract
      * Comenta el método anterior y descomenta este si agregas el método al DAO
      */
     /*
-    public List<Caracteristica> buscarCaracteristicasPorNombres(String nombre) {
-        try {
-            if (nombre != null && !nombre.isBlank()) {
-                // Usar método del DAO si está disponible (más eficiente)
-                return caracteristicaDAO.findByNombreLike(nombre, 0, 25);
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.SEVERE,
-                    "Error al buscar características por nombre: " + nombre, ex);
-        }
-        return List.of();
-    }
-    */
+     * public List<Caracteristica> buscarCaracteristicasPorNombres(String nombre) {
+     * try {
+     * if (nombre != null && !nombre.isBlank()) {
+     * // Usar método del DAO si está disponible (más eficiente)
+     * return caracteristicaDAO.findByNombreLike(nombre, 0, 25);
+     * }
+     * } catch (Exception ex) {
+     * Logger.getLogger(TipoProductoCaracteristicaFrm.class.getName()).log(Level.
+     * SEVERE,
+     * "Error al buscar características por nombre: " + nombre, ex);
+     * }
+     * return List.of();
+     * }
+     */
 }

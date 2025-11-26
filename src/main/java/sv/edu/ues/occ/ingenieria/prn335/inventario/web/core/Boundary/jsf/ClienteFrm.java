@@ -8,13 +8,14 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.ClienteDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Cliente;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.UUID;
 
 @Named
 @ViewScoped
-public class ClienteFrm extends DefaultFrm<Cliente> {
+public class ClienteFrm extends DefaultFrm<Cliente> implements Serializable {
 
     @Inject
     ClienteDAO clienteDAO;

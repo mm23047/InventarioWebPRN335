@@ -1,6 +1,5 @@
 package sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control;
 
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -9,8 +8,7 @@ import jakarta.persistence.criteria.Root;
 
 import java.util.List;
 
-
-public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInterface<T>{
+public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInterface<T> {
 
     private final Class<T> tipoDato;
 
@@ -21,8 +19,8 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
     // Método abstracto que cada DAO debe implementar
     public abstract EntityManager getEntityManager();
 
-    public void crear (T registro) throws IllegalArgumentException {
-        if(registro==null){
+    public void crear(T registro) throws IllegalArgumentException {
+        if (registro == null) {
             throw new IllegalArgumentException("El registro no puede ser nulo");
         }
         try {
@@ -34,10 +32,10 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
             } else {
                 throw new IllegalStateException("EntityManager no inicializado");
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println("Error al crear registro: " + ex.getMessage());
             ex.printStackTrace();
-            throw  new IllegalStateException("Error al ingresar el registro");
+            throw new IllegalStateException("Error al ingresar el registro");
         }
     }
 
@@ -61,24 +59,24 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
         }
     }
 
-
-   // @Override
-   // public int count() throws IllegalStateException {
-     //   EntityManager em = null;
-       // try {
-         //   em = getEntityManager();
-           // CriteriaBuilder cb = em.getCriteriaBuilder();
-            //CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-            //cq.select(cb.count(cq.from(tipoDato)));
-    //return em.createQuery(cq).getSingleResult().intValue();
-    //  } catch (Exception e) {
-    //      throw new IllegalStateException("Error al contar registros de " + tipoDato.getSimpleName(), e);
-    //  } finally {
-    //      if (em != null && em.isOpen()) {
-    //          em.close();
-    //      }
-    //  }
-    //}
+    // @Override
+    // public int count() throws IllegalStateException {
+    // EntityManager em = null;
+    // try {
+    // em = getEntityManager();
+    // CriteriaBuilder cb = em.getCriteriaBuilder();
+    // CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+    // cq.select(cb.count(cq.from(tipoDato)));
+    // return em.createQuery(cq).getSingleResult().intValue();
+    // } catch (Exception e) {
+    // throw new IllegalStateException("Error al contar registros de " +
+    // tipoDato.getSimpleName(), e);
+    // } finally {
+    // if (em != null && em.isOpen()) {
+    // em.close();
+    // }
+    // }
+    // }
 
     @Override
     public T actualizar(T registro) {
@@ -121,14 +119,14 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
 
     public List<T> findRange(int first, int max) throws IllegalStateException {
 
-        if(first<0 || max <1){
+        if (first < 0 || max < 1) {
             throw new IllegalArgumentException();
         }
         try {
             EntityManager em = getEntityManager();
             if (em != null) {
                 CriteriaBuilder cb = em.getCriteriaBuilder();
-                CriteriaQuery cq = cb.createQuery(tipoDato);
+                CriteriaQuery<T> cq = cb.createQuery(tipoDato);
                 Root<T> rootEntry = cq.from(tipoDato);
                 CriteriaQuery<T> all = cq.select(rootEntry);
                 TypedQuery<T> allQuery = em.createQuery(all);
@@ -142,12 +140,11 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
         throw new IllegalStateException("No se pudo accerder al repositorio");
     }
 
-
-    public int count () throws IllegalStateException{
-        try{
+    public int count() throws IllegalStateException {
+        try {
             EntityManager em = getEntityManager();
 
-            if(em != null) {
+            if (em != null) {
 
                 CriteriaBuilder cb = em.getCriteriaBuilder();
                 CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -156,7 +153,7 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
                 TypedQuery<Long> allQuery = em.createQuery(all);
                 return (allQuery.getSingleResult().intValue());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalStateException("No se pudo acceder al repositorio");
         }
         return -1;
