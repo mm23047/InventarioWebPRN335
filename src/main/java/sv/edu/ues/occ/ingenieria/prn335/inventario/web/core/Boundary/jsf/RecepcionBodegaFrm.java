@@ -36,7 +36,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
     private CompraDAO compraDAO;
 
     public String getNombreBean() {
-        return nombreBean = "Recepci\u00f3n en Bodega";
+        return nombreBean = "Recepcion en Bodega";
     }
 
     @Override
