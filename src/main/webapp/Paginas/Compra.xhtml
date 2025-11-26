@@ -101,7 +101,8 @@
                                         required="true"
                                         requiredMessage="Seleccione un proveedor"
                                         size="50"
-                                        placeholder="Escriba el nombre...">
+                                        placeholder="Escriba el nombre..."
+                                        disabled="#{compraFrm.registro.estado == 'RECIBIDA'}">
                            <!-- ESTA LÍNEA ES CRÍTICA -->
                            <f:converter converterId="proveedorConverter" />
                         </p:autoComplete>
@@ -111,7 +112,8 @@
                      <!-- Estado (Dropdown con opciones) -->
                      <p:outputLabel for="selEstado" value="Estado:"/>
                      <p:selectOneMenu id="selEstado" value="#{compraFrm.registro.estado}"
-                                      required="true" requiredMessage="Seleccione un estado">
+                                      required="true" requiredMessage="Seleccione un estado"
+                                      disabled="#{compraFrm.registro.estado == 'RECIBIDA'}">
                         <f:selectItems value="#{compraFrm.estadosCompra}"
                                        var="estado"
                                        itemLabel="#{estado}"
@@ -134,7 +136,8 @@
                      <p:outputLabel for="txtObservaciones" value="Observaciones:"/>
                      <p:inputTextarea id="txtObservaciones"
                                       value="#{compraFrm.registro.observaciones}"
-                                      rows="4" cols="50"/>
+                                      rows="4" cols="50"
+                                      disabled="#{compraFrm.registro.estado == 'RECIBIDA'}"/>
 
                   </h:panelGrid>
 
@@ -148,13 +151,13 @@
 
                      <p:commandButton value="#{crud['frm.botones.modificar']}"
                                       actionListener="#{compraFrm.btnModificarHandler}"
-                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      rendered="#{compraFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'RECIBIDA'}"
                                       update=":pnlCompraTabla :pnlCompraDetalle"
                                       process="@form"/>
 
                      <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                       actionListener="#{compraFrm.btnEliminarHandler}"
-                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      rendered="#{compraFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'RECIBIDA'}"
                                       update=":pnlCompraTabla :pnlCompraDetalle"
                                       process="@form"/>
 
@@ -162,7 +165,7 @@
                      <p:commandButton value="Cerrar compra"
                                       actionListener="#{compraFrm.notificarCambioKardex}"
                                       update=":pnlCompraDetalle :pnlCompraTabla"
-                                      rendered="#{compraFrm.estado=='MODIFICAR'}"
+                                      rendered="#{compraFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'RECIBIDA'}"
                                       process="@form"/>
 
 
@@ -232,7 +235,7 @@
                      <!-- Botón Nuevo Detalle de Compra -->
                      <p:commandButton value="Nuevo Detalle de Compra"
                                       actionListener="#{compraFrm.compraDetalleFrm.btnNuevoHandler}"
-                                      rendered="#{compraFrm.compraDetalleFrm.estado=='NADA'}"
+                                      rendered="#{compraFrm.compraDetalleFrm.estado=='NADA' and compraFrm.registro.estado != 'RECIBIDA'}"
                                       update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
                                       style="margin-top: 10px;"/>
 
@@ -270,6 +273,7 @@
                                            dropdown="true"
                                            required="true"
                                            requiredMessage="Seleccione un producto"
+                                           disabled="#{compraFrm.registro.estado == 'RECIBIDA'}"
                                            size="50">
                               <f:converter converterId="productoConverter" />
                            </p:autoComplete>
@@ -283,6 +287,7 @@
                                           maxValue="999999.99"
                                           required="true"
                                           requiredMessage="Ingrese la cantidad"
+                                          disabled="#{compraFrm.registro.estado == 'RECIBIDA'}"
                                           style="width: 120px;"/>
 
                            <!-- Precio Unitario (Manual) -->
@@ -294,13 +299,15 @@
                                           maxValue="999999.99"
                                           required="true"
                                           requiredMessage="Ingrese el precio unitario"
+                                          disabled="#{compraFrm.registro.estado == 'RECIBIDA'}"
                                           style="width: 120px;"/>
 
                            <!-- Estado (Dropdown) -->
                            <p:outputLabel for="selEstadoDetalle" value="Estado:"/>
                            <p:selectOneMenu id="selEstadoDetalle"
                                             value="#{compraFrm.compraDetalleFrm.registro.estado}"
-                                            required="true" requiredMessage="Seleccione un estado">
+                                            required="true" requiredMessage="Seleccione un estado"
+                                            disabled="#{compraFrm.registro.estado == 'RECIBIDA'}">
                               <f:selectItems value="#{compraFrm.compraDetalleFrm.estadosDetalle}"
                                              var="estado"
                                              itemLabel="#{estado}"
@@ -311,7 +318,8 @@
                            <p:outputLabel for="txtObsDetalle" value="Observaciones:"/>
                            <p:inputTextarea id="txtObsDetalle"
                                             value="#{compraFrm.compraDetalleFrm.registro.observaciones}"
-                                            rows="3" cols="50"/>
+                                            rows="3" cols="50"
+                                            disabled="#{compraFrm.registro.estado == 'RECIBIDA'}"/>
 
                         </h:panelGrid>
 
@@ -319,26 +327,22 @@
                         <h:panelGrid columns="4" style="margin-top: 20px; text-align: center;">
                            <p:commandButton value="#{crud['frm.botones.guardar']}"
                                             actionListener="#{compraFrm.compraDetalleFrm.btnGuardarHandler}"
-                                            rendered="#{compraFrm.compraDetalleFrm.estado=='CREAR'}"
+                                            rendered="#{compraFrm.compraDetalleFrm.estado=='CREAR' and compraFrm.registro.estado != 'RECIBIDA'}"
                                             update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
                                             process="@form"/>
 
                            <p:commandButton value="#{crud['frm.botones.modificar']}"
                                             actionListener="#{compraFrm.compraDetalleFrm.btnModificarHandler}"
-                                            rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR'}"
+                                            rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'RECIBIDA'}"
                                             update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
                                             process="@form"/>
 
                            <p:commandButton value="#{crud['frm.botones.eliminar']}"
                                             actionListener="#{compraFrm.compraDetalleFrm.btnEliminarHandler}"
-                                            rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR'}"
+                                            rendered="#{compraFrm.compraDetalleFrm.estado=='MODIFICAR' and compraFrm.registro.estado != 'RECIBIDA'}"
                                             update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario :pnlCompraTabla"
                                             process="@form"/>
 
-                           <p:commandButton value="#{crud['frm.botones.cancelar']}"
-                                            actionListener="#{compraFrm.compraDetalleFrm.btnCancelarHandler}"
-                                            update=":tabCompra:pnlCompraDetalleTabla :tabCompra:pnlCompraDetalleFormulario"
-                                            process="@this"/>
 
                         </h:panelGrid>
 

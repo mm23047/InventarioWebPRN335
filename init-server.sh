@@ -31,3 +31,5 @@ echo "Iniciando OpenLiberty con JAVA_OPTS: $JAVA_OPTS"
 
 # Iniciar OpenLiberty
 exec /opt/wlp/bin/server run defaultServer
+
+

@@ -454,15 +454,15 @@
             </h:panelGrid>
             
             <div style="text-align: center; margin-top: 15px;">
-               <!-- Botón con Ajax explícito -->
+               <!-- Botón que genera PDF con oncomplete -->
                <p:commandButton value="Generar PDF" 
                                 icon="pi pi-file-pdf"
                                 styleClass="ui-button-success"
-                                style="margin-right: 10px;">
-                  <p:ajax listener="#{productoFrm.generarReporteKardex}" 
-                          process="@form" 
-                          update="@none"/>
-               </p:commandButton>
+                                style="margin-right: 10px;"
+                                actionListener="#{productoFrm.generarReporteKardex}"
+                                process="@form"
+                                oncomplete="if (args &amp;&amp; !args.validationFailed) { window.open(args.pdfUrl, '_blank'); PF('dlgReportes').hide(); }"
+                                update="@none"/>
                
                <p:commandButton value="Cancelar" 
                                 type="button"

@@ -35,6 +35,13 @@ public class ReporteResource implements Serializable {
                               @QueryParam("idProducto") String idProducto,
                               @QueryParam("fechaInicio") Long fechaInicioMillis,
                               @QueryParam("fechaFin") Long fechaFinMillis) {
+        
+        LOGGER.log(Level.INFO, "=== GENERANDO REPORTE ===");
+        LOGGER.log(Level.INFO, "Nombre reporte: " + nombreReporte);
+        LOGGER.log(Level.INFO, "idProducto recibido: " + idProducto);
+        LOGGER.log(Level.INFO, "fechaInicio recibido: " + fechaInicioMillis);
+        LOGGER.log(Level.INFO, "fechaFin recibido: " + fechaFinMillis);
+        
         // Validar que el nombre solo contenga caracteres seguros (alfanuméricos, guiones y guiones bajos)
         if (!nombreReporte.matches("^[a-zA-Z0-9_-]+$")) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -60,17 +67,26 @@ public class ReporteResource implements Serializable {
             // Agregar parámetros si están presentes (para reporte kardex)
             if (idProducto != null && !idProducto.isEmpty()) {
                 parametros.put("idProducto", idProducto);
+                LOGGER.log(Level.INFO, "Parámetro idProducto agregado: " + idProducto);
+            } else {
+                LOGGER.log(Level.WARNING, "idProducto es NULL o vacío!");
             }
             if (fechaInicioMillis != null) {
                 Timestamp fechaInicio = new Timestamp(fechaInicioMillis);
                 parametros.put("fechaInicio", fechaInicio);
+                LOGGER.log(Level.INFO, "Parámetro fechaInicio agregado: " + fechaInicio);
             }
             if (fechaFinMillis != null) {
                 Timestamp fechaFin = new Timestamp(fechaFinMillis);
                 parametros.put("fechaFin", fechaFin);
+                LOGGER.log(Level.INFO, "Parámetro fechaFin agregado: " + fechaFin);
             }
             
+            LOGGER.log(Level.INFO, "Total parámetros: " + parametros.size());
+            
             JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parametros, connection);
+
+            LOGGER.log(Level.INFO, "Reporte generado, páginas: " + jasperPrint.getPages().size());
 
             StreamingOutput stream = outputStream -> {
                 try {

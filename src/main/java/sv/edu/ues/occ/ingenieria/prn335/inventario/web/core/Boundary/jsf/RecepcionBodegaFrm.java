@@ -154,10 +154,17 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
             // CAMBIO IMPORTANTE: Mantenemos el estado en NADA para no abrir detalles
             this.estado = ESTADO_CRUD.NADA;
 
+            // CRÍTICO: Limpiar los datos en caché para que se recarguen cuando se acceda
+            // Esto evita que los datos del registro anterior se muestren
+            this.detallesCompra = null;
+            this.almacenSeleccionado.clear();
+            this.observacionesRecepcion.clear();
+
             Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
                     "Compra seleccionada para recepción - ID: " + this.registro.getId() +
                             ", Proveedor: " + this.registro.getProveedor().getNombre() +
-                            ", Estado: " + this.estado);
+                            ", Estado: " + this.estado +
+                            " - Datos en caché limpiados");
         }
     }
 
@@ -231,35 +238,73 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         this.observacionesRecepcion = observacionesRecepcion;
     }
 
+    /**
+     * Valida que todos los productos tengan un almacén seleccionado
+     * @return true si todos los productos tienen almacén, false si falta seleccionar alguno
+     */
+    public boolean validarAlmacenesSeleccionados() {
+        if (this.detallesCompra == null || this.detallesCompra.isEmpty()) {
+            return true; // Si no hay detalles, la validación pasa
+        }
+
+        for (CompraDetalle detalle : this.detallesCompra) {
+            Integer idAlmacen = this.almacenSeleccionado.get(detalle.getId());
+            if (idAlmacen == null) {
+                Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.WARNING,
+                        "Falta seleccionar almacén para el producto: " + detalle.getIdProducto().getNombreProducto());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Obtiene los productos que no tienen almacén seleccionado
+     * @return Lista de nombres de productos sin almacén asignado
+     */
+    public List<String> obtenerProductosSinAlmacen() {
+        List<String> productosSin = new java.util.ArrayList<>();
+
+        if (this.detallesCompra != null && !this.detallesCompra.isEmpty()) {
+            for (CompraDetalle detalle : this.detallesCompra) {
+                Integer idAlmacen = this.almacenSeleccionado.get(detalle.getId());
+                if (idAlmacen == null) {
+                    productosSin.add(detalle.getIdProducto().getNombreProducto());
+                }
+            }
+        }
+
+        return productosSin;
+    }
+
     public void confirmarRecepcion() {
         if (this.registro != null && this.registro.getId() != null) {
             try {
                 // Validar que todos los productos tengan almacén seleccionado
+                if (!validarAlmacenesSeleccionados()) {
+                    List<String> productosSin = obtenerProductosSinAlmacen();
+                    String productos = String.join(", ", productosSin);
+                    enviarMensajeError("Debe seleccionar un almacén para los siguientes productos: " + productos);
+                    Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.WARNING,
+                            "Intento de confirmar sin todos los almacenes seleccionados");
+                    return;
+                }
+
+                // Procesar movimientos de kardex
                 if (this.detallesCompra != null && !this.detallesCompra.isEmpty()) {
                     for (CompraDetalle detalle : detallesCompra) {
-                        String idAlmacenStr = String.valueOf(almacenSeleccionado.get(detalle.getId()));
-                        if (idAlmacenStr == null || idAlmacenStr.trim().isEmpty()) {
-                            enviarMensajeError("Debe seleccionar un almacén para el producto: " +
+                        Integer idAlmacen = almacenSeleccionado.get(detalle.getId());
+
+                        if (idAlmacen == null) {
+                            enviarMensajeError("Error interno: Almacén no válido para el producto: " +
                                     detalle.getIdProducto().getNombreProducto());
                             return;
                         }
 
-                        try {
-                            // Convertir String a Integer
-                            Integer idAlmacen = Integer.valueOf(idAlmacenStr);
+                        String observaciones = observacionesRecepcion.get(detalle.getId());
 
-                            String observaciones = observacionesRecepcion.get(detalle.getId());
-
-                            // Aquí iría la lógica para crear el movimiento de kardex
-                            procesarMovimientoKardex(detalle, idAlmacen, observaciones);
-
-                        } catch (NumberFormatException e) {
-                            enviarMensajeError("ID de almacén inválido para el producto: " +
-                                    detalle.getIdProducto().getNombreProducto());
-                            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
-                                    "Error al convertir ID almacén: " + idAlmacenStr, e);
-                            return;
-                        }
+                        // Aquí iría la lógica para crear el movimiento de kardex
+                        procesarMovimientoKardex(detalle, idAlmacen, observaciones);
                     }
                 }
 
@@ -315,6 +360,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                     detalle.getIdProducto().getNombreProducto(), e);
         }
     }
+<<<<<<< HEAD
 
     public void procesarMasTarde() {
         // Limpiar selecciones temporales pero mantener la compra seleccionada
@@ -323,4 +369,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
         this.detallesCompra = null;
         enviarMensajeExito("Puede continuar con la recepción más tarde");
     }
+=======
+>>>>>>> origin/main
 }
