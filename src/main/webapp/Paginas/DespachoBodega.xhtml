@@ -70,7 +70,7 @@
             <!-- Remote Command para actualización automática vía WebSocket -->
             <p:remoteCommand name="refrescarTablaVentas"
                              actionListener="#{despachoBodegaFrm.actualizarTablaAutomaticamente}"
-                             update=":pnlTabla:growlGlobal tblVentasAprobadas"
+                             update="tblVentasAprobadas"
                              process="@none"
                              global="false"
                              async="true"/>

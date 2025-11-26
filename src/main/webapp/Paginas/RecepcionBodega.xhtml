@@ -13,7 +13,7 @@
         <h:panelGrid>
             <h:form id="frmTop">
                 <p:remoteCommand
-                        name="actualizar" update=":pnlTabla:growlGlobal :frmTop:tblCompras" actionListener="#{recepcionBodegaFrm.actualizarTabla}"/>
+                        name="actualizar" update=":frmTop:tblCompras" actionListener="#{recepcionBodegaFrm.actualizarTabla}"/>
 
                 <p:dataTable id="tblCompras"
                              value="#{recepcionBodegaFrm.modelo}" var="compra"
