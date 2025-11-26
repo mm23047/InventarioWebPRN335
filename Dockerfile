@@ -63,7 +63,8 @@ COPY server.xml /opt/wlp/usr/servers/defaultServer/server.xml
 
 # Copiar script de inicialización
 COPY init-server.sh /opt/init-server.sh
-RUN chmod +x /opt/init-server.sh
+RUN chmod +x /opt/init-server.sh && \
+    sed -i 's/\r$//' /opt/init-server.sh
 
 # Exponer puerto
 EXPOSE 9080 9443

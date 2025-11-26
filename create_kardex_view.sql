@@ -26,3 +26,7 @@ SELECT
     k.id_almacen
 FROM kardex k
 INNER JOIN producto p ON k.id_producto = p.id_producto;
+
+-- Crear alias en minúsculas por compatibilidad
+CREATE VIEW kardex_implementado AS SELECT * FROM "Kardex_Implementado";
+

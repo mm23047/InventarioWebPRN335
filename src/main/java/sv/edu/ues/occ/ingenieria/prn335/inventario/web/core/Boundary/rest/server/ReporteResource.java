@@ -71,16 +71,31 @@ public class ReporteResource implements Serializable {
             } else {
                 LOGGER.log(Level.WARNING, "idProducto es NULL o vacío!");
             }
+            
+            // Para reportes de kardex, las fechas son REQUERIDAS
+            // Si no se proporcionan, usar rango de 1 año atrás hasta hoy
+            Timestamp fechaInicio;
+            Timestamp fechaFin;
+            
             if (fechaInicioMillis != null) {
-                Timestamp fechaInicio = new Timestamp(fechaInicioMillis);
-                parametros.put("fechaInicio", fechaInicio);
-                LOGGER.log(Level.INFO, "Parámetro fechaInicio agregado: " + fechaInicio);
+                fechaInicio = new Timestamp(fechaInicioMillis);
+            } else {
+                // Default: 1 año atrás
+                fechaInicio = new Timestamp(System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000));
+                LOGGER.log(Level.WARNING, "fechaInicio es NULL! Usando default: " + fechaInicio);
             }
+            parametros.put("fechaInicio", fechaInicio);
+            LOGGER.log(Level.INFO, "Parámetro fechaInicio: " + fechaInicio);
+            
             if (fechaFinMillis != null) {
-                Timestamp fechaFin = new Timestamp(fechaFinMillis);
-                parametros.put("fechaFin", fechaFin);
-                LOGGER.log(Level.INFO, "Parámetro fechaFin agregado: " + fechaFin);
+                fechaFin = new Timestamp(fechaFinMillis);
+            } else {
+                // Default: ahora
+                fechaFin = new Timestamp(System.currentTimeMillis());
+                LOGGER.log(Level.WARNING, "fechaFin es NULL! Usando default: " + fechaFin);
             }
+            parametros.put("fechaFin", fechaFin);
+            LOGGER.log(Level.INFO, "Parámetro fechaFin: " + fechaFin);
             
             LOGGER.log(Level.INFO, "Total parámetros: " + parametros.size());
             

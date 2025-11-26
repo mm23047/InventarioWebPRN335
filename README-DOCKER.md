@@ -52,6 +52,11 @@ docker network inspect inventario-network --format '{{range .Containers}}{{.Name
 # Esta vista es necesaria para que funcionen los reportes Kardex
 docker exec -i db17 psql -U postgres -d inventario_prn335 < create_kardex_view.sql
 
+# PASO 11: ⚠️ IMPORTANTE - Crear la vista Kardex_Implementado en PostgreSQL
+# Esta vista es NECESARIA para que funcionen los reportes de Kardex
+# Si no ejecutas esto, los PDFs saldrán en blanco
+Get-Content create_kardex_view.sql | docker exec -i db17 psql -U postgres -d inventario_prn335
+
 # PASO 12: Ver los logs para confirmar que inició correctamente
 docker logs -f inventario-web
 # Presiona Ctrl+C para salir de los logs
@@ -92,14 +97,37 @@ Si ya configuraste todo anteriormente y solo necesitas levantar la aplicación:
 
 ```powershell
 # Navegar al proyecto
-cd c:\Users\TU_USUARIO\Desktop\InventarioWebPRN335
+cd C:\Users\melya\Desktop\e\InventarioWebPRN335
 
 # Levantar la aplicación
 docker-compose up -d inventario-app
 
+# ⚠️ IMPORTANTE: Si los reportes de Kardex salen en blanco, ejecuta esto:
+Get-Content create_kardex_view.sql | docker exec -i db17 psql -U postgres -d inventario_prn335
+
 # Ver logs
 docker logs -f inventario-web
 ```
+
+---
+
+## ⚠️ Solución de Problemas
+
+### PDFs de Kardex salen en blanco
+
+**Causa**: La vista `Kardex_Implementado` no está creada en la base de datos.
+
+**Solución**:
+```powershell
+Get-Content create_kardex_view.sql | docker exec -i db17 psql -U postgres -d inventario_prn335
+```
+
+**Verificar que la vista existe**:
+```powershell
+docker exec -i db17 psql -U postgres -d inventario_prn335 -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'VIEW';"
+```
+
+Deberías ver `Kardex_Implementado` en la lista.
 
 ---
 
