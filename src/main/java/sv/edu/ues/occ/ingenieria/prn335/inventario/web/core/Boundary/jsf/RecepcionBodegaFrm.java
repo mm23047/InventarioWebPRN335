@@ -359,6 +359,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
             nuevoMovimiento.setId(UUID.randomUUID());
             nuevoMovimiento.setIdProducto(detalle.getIdProducto());
             nuevoMovimiento.setIdCompraDetalle(detalle);
+            nuevoMovimiento.setIdVentaDetalle(null); // Explícitamente NULL para compras
             nuevoMovimiento.setIdAlmacen(almacenDAO.leer(idAlmacen));
             nuevoMovimiento.setFecha(java.time.OffsetDateTime.now());
             nuevoMovimiento.setTipoMovimiento("ENTRADA");
