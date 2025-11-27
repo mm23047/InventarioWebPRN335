@@ -116,7 +116,7 @@ class InventarioDefaultDataAccessTest {
                 IllegalStateException.class,
                 () -> dataAccessSinEM.crear(entidadPrueba));
 
-        assertEquals("Error al ingresar el registro", exception.getMessage());
+        assertEquals("Error al ingresar el registro: EntityManager no inicializado", exception.getMessage());
     }
 
     @Test
@@ -130,7 +130,7 @@ class InventarioDefaultDataAccessTest {
                 IllegalStateException.class,
                 () -> dataAccess.crear(entidadPrueba));
 
-        assertEquals("Error al ingresar el registro", exception.getMessage());
+        assertEquals("Error al ingresar el registro: Error de persistencia", exception.getMessage());
         verify(entityManager, times(1)).persist(entidadPrueba);
     }
 
