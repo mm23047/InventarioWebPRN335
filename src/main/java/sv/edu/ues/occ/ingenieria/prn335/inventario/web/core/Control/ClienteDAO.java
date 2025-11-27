@@ -54,7 +54,7 @@ public class ClienteDAO extends InventarioDefaultDataAccess<Cliente> implements 
                 return q.getResultList();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger(ClienteDAO.class.getName()).log(Level.SEVERE, "Error buscando clientes", ex);
         }
         return List.of();
     }

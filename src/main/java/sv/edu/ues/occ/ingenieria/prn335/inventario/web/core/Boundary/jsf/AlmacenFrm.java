@@ -60,9 +60,6 @@ public class AlmacenFrm extends DefaultFrm<Almacen> implements Serializable {
     public void inicializarListas() {
         try {
             this.listaTipoAlmacen = tipoAlmacenDAO.findRange(0, Integer.MAX_VALUE);
-            Logger.getLogger(AlmacenFrm.class.getName()).log(Level.INFO,
-                    "Lista de tipos de almacén cargada: {0} elementos",
-                    listaTipoAlmacen != null ? listaTipoAlmacen.size() : 0);
         } catch (Exception e) {
             Logger.getLogger(AlmacenFrm.class.getName()).log(Level.SEVERE, "Error al cargar tipos de almacén", e);
             listaTipoAlmacen = List.of();

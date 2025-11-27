@@ -348,7 +348,9 @@ public class DespachoBodegaFrm extends DefaultFrm<Venta> {
                 // Mantener precio_actual (no cambia en SALIDA)
                 nuevoMovimiento.setPrecioActual(ultimoMovimiento.getPrecioActual());
 
-                nuevoMovimiento.setObservaciones("Despacho venta #" + this.registro.getId().toString());
+                // Referencia externa (coherente con RecepcionBodega: COMP-{id})
+                nuevoMovimiento.setReferenciaExterna("VENTA-" + this.registro.getId().toString());
+                nuevoMovimiento.setObservaciones("Despacho de venta #" + this.registro.getId().toString());
 
                 // Persistir el movimiento
                 kardexDAO.crear(nuevoMovimiento);

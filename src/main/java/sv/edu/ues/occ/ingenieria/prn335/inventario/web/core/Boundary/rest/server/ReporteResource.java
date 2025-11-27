@@ -12,6 +12,10 @@ import net.sf.jasperreports.engine.*;
 import javax.sql.DataSource;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,13 +40,7 @@ public class ReporteResource implements Serializable {
                               @QueryParam("fechaInicio") Long fechaInicioMillis,
                               @QueryParam("fechaFin") Long fechaFinMillis) {
         
-        LOGGER.log(Level.INFO, "=== GENERANDO REPORTE ===");
-        LOGGER.log(Level.INFO, "Nombre reporte: " + nombreReporte);
-        LOGGER.log(Level.INFO, "idProducto recibido: " + idProducto);
-        LOGGER.log(Level.INFO, "fechaInicio recibido: " + fechaInicioMillis);
-        LOGGER.log(Level.INFO, "fechaFin recibido: " + fechaFinMillis);
-        
-        // Validar que el nombre solo contenga caracteres seguros (alfanuméricos, guiones y guiones bajos)
+        // Validar que el nombre solo contenga caracteres seguros
         if (!nombreReporte.matches("^[a-zA-Z0-9_-]+$")) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Nombre de reporte inválido. Solo se permiten letras, números, guiones y guiones bajos.")
@@ -64,44 +62,106 @@ public class ReporteResource implements Serializable {
         try (var connection = ds.getConnection()) {
             Map<String, Object> parametros = new HashMap<>();
             
-            // Agregar parámetros si están presentes (para reporte kardex)
             if (idProducto != null && !idProducto.isEmpty()) {
                 parametros.put("idProducto", idProducto);
-                LOGGER.log(Level.INFO, "Parámetro idProducto agregado: " + idProducto);
+                
+                // Consultar datos del producto
+                String sqlProducto = "SELECT nombre_producto, referencia_externa FROM producto WHERE id_producto = ?::uuid";
+                try (PreparedStatement psProducto = connection.prepareStatement(sqlProducto)) {
+                    psProducto.setString(1, idProducto);
+                    try (ResultSet rsProducto = psProducto.executeQuery()) {
+                        if (rsProducto.next()) {
+                            String nombreProducto = rsProducto.getString("nombre_producto");
+                            String referenciaExterna = rsProducto.getString("referencia_externa");
+                            
+                            parametros.put("productoNombre", nombreProducto != null ? nombreProducto : "Sin nombre");
+                            parametros.put("productoReferencia", referenciaExterna != null ? referenciaExterna : "N/A");
+                        } else {
+                            LOGGER.log(Level.WARNING, "Producto no encontrado: " + idProducto);
+                            parametros.put("productoNombre", "Producto no encontrado");
+                            parametros.put("productoReferencia", "N/A");
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error consultando producto", e);
+                    parametros.put("productoNombre", "Error al consultar");
+                    parametros.put("productoReferencia", "N/A");
+                }
+                
+                // Consultar stock y valores actuales del kardex
+                String sqlKardex = 
+                    "SELECT cantidad_actual, precio_actual, (cantidad_actual * precio_actual) as valor_inventario " +
+                    "FROM kardex WHERE id_producto = ?::uuid " +
+                    "ORDER BY fecha DESC, id_kardex DESC LIMIT 1";
+                
+                try (PreparedStatement psKardex = connection.prepareStatement(sqlKardex)) {
+                    psKardex.setString(1, idProducto);
+                    try (ResultSet rsKardex = psKardex.executeQuery()) {
+                        if (rsKardex.next()) {
+                            parametros.put("stockActual", rsKardex.getBigDecimal("cantidad_actual"));
+                            parametros.put("costoPromedioActual", rsKardex.getBigDecimal("precio_actual"));
+                            parametros.put("valorInventario", rsKardex.getBigDecimal("valor_inventario"));
+                        } else {
+                            parametros.put("stockActual", BigDecimal.ZERO);
+                            parametros.put("costoPromedioActual", BigDecimal.ZERO);
+                            parametros.put("valorInventario", BigDecimal.ZERO);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error consultando kardex", e);
+                    parametros.put("stockActual", BigDecimal.ZERO);
+                    parametros.put("costoPromedioActual", BigDecimal.ZERO);
+                    parametros.put("valorInventario", BigDecimal.ZERO);
+                }
             } else {
-                LOGGER.log(Level.WARNING, "idProducto es NULL o vacío!");
+                parametros.put("productoNombre", "Sin producto");
+                parametros.put("productoReferencia", "N/A");
+                parametros.put("stockActual", BigDecimal.ZERO);
+                parametros.put("costoPromedioActual", BigDecimal.ZERO);
+                parametros.put("valorInventario", BigDecimal.ZERO);
             }
             
-            // Para reportes de kardex, las fechas son REQUERIDAS
-            // Si no se proporcionan, usar rango de 1 año atrás hasta hoy
-            Timestamp fechaInicio;
-            Timestamp fechaFin;
+            // Fechas para kardex
+            Timestamp fechaInicio = (fechaInicioMillis != null) 
+                ? new Timestamp(fechaInicioMillis) 
+                : new Timestamp(System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000));
             
-            if (fechaInicioMillis != null) {
-                fechaInicio = new Timestamp(fechaInicioMillis);
-            } else {
-                // Default: 1 año atrás
-                fechaInicio = new Timestamp(System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000));
-                LOGGER.log(Level.WARNING, "fechaInicio es NULL! Usando default: " + fechaInicio);
-            }
+            Timestamp fechaFin = (fechaFinMillis != null) 
+                ? new Timestamp(fechaFinMillis) 
+                : new Timestamp(System.currentTimeMillis());
+            
             parametros.put("fechaInicio", fechaInicio);
-            LOGGER.log(Level.INFO, "Parámetro fechaInicio: " + fechaInicio);
-            
-            if (fechaFinMillis != null) {
-                fechaFin = new Timestamp(fechaFinMillis);
-            } else {
-                // Default: ahora
-                fechaFin = new Timestamp(System.currentTimeMillis());
-                LOGGER.log(Level.WARNING, "fechaFin es NULL! Usando default: " + fechaFin);
-            }
             parametros.put("fechaFin", fechaFin);
-            LOGGER.log(Level.INFO, "Parámetro fechaFin: " + fechaFin);
+            parametros.put("fechaGeneracion", new Timestamp(System.currentTimeMillis()));
             
-            LOGGER.log(Level.INFO, "Total parámetros: " + parametros.size());
+            // Verificar si hay movimientos en el rango de fechas
+            if (idProducto != null && !idProducto.isEmpty()) {
+                String sqlVerificar = "SELECT COUNT(*) as total FROM kardex WHERE id_producto = ?::uuid AND fecha BETWEEN ? AND ?";
+                try (PreparedStatement psVerificar = connection.prepareStatement(sqlVerificar)) {
+                    psVerificar.setString(1, idProducto);
+                    psVerificar.setTimestamp(2, (Timestamp) parametros.get("fechaInicio"));
+                    psVerificar.setTimestamp(3, (Timestamp) parametros.get("fechaFin"));
+                    
+                    try (ResultSet rsVerificar = psVerificar.executeQuery()) {
+                        if (rsVerificar.next()) {
+                            int totalMovimientos = rsVerificar.getInt("total");
+                            
+                            if (totalMovimientos == 0) {
+                                LOGGER.log(Level.WARNING, "ADVERTENCIA: NO HAY MOVIMIENTOS EN KARDEX para producto " + 
+                                    parametros.get("productoNombre") + " en el rango seleccionado");
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Error verificando movimientos", e);
+                }
+            }
             
             JasperPrint jasperPrint = JasperFillManager.fillReport(reportStream, parametros, connection);
 
-            LOGGER.log(Level.INFO, "Reporte generado, páginas: " + jasperPrint.getPages().size());
+            if (jasperPrint.getPages().isEmpty()) {
+                LOGGER.log(Level.WARNING, "ADVERTENCIA: REPORTE SIN PAGINAS - Probablemente sin datos en el rango seleccionado");
+            }
 
             StreamingOutput stream = outputStream -> {
                 try {

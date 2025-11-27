@@ -36,10 +36,19 @@ public class ProductoFrm extends DefaultFrm<Producto> {
     public ProductoFrm() {
         this.nombreBean = "Producto";
         // Inicializar fechas por defecto - TODO EL AÑO 2025 para pruebas
+        ZoneId zonaSistema = ZoneId.systemDefault();
         LocalDate inicioAnio = LocalDate.of(2025, 1, 1);
-        LocalDate hoy = LocalDate.now();
-        this.fechaInicioReporte = Date.from(inicioAnio.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        this.fechaFinReporte = Date.from(hoy.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        LocalDate hoy = LocalDate.now(zonaSistema);
+        
+        // Fecha inicio: 00:00:00 del 1 de enero de 2025
+        this.fechaInicioReporte = Date.from(inicioAnio.atStartOfDay(zonaSistema).toInstant());
+        
+        // CORRECCIÓN CRÍTICA: Fecha fin debe ser el DÍA SIGUIENTE a las 00:00:00
+        // Esto incluye todo el día actual hasta las 23:59:59.999
+        // Ejemplo: si hoy es 26/11/2025, la fecha fin será 27/11/2025 00:00:00
+        // que al comparar con BETWEEN incluirá todos los movimientos del 26
+        LocalDate manana = hoy.plusDays(1);
+        this.fechaFinReporte = Date.from(manana.atStartOfDay(zonaSistema).toInstant());
     }
 
     @Override

@@ -63,35 +63,18 @@ public class KardexDAO extends InventarioDefaultDataAccess<Kardex> implements Se
      */
     public List<Object[]> findAlmacenesConStock(UUID idProducto, BigDecimal cantidadMinima) {
         try {
-            Logger.getLogger(KardexDAO.class.getName()).log(Level.INFO,
-                    "Buscando almacenes para producto: " + idProducto + ", cantidad mínima: " + cantidadMinima);
-
-            // Obtener todos los almacenes activos
             String jpqlAlmacenes = "SELECT a FROM Almacen a WHERE a.activo = true ORDER BY a.id";
             List<Almacen> almacenes = em.createQuery(jpqlAlmacenes, Almacen.class).getResultList();
-
-            Logger.getLogger(KardexDAO.class.getName()).log(Level.INFO,
-                    "Almacenes activos encontrados: " + almacenes.size());
 
             List<Object[]> resultado = new java.util.ArrayList<>();
 
             for (Almacen almacen : almacenes) {
-                // Para cada almacén, obtener el stock actual del producto
                 BigDecimal stock = obtenerStockActual(idProducto, almacen.getId());
-
-                Logger.getLogger(KardexDAO.class.getName()).log(Level.INFO,
-                        "Almacén ID: " + almacen.getId() + " (" + almacen.getObservaciones() + ") - Stock: " + stock);
-
-                // CAMBIO CRÍTICO: Incluir TODOS los almacenes, incluso con stock = 0
-                // Esto permite que el usuario vea que el producto no tiene inventario
                 resultado.add(new Object[] { almacen.getId(), almacen.getObservaciones(), stock });
             }
 
-            // Ordenar por stock descendente (los que tienen stock primero)
+            // Ordenar por stock descendente
             resultado.sort((a, b) -> ((BigDecimal) b[2]).compareTo((BigDecimal) a[2]));
-
-            Logger.getLogger(KardexDAO.class.getName()).log(Level.INFO,
-                    "Total almacenes devueltos: " + resultado.size());
 
             return resultado;
         } catch (Exception e) {

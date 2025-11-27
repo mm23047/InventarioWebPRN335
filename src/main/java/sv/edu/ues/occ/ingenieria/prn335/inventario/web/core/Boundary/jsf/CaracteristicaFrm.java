@@ -51,9 +51,6 @@ public class CaracteristicaFrm extends DefaultFrm<Caracteristica> implements Ser
     public void inicializarListas() {
         try {
             this.listaTipoUnidadMedida = tipoUnidadMedidaDAO.findRange(0, Integer.MAX_VALUE);
-            Logger.getLogger(CaracteristicaFrm.class.getName()).log(Level.INFO,
-                    "Lista de tipos de unidad de medida cargada: {0} elementos",
-                    listaTipoUnidadMedida != null ? listaTipoUnidadMedida.size() : 0);
         } catch (Exception e) {
             Logger.getLogger(CaracteristicaFrm.class.getName()).log(Level.SEVERE, "Error al cargar tipos de unidad de medida", e);
             listaTipoUnidadMedida = List.of();

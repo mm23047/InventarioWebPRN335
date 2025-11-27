@@ -82,8 +82,6 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
                     try {
                         if (idCompra != null) {
                             long count = compraDetalleDAO.countByCompra(idCompra);
-                            Logger.getLogger(CompraDetalleFrm.class.getName()).log(Level.INFO,
-                                    "Contando detalles para compra ID: " + idCompra + ", total: " + count);
                             return (int) Math.min(count, Integer.MAX_VALUE);
                         }
                         return getDao().count();
@@ -97,12 +95,7 @@ public class CompraDetalleFrm extends DefaultFrm<CompraDetalle> implements Seria
                 public List<CompraDetalle> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
                     try {
                         if (idCompra != null) {
-                            List<CompraDetalle> detalles = compraDetalleDAO.findByCompra(idCompra, first, pageSize);
-                            Logger.getLogger(CompraDetalleFrm.class.getName()).log(Level.INFO,
-                                    "Cargando detalles para compra ID: " + idCompra +
-                                            ", first: " + first + ", pageSize: " + pageSize +
-                                            ", encontrados: " + detalles.size());
-                            return detalles;
+                            return compraDetalleDAO.findByCompra(idCompra, first, pageSize);
                         }
                         return getDao().findRange(first, pageSize);
                     } catch (Exception e) {

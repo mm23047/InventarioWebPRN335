@@ -13,11 +13,15 @@ import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.AlmacenDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CompraDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.CompraDetalleDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.InventarioDAOInterface;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Control.KardexDAO;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Almacen;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Compra;
 import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.CompraDetalle;
+import sv.edu.ues.occ.ingenieria.prn335.inventario.web.core.Entity.Kardex;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +38,15 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
 
     @Inject
     private CompraDAO compraDAO;
+
+    @Inject
+    private CompraDetalleDAO compraDetalleDAO;
+
+    @Inject
+    private AlmacenDAO almacenDAO;
+
+    @Inject
+    private KardexDAO kardexDAO;
 
     public String getNombreBean() {
         return nombreBean = "Recepcion en Bodega";
@@ -72,10 +85,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                 @Override
                 public int count(Map<String, FilterMeta> filterBy) {
                     try {
-                        // Contar solo compras con estado PAGADA
                         long count = compraDAO.countByEstado("PAGADA");
-                        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
-                                "Contando compras PAGADAS, total: " + count);
                         return (int) Math.min(count, Integer.MAX_VALUE);
                     } catch (Exception e) {
                         Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
@@ -88,12 +98,7 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
                 public List<Compra> load(int first, int pageSize, Map<String, SortMeta> sortBy,
                         Map<String, FilterMeta> filterBy) {
                     try {
-                        // Cargar solo compras con estado PAGADA
                         List<Compra> comprasPagadas = compraDAO.findByEstado("PAGADA", first, pageSize);
-                        Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
-                                "Cargando compras PAGADAS - first: " + first +
-                                        ", pageSize: " + pageSize +
-                                        ", encontradas: " + comprasPagadas.size());
                         return comprasPagadas;
                     } catch (Exception e) {
                         Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
@@ -150,18 +155,11 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
     public void seleccionarRegistro(org.primefaces.event.SelectEvent<Compra> event) {
         if (event != null && event.getObject() != null) {
             this.registro = event.getObject();
-            // CAMBIO IMPORTANTE: Mantenemos el estado en NADA para no abrir detalles
             this.estado = ESTADO_CRUD.NADA;
 
             this.detallesCompra = null;
             this.almacenSeleccionado.clear();
             this.observacionesRecepcion.clear();
-
-            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
-                    "Compra seleccionada para recepción - ID: " + this.registro.getId() +
-                            ", Proveedor: " + this.registro.getProveedor().getNombre() +
-                            ", Estado: " + this.estado +
-                            " - Datos en caché limpiados");
         }
     }
 
@@ -182,9 +180,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
 
 
     public void actualizarTabla(ActionEvent actionEvent) {
-        System.out.println("Actualizando tabla de compras");
-        
-        // Mostrar notificación visual al usuario
         facesContext.addMessage(null, new jakarta.faces.application.FacesMessage(
             jakarta.faces.application.FacesMessage.SEVERITY_INFO,
             "¡Nueva Compra Disponible!",
@@ -196,12 +191,6 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
     private Map<UUID, Integer> almacenSeleccionado = new HashMap<>();
     private Map<UUID, String> observacionesRecepcion = new HashMap<>();
     private List<Almacen> almacenesActivos;
-
-    @Inject
-    private CompraDetalleDAO compraDetalleDAO;
-
-    @Inject
-    private AlmacenDAO almacenDAO;
 
     @PostConstruct
     public void init() {
@@ -334,23 +323,63 @@ public class RecepcionBodegaFrm extends DefaultFrm<Compra> implements Serializab
 
     private void procesarMovimientoKardex(CompraDetalle detalle, Integer idAlmacen, String observaciones) {
         try {
-            Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.INFO,
-                    "Procesando movimiento kardex - Producto: {0}, Almacén: {1}, Cantidad: {2}, Precio: {3}, Observaciones: {4}",
-                    new Object[] {
-                            detalle.getIdProducto().getNombreProducto(),
-                            idAlmacen,
-                            detalle.getCantidad(),
-                            detalle.getPrecio(),
-                            observaciones != null ? observaciones : "Sin observaciones"
-                    });
+            // Obtener el último movimiento para calcular stock y precio promedio actual
+            Kardex ultimoMovimiento = kardexDAO.findUltimoMovimiento(
+                    detalle.getIdProducto().getId(),
+                    idAlmacen);
+
+            BigDecimal stockAnterior;
+            BigDecimal precioAnterior;
+
+            if (ultimoMovimiento == null) {
+                stockAnterior = BigDecimal.ZERO;
+                precioAnterior = BigDecimal.ZERO;
+            } else {
+                stockAnterior = ultimoMovimiento.getCantidadActual();
+                precioAnterior = ultimoMovimiento.getPrecioActual();
+            }
+
+            // Calcular nuevo stock (ENTRADA suma al stock)
+            BigDecimal nuevoStock = stockAnterior.add(detalle.getCantidad());
+
+            // Calcular precio promedio ponderado
+            BigDecimal valorAnterior = stockAnterior.multiply(precioAnterior);
+            BigDecimal valorNuevo = detalle.getCantidad().multiply(detalle.getPrecio());
+            BigDecimal valorTotal = valorAnterior.add(valorNuevo);
+
+            BigDecimal nuevoPrecioPromedio;
+            if (nuevoStock.compareTo(BigDecimal.ZERO) > 0) {
+                nuevoPrecioPromedio = valorTotal.divide(nuevoStock, 2, RoundingMode.HALF_UP);
+            } else {
+                nuevoPrecioPromedio = detalle.getPrecio();
+            }
+
+            // Crear el nuevo movimiento de ENTRADA
+            Kardex nuevoMovimiento = new Kardex();
+            nuevoMovimiento.setId(UUID.randomUUID());
+            nuevoMovimiento.setIdProducto(detalle.getIdProducto());
+            nuevoMovimiento.setIdCompraDetalle(detalle);
+            nuevoMovimiento.setIdAlmacen(almacenDAO.leer(idAlmacen));
+            nuevoMovimiento.setFecha(java.time.OffsetDateTime.now());
+            nuevoMovimiento.setTipoMovimiento("ENTRADA");
+            nuevoMovimiento.setCantidad(detalle.getCantidad());
+            nuevoMovimiento.setPrecio(detalle.getPrecio());
+            nuevoMovimiento.setCantidadActual(nuevoStock);
+            nuevoMovimiento.setPrecioActual(nuevoPrecioPromedio);
+            nuevoMovimiento.setReferenciaExterna("COMP-" + this.registro.getId().toString());
+            if (observaciones != null && !observaciones.isBlank()) {
+                nuevoMovimiento.setObservaciones(observaciones);
+            } else {
+                nuevoMovimiento.setObservaciones("Recepción de compra #" + this.registro.getId().toString());
+            }
+
+            // Persistir el movimiento en la base de datos
+            kardexDAO.crear(nuevoMovimiento);
 
         } catch (Exception e) {
             Logger.getLogger(RecepcionBodegaFrm.class.getName()).log(Level.SEVERE,
-                    "Error al procesar movimiento kardex para producto: " +
-                            detalle.getIdProducto().getNombreProducto(),
-                    e);
-            throw new RuntimeException("Error en procesamiento de kardex para producto: " +
-                    detalle.getIdProducto().getNombreProducto(), e);
+                    "Error procesando kardex: " + detalle.getIdProducto().getNombreProducto(), e);
+            throw new RuntimeException("Error en procesamiento de kardex: " + e.getMessage(), e);
         }
     }
 }

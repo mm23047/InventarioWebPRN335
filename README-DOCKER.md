@@ -463,7 +463,7 @@ ports:
 
 ---
 
-### 🔍 Ver Logs Completos del Servidor
+### Ver Logs Completos del Servidor
 
 Si necesitas ver logs más detallados:
 
@@ -553,7 +553,7 @@ docker-compose up -d inventario-app
 docker-compose build --progress=plain inventario-app
 ```
 
-## 📝 Comandos Útiles
+## Comandos Utiles
 
 ### Gestión de Contenedores
 

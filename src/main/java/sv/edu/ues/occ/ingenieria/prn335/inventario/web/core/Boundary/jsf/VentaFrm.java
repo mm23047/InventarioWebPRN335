@@ -365,34 +365,20 @@ public class VentaFrm extends DefaultFrm<Venta> implements Serializable {
     }
 
     public void notificarCambioKardex(jakarta.faces.event.ActionEvent actionEvent) {
-        Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> INICIO notificarCambioKardex - Venta ID: " + (this.registro != null ? this.registro.getId() : "null"));
         if (this.registro != null && this.registro.getId() != null) {
             try {
                 String estadoAnterior = this.registro.getEstado();
                 UUID ventaId = this.registro.getId();
                 
                 this.registro.setEstado("APROBADO");
-                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, 
-                    ">>> Estado cambiado en memoria: " + estadoAnterior + " → APROBADO");
-                
-                // GUARDAR EN BD sin limpiar formulario
                 getDao().actualizar(this.registro);
-                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> Registro actualizado en BD");
-                
-                // Actualizar tabla
                 inicializarRegistros();
                 
-                // Mensaje de confirmación
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Estado Actualizado", 
                     "Venta #" + ventaId + " cambiada de '" + estadoAnterior + "' a 'APROBADO'"));
                 
-                // Notificar directamente por WebSocket
-                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> Llamando VentaWebSocketEndpoint.broadcast");
                 VentaWebSocketEndpoint.broadcast("refresh");
-                Logger.getLogger(VentaFrm.class.getName()).log(Level.INFO, ">>> Mensaje WebSocket enviado - VENTA APROBADA");
-                
-                // Limpiar formulario DESPUÉS de los mensajes
                 limpiarFormulario();
                 
             } catch (Exception e) {

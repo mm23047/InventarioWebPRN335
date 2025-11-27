@@ -66,19 +66,12 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     @Override
     public void inicializarListas() {
         try {
-            // Cargar solo proveedores activos
             this.listaProveedores = proveedorDAO.findByActivos(0, Integer.MAX_VALUE);
-
-            // Definir estados disponibles
             this.estadosCompra = Arrays.asList("ORDEN", "CREADO", "APROBADO", "RECHAZADO", "ANULADO", "PAGADA");
-
-            Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
-                    "Listas de compra inicializadas correctamente. Proveedores activos cargados: "
-                            + listaProveedores.size());
         } catch (Exception e) {
             Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, "Error al cargar listas", e);
             estadosCompra = Arrays.asList("CREADO");
-            listaProveedores = new ArrayList<>(); // Lista vacía en caso de error
+            listaProveedores = new ArrayList<>();
         }
     }
 
@@ -121,15 +114,8 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
             this.registro = event.getObject();
             this.estado = ESTADO_CRUD.MODIFICAR;
 
-            // Configurar el compraDetalleFrm con la compra seleccionada
             this.compraDetalleFrm.setIdCompra(this.registro.getId());
-
-            // Forzar la inicialización de los registros del detalle
             this.compraDetalleFrm.inicializarRegistros();
-
-            Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO,
-                    "Compra seleccionada - ID: " + this.registro.getId() +
-                            ", Estado: " + this.estado);
         }
     }
 
@@ -206,38 +192,25 @@ public class CompraFrm extends DefaultFrm<Compra> implements Serializable {
     }
 
     public void notificarCambioKardex(ActionEvent actionEvent) {
-        Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> INICIO notificarCambioKardex - Compra ID: " + (this.registro != null ? this.registro.getId() : "null"));
         if (this.registro != null && this.registro.getId() != null) {
             try {
                 String estadoAnterior = this.registro.getEstado();
                 Long compraId = this.registro.getId();
                 
                 this.registro.setEstado("PAGADA");
-                Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, 
-                    ">>> Estado cambiado en memoria: " + estadoAnterior + " → PAGADA");
-                
-                // GUARDAR EN BD sin limpiar formulario
                 getDao().actualizar(this.registro);
-                Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> Registro actualizado en BD");
-                
-                // Actualizar tabla
                 inicializarRegistros();
                 
-                // Mensaje de confirmación
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                     "Estado Actualizado", 
                     "Compra #" + compraId + " cambiada de '" + estadoAnterior + "' a 'PAGADA'"));
                 
-                // Notificar directamente por WebSocket
                 if (kardexEndpoint != null) {
-                    Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> Llamando kardexEndpoint.enviarMensajeBroadcast");
                     kardexEndpoint.enviarMensajeBroadcast("refresh");
-                    Logger.getLogger(CompraFrm.class.getName()).log(Level.INFO, ">>> Mensaje WebSocket enviado - COMPRA PAGADA");
                 } else {
-                    Logger.getLogger(CompraFrm.class.getName()).log(Level.SEVERE, ">>> kardexEndpoint es NULL");
+                    Logger.getLogger(CompraFrm.class.getName()).log(Level.WARNING, "kardexEndpoint es NULL");
                 }
                 
-                // Limpiar formulario DESPUÉS de los mensajes
                 limpiarFormulario();
                 
             } catch (Exception e) {

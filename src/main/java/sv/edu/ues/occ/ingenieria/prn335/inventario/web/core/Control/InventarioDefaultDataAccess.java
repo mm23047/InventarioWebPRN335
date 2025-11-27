@@ -27,15 +27,12 @@ public abstract class InventarioDefaultDataAccess<T> implements InventarioDAOInt
             EntityManager em = getEntityManager();
             if (em != null) {
                 em.persist(registro);
-                em.flush(); // Forzar escritura inmediata a la base de datos
-                System.out.println("Registro creado y guardado: " + registro.toString());
+                em.flush();
             } else {
                 throw new IllegalStateException("EntityManager no inicializado");
             }
         } catch (Exception ex) {
-            System.err.println("Error al crear registro: " + ex.getMessage());
-            ex.printStackTrace();
-            throw new IllegalStateException("Error al ingresar el registro");
+            throw new IllegalStateException("Error al ingresar el registro: " + ex.getMessage(), ex);
         }
     }
 
