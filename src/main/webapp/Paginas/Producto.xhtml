@@ -53,7 +53,7 @@
                        update=":pnlProductoTabla :pnlProductoDetalle"/>
             </p:dataTable>
 
-            <!-- Botones personalizados para Producto (Nuevo y Reportes juntos) -->
+            <!-- Botones personalizados para Producto (Nuevo y Reporte) -->
             <h:panelGrid columns="2" style="margin-top: 10px;">
                <p:commandButton id="btnNuevo"
                                 value="#{crud['frm.botones.nuevo']} #{productoFrm.nombreBean}"
@@ -61,7 +61,7 @@
                                 actionListener="#{productoFrm.btnNuevoHandler}"
                                 update=":pnlProductoTabla :pnlProductoDetalle"/>
                
-               <p:commandButton value="Reportes" 
+               <p:commandButton value="Reporte Kardex" 
                                 icon="pi pi-file-pdf" 
                                 onclick="PF('dlgReportes').show(); return false;"
                                 rendered="#{productoFrm.estado=='NADA'}"
